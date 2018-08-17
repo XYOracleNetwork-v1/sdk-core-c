@@ -1,0 +1,31 @@
+cmake_minimum_required (VERSION 2.6)
+project (sdk-core)
+# The version number.
+set (Tutorial_VERSION_MAJOR 0)
+set (Tutorial_VERSION_MINOR 1)
+ 
+#Bring in the headers
+include_directories(include)
+
+find_package(PkgConfig REQUIRED)
+pkg_search_module(OPENSSL REQUIRED openssl)
+
+if( OPENSSL_FOUND )
+    include_directories(${OPENSSL_INCLUDE_DIRS})
+    message(STATUS "Using OpenSSL ${OPENSSL_VERSION}")
+else()
+    # Error; with REQUIRED, pkg_search_module() will throw an error by it's own
+endif()
+
+file(GLOB SOURCES "src/*.c")
+
+# add the binary tree to the search path for include files
+# so that we will find TutorialConfig.h
+
+include_directories("${PROJECT_BINARY_DIR}")
+ 
+set(CMAKE_BUILD_TYPE Debug)
+# add the executable
+add_executable(simulation ${SOURCES})
+
+target_link_libraries(simulation ${OPENSSL_LIBRARIES})

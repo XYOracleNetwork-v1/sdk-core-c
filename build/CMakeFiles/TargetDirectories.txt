@@ -1,0 +1,3 @@
+/home/nate/XY/sdk-core-c/build/CMakeFiles/rebuild_cache.dir
+/home/nate/XY/sdk-core-c/build/CMakeFiles/simulation.dir
+/home/nate/XY/sdk-core-c/build/CMakeFiles/edit_cache.dir
