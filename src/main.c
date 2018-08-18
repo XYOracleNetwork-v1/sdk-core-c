@@ -18,6 +18,7 @@
 /* Function to add a node at the beginning of Linked List.
    This function expects a pointer to the data to be added
    and size of the data type */
+/*
 void push(struct basicOriginBlockNode** head_ref, void *new_data, size_t data_size)
 {
     // Allocate memory for node
@@ -48,73 +49,6 @@ void generateGenisisBlock(basicOriginBlock* block, basicOriginBlock* lastblock, 
   strcpy(block->previous_hash, "11111111111111111111111111117799");
 }
 
-char* serializeBlock(basicOriginBlock* block){
-
-  int totalSize = sizeof(basicOriginBlock);
-  for(int i = 0; i < block->heuristicGroup.heuristics_count; i++){
-    totalSize+=block->heuristicGroup.heuristics[i].size + sizeof(basicHeuristic);
-    printf("totalSize heuristic[%d]: %d\n", i, totalSize);
-  }
-
-  uint8_t *start = malloc(totalSize);
-
-  printf("start: %p\n", start);
-  uint8_t* itr = start;
-  memcpy(itr, (char*)&totalSize, sizeof(int));
-  memcpy(itr+4, block, totalSize);
-  /*
-  printf("totalSize before assignment: %d\n", totalSize);
-  int spret = sprintf(itr, "%0d", totalSize);
-  printf("spret %d\n", spret);
-
-  itr+= sizeof(char)*spret; // reserve space for totalSize
-  *itr = '\0';
-  breakpoint();
-  itr+= sizeof(char);
-  //int totalSize = sizeof(int);
-
-  memcpy(itr, &block->sig_type, sizeof(uint16_t));
-  itr += sizeof(uint16_t);
-
-  memcpy(itr, &block->nonce, sizeof(uint32_t));
-  itr += sizeof(uint32_t);
-
-  memcpy(itr, &block->rssi, sizeof(uint32_t));
-  itr += sizeof(uint32_t);
-
-  memcpy(itr, &block->primary_pubkey, sizeof(int));
-  itr += sizeof(int);
-
-  memcpy(itr, &block->secondary_pubkey, sizeof(int));
-  itr += sizeof(int);
-
-  memcpy(itr, &block->xyo_id, sizeof(char)*32);
-  itr += sizeof(char)*32;
-
-  memcpy(itr, &block->heuristicGroup.heuristics_count, sizeof(size_t));
-  itr += sizeof(size_t);
-
-  for(int i = 0; i < block->heuristicGroup.heuristics_count; i++){
-    memcpy(itr, &block->heuristicGroup.heuristics[i].heuristicIdentifier, sizeof(char[16]));
-    itr += sizeof(char)*16;
-    memcpy(itr, &block->heuristicGroup.heuristics[i].size, sizeof(size_t));
-    itr += sizeof(size_t);
-    memcpy(itr, block->heuristicGroup.heuristics[i].heuristicPayload, block->heuristicGroup.heuristics[i].size);
-    itr += sizeof(char)*block->heuristicGroup.heuristics[i].size;
-  }
-
-  memcpy(itr, &block->signature, sizeof(int));
-  itr += sizeof(int);
-
-  memcpy(itr, &block->previous_hash, sizeof(char)*32);
-  itr += sizeof(int);
-  memset(itr, '\0', sizeof(char));
-  printf("itr: %p\n", itr);
-  */
-  return start;
-
-}
-
 void HASH(char* block, unsigned char *hash){
 
   SHA256_CTX sha256;
@@ -138,7 +72,9 @@ boundBlock* startBoundWitness(basicOriginBlock* lastBlock){
 void breakpoint(){
   return;
 }
+*/
 int main(){
+/*
   basicOriginBlockNode *peerOneStart = NULL;
   basicOriginBlockNode *peerTwoStart = NULL;
   basicOriginBlock *peerOneBlock = malloc(sizeof(basicOriginBlock) + sizeof(basicHeuristicGroup)+(sizeof(char)*16));
@@ -166,7 +102,7 @@ int main(){
   HASH(serializedBlock, &hash);
   printf("hash: %p\n", &hash);
   breakpoint();
-
+*/
 
   return 0;
 }

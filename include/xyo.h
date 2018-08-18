@@ -10,6 +10,7 @@
  */
 #include <stddef.h>
 #include <stdint.h>
+#include "xyobject.h"
 
 typedef struct {
   char heuristicIdentifier[16];
@@ -23,15 +24,11 @@ typedef struct {
 } basicHeuristicGroup;
 
 typedef struct {
-  uint16_t sig_type;
-  uint32_t nonce;
-  uint32_t rssi;
-  int primary_pubkey; // wrong data type
-  int secondary_pubkey; //fingerprint; wrong data type
-  char xyo_id[32]; //wrong data type
-  int signature; //wrong data type
-  char previous_hash[32];
-  basicHeuristicGroup heuristicGroup;
+  char totalSize[4];
+  XYObject *publicKeys;
+  char hash[32];
+  XYObject *payload;
+  XYObject *sigs;
 } basicOriginBlock;
 
 typedef struct {
@@ -45,10 +42,3 @@ typedef struct basicOriginBlockNode{
   basicOriginBlock* block;
   struct basicOriginBlockNode *next;
 } basicOriginBlockNode;
-
-typedef struct tagXYObject{
-  char id[2];
-  void* payload;
-  char* (*GetId)(struct tagXYObject*);
-  void* (*GetPayload)(struct tagXYObject*);
-} XYObject;

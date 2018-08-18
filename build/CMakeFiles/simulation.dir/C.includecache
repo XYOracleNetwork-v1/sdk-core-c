@@ -8,6 +8,18 @@
 
 ../include/crypto.h
 
+../include/hash.h
+
+../include/network.h
+stddef.h
+-
+
+../include/serializer.h
+
+../include/storage.h
+xyobject.h
+../include/xyobject.h
+
 ../include/strmap.h
 stdlib.h
 -
@@ -19,6 +31,10 @@ stddef.h
 -
 stdint.h
 -
+xyobject.h
+../include/xyobject.h
+
+../include/xyobject.h
 
 /home/nate/XY/sdk-core-c/src/XYOHeuristicsBuilder.c
 
@@ -30,6 +46,12 @@ stdlib.h
 stddef.h
 -
 string.h
+-
+
+/home/nate/XY/sdk-core-c/src/hash.c
+hash.h
+/home/nate/XY/sdk-core-c/src/hash.h
+stdlib.h
 -
 
 /home/nate/XY/sdk-core-c/src/main.c
@@ -45,6 +67,22 @@ stdio.h
 -
 openssl/sha.h
 -
+
+/home/nate/XY/sdk-core-c/src/network.c
+stdlib.h
+-
+network.h
+/home/nate/XY/sdk-core-c/src/network.h
+
+/home/nate/XY/sdk-core-c/src/serializer.c
+serializer.h
+/home/nate/XY/sdk-core-c/src/serializer.h
+
+/home/nate/XY/sdk-core-c/src/storage.c
+stdlib.h
+-
+storage.h
+/home/nate/XY/sdk-core-c/src/storage.h
 
 /home/nate/XY/sdk-core-c/src/strmap.c
 strmap.h
