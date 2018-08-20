@@ -3,18 +3,26 @@ typedef struct{
   char* privateKey;
 } keyPairStruct;
 
-typedef struct tagSigner{
-  char* publicKey;
-  char* privateKey;
-  char* (*GetPubKey)(struct tagSigner*);
-  char* (*Sign)(struct tagSigner*, char*);
-  int (*Verify)(struct tagSigner, char*, char*);
-  char* (*Encrypt)(char*);
-  char* (*Decrypt)(char*);
-} Signer;
+typedef struct Signer Signer, *sop;
+typedef struct CryptoCreator CryptoCreator, *ccp;
 
-typedef struct tagCryptoCreator{
+struct Signer{
+  char* publicKey; // Cryptographic Public Key
+  char* privateKey; // Cryptographic Private Key
+  char* (*GetPubKey)(Signer*);  // Returns public key
+  char* (*Sign)(Signer*, char*); // Returns signed byte array
+  /*
+   * The method will take data and a cryptographic signature and a cryptographic public key
+   * and determine if data was signed by the given public key correctly or if the signature
+   * is malformed / invalid. Boolean return value.
+   */
+  int (*Verify)(Signer*, char* data, char* sig, char* pubkey);
+  char* (*Encrypt)(Signer*, char*); // Encrypt the data to the key of this Signer object
+  char* (*Decrypt)(Signer*, char*); // Decrypt the data with the key of this Signer object.
+};
+
+struct CryptoCreator{
   char id[2];
-  char* (*GetId)(struct tagCryptoCreator*);
-  Signer* (*GetSigner)();
-} CryptoCreator;
+  char* (*GetId)(CryptoCreator*); // Fetch the above id object and return it.
+  Signer* (*GetSigner)(); // Generate a new Signer object which includes generating a new keypair.
+};
