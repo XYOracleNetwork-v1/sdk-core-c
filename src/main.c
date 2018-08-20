@@ -16,9 +16,9 @@
 #include <openssl/sha.h>
 
 /* Function to add a node at the beginning of Linked List.
-   This function expects a pointer to the data to be added
-   and size of the data type */
-/*
+ * This function expects a pointer to the data to be added
+ * and size of the data type
+ */
 void push(struct basicOriginBlockNode** head_ref, void *new_data, size_t data_size)
 {
     // Allocate memory for node
@@ -37,72 +37,7 @@ void push(struct basicOriginBlockNode** head_ref, void *new_data, size_t data_si
     (*head_ref)    = new_node;
 }
 
-
-void generateGenisisBlock(basicOriginBlock* block, basicOriginBlock* lastblock, char* account){
-  block->sig_type = 1;
-  block->nonce = 2;
-  block->rssi = 3;
-  block->primary_pubkey = 4;
-  block->secondary_pubkey = 5;
-  strcpy(block->xyo_id, account);
-  block->signature = 6;
-  strcpy(block->previous_hash, "11111111111111111111111111117799");
-}
-
-void HASH(char* block, unsigned char *hash){
-
-  SHA256_CTX sha256;
-  SHA256_Init(&sha256);
-  char *sizeptr = block;
-  printf("size in hash: %d\n", sizeptr[0]);
-  SHA256_Update(&sha256, block, sizeptr[0]);
-  SHA256_Final(hash, &sha256);
-}
-
-boundBlock* startBoundWitness(basicOriginBlock* lastBlock){
-  basicOriginBlock block;
-  srand(time(NULL));
-  block.nonce = rand() % 2048;
-  int distance = rand() % 20;
-  block.rssi = distance;
-  block.heuristicGroup.heuristics_count = 0;
-  char* serialBlock = serializeBlock(lastBlock);
-  //block.signerPreviousHash = HASH(serialBlock);
-}
-void breakpoint(){
-  return;
-}
-*/
 int main(){
-/*
-  basicOriginBlockNode *peerOneStart = NULL;
-  basicOriginBlockNode *peerTwoStart = NULL;
-  basicOriginBlock *peerOneBlock = malloc(sizeof(basicOriginBlock) + sizeof(basicHeuristicGroup)+(sizeof(char)*16));
-  generateGenisisBlock(peerOneBlock, NULL, "account1");
-  //basicOriginBlock *peerTwoBlock = malloc(sizeof(basicOriginBlock));
-  //generateGenisisBlock(peerTwoBlock, "account2");
-  push(&peerOneStart, &peerOneBlock, sizeof(peerOneBlock));
-  //peerOneBlock->rssi = 13;
-  peerOneBlock->heuristicGroup.heuristics_count = 2;
-  strcpy(peerOneBlock->heuristicGroup.heuristics[0].heuristicIdentifier, "FirstHeuristic");
-  peerOneBlock->heuristicGroup.heuristics[0].size = 16;
-  char *heuritic = "123456789A12345" + '\0';
-  peerOneBlock->heuristicGroup.heuristics[0].heuristicPayload = malloc(sizeof(char)*16);
-  strcpy(peerOneBlock->heuristicGroup.heuristics[0].heuristicPayload, heuritic);
-  strcpy(peerOneBlock->heuristicGroup.heuristics[1].heuristicIdentifier, "SecondHeuristic");
-  peerOneBlock->heuristicGroup.heuristics[1].size = 16;
-  heuritic = "210456789A12345" + '\0';
-  peerOneBlock->heuristicGroup.heuristics[1].heuristicPayload = malloc(sizeof(char)*16);
-  strcpy(peerOneBlock->heuristicGroup.heuristics[0].heuristicPayload, heuritic);
-  //push(&peerTwoStart, &peerTwoBlock, sizeof(peerTwoBlock));
-  void* serializedBlock = serializeBlock(peerOneBlock);
-  printf("peerOneBlock %p\n", peerOneBlock);
-  printf("serialized: %p\n", serializedBlock);
-  unsigned char hash[SHA256_DIGEST_LENGTH];
-  HASH(serializedBlock, &hash);
-  printf("hash: %p\n", &hash);
-  breakpoint();
-*/
-
+  
   return 0;
 }

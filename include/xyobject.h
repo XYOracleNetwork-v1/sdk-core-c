@@ -5,8 +5,8 @@ typedef struct XYObject XYObject, *xop;
 struct XYObject{
   char id[2];
   void* payload;
-  char* (*GetId)(XYObject*);
-  void* (*GetPayload)(XYObject*);
+  char* (*GetId)(XYObject*); // Fetch the above id object and return it.
+  void* (*GetPayload)(XYObject*); // Fetch the above payload pointer object and return it.
 };
 
 typedef struct {
