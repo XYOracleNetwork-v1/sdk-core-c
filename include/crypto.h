@@ -1,10 +1,12 @@
+#ifndef XYCrypto
+typedef struct Signer Signer, *sop;
+typedef struct CryptoCreator CryptoCreator, *ccp;
 typedef struct{
   char* publicKey;
   char* privateKey;
 } keyPairStruct;
-
-typedef struct Signer Signer, *sop;
-typedef struct CryptoCreator CryptoCreator, *ccp;
+#define XYCrypto
+#endif
 
 struct Signer{
   char* publicKey; // Cryptographic Public Key
@@ -17,12 +19,12 @@ struct Signer{
    * is malformed / invalid. Boolean return value.
    */
   int (*Verify)(Signer*, char* data, char* sig, char* pubkey);
-  char* (*Encrypt)(Signer*, char*); // Encrypt the data to the key of this Signer object
-  char* (*Decrypt)(Signer*, char*); // Decrypt the data with the key of this Signer object.
+  char* (*Encrypt)(struct Signer*, char*); // Encrypt the data to the key of this Signer object
+  char* (*Decrypt)(struct Signer*, char*); // Decrypt the data with the key of this Signer object.
 };
 
 struct CryptoCreator{
   char id[2];
-  char* (*GetId)(CryptoCreator*); // Fetch the above id object and return it.
+  char* (*GetId)(struct CryptoCreator*); // Fetch the above id object and return it.
   Signer* (*GetSigner)(); // Generate a new Signer object which includes generating a new keypair.
 };

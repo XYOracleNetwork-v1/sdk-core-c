@@ -12,4 +12,5 @@ HashProvider* newHashProvider(){
   hasher->GetId = &hashGetId;
   hasher->id[0] = 0x00;
   hasher->id[1] = 0x00;
+  return hasher;
 }

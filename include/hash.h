@@ -1,6 +1,7 @@
+#include "xyobject.h"
 typedef struct {
   char id[2];
-  char* (*Hash)(char*); // Given just a null terminated char* return a cryptographic hash for it
+  struct XYObject* (*Hash)(char*); // Given just a null terminated char* return a cryptographic hash for it
   /*
    * Given a cryptographic hash and a piece of data, verify the given hash == hash(data).
    */

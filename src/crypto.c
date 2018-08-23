@@ -28,6 +28,7 @@ Signer* GetSigner(){
   sig->Sign = NULL;
   sig->Verify = NULL;
   sig->Verify = NULL;
+  return sig;
 }
 
 CryptoCreator* newCryptoCreator(){
@@ -35,4 +36,5 @@ CryptoCreator* newCryptoCreator(){
   memset(creator->id, 0x00, 2);
   creator->GetSigner = &GetSigner;
   creator->GetId = &cryptoGetId;
+  return creator;
 }

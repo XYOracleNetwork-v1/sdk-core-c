@@ -10,8 +10,9 @@
  */
 #include <stddef.h>
 #include <stdint.h>
-#include "xyobject.h"
 
+#ifndef XYO_H
+#include "xyobject.h"
 typedef struct {
   char heuristicIdentifier[16];
   size_t size;
@@ -25,10 +26,10 @@ typedef struct {
 
 typedef struct {
   char totalSize[4];
-  XYObject *publicKeys;
+  struct XYObject *publicKeys;
   char hash[32];
-  XYObject *payload;
-  XYObject *sigs;
+  struct XYObject *payload;
+  struct XYObject *sigs;
 } basicOriginBlock;
 
 typedef struct {
@@ -42,3 +43,6 @@ typedef struct basicOriginBlockNode{
   basicOriginBlock* block;
   struct basicOriginBlockNode *next;
 } basicOriginBlockNode;
+
+#define XYO_H
+#endif
