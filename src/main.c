@@ -19,7 +19,18 @@ int main(){
   preallocated_result = malloc(sizeof(struct XYResult));
   if(preallocated_result){
     initTable();
-    char* testArray = { 0x01 0x01 0x06 0x0a 0x0b 0x0c} 
+    char* testArray = { 0x01 0x01 0x06 0x0a 0x0b 0x0c}
+    char id[2] = { 0x01 0x01 }
+    XYResult* result = lookup(id);
+    ByteStrongArray_creator* arrayCreator = result.result;
+    XYResult* result = arrayCreator.fromBytes(testArray);
+    if(result.error == OK){
+      ByteStrongArray* array = result.result;
+    }
+    printf("%p", array);
+    else {
+      RETURN_ERROR(ERR_CRITICAL)
+    }
   }
   else{
     return -1;
