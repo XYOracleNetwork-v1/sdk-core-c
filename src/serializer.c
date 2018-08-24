@@ -170,25 +170,56 @@ XYResult* ByteStrongArray_creator_create(char id[2], void* user_data){ // consid
 /* todo */
 XYResult* ByteStrongArray_creator_fromBytes(char* data){
   ByteStrongArray* ByteStrongArrayObject = malloc(sizeof(ByteStrongArray));
-  char id[2];
-  id[0] = data[0];
-  id[1] = data[1];
-  ByteStrongArrayObject->id[0] = data[0];
-  ByteStrongArrayObject->id[1] = data[1];
-  XYResult* newObject_result = newObject(id, ByteStrongArrayObject);
-  ByteStrongArrayObject->size =  data[2];
-  ByteStrongArrayObject->add = &ByteStrongArray_add;
-  XYResult* return_result = malloc(sizeof(XYResult));
-  if(return_result != NULL){
-    return_result->error = 0;
-    return_result->result = &ByteStrongArrayObject;
-    return return_result;
+  if(ByteStrongArrayObject != NULL){
+    char id[2];
+    id[0] = data[0];
+    id[1] = data[1];
+    ByteStrongArrayObject->id[0] = data[0];
+    ByteStrongArrayObject->id[1] = data[1];
+    XYResult* newObject_result = newObject(id, ByteStrongArrayObject);
+    ByteStrongArrayObject->size =  data[2];
+    ByteStrongArrayObject->add = &ByteStrongArray_add;
+    XYResult* return_result = malloc(sizeof(XYResult));
+    if(return_result != NULL){
+      return_result->error = 0;
+      return_result->result = &ByteStrongArrayObject;
+      return return_result;
+    }
+    else {
+      RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)
+    }
   }
   else {
-    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-    preallocated_result->result = 0;
-    return preallocated_result;
+    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)
   }
+}
 
+XYResult* ByteStrongArray_creator_toBytes(struct XYObject* user_XYObect){
+  if(user_XYObect->id[0] == 0x01 && user_XYObect->id[1] == 0x01){
+    ByteStrongArray* ByteStrongArrayObject = malloc(sizeof(ByteStrongArray));
+    if(ByteStrongArrayObject != NULL){
+      ByteStrongArray* user_array = user_XYObect->GetPayload(user_XYObect);
+      uint8_t totalSize = user_array->size;
+      char* byteBuffer = malloc(sizeof(char)*totalSize);
+      XYResult* return_result = malloc(sizeof(XYResult));
+      if(return_result != NULL && byteBuffer != NULL){
+        memcpy(byteBuffer, user_XYObect->GetPayload(user_XYObect), totalSize);
+        return_result->error = OK;
+        return_result->result = &byteBuffer;
+        return return_result;
+      }
+      else {
+        RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)
+      }
+    }
+    else {
+      preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+      preallocated_result->result = 0;
+      return preallocated_result;
+    }
+  }
+  else {
+    RETURN_ERROR(ERR_BADDATA)
+  }
 
 }

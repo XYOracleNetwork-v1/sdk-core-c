@@ -19,6 +19,7 @@ int main(){
   preallocated_result = malloc(sizeof(struct XYResult));
   if(preallocated_result){
     initTable();
+    char* testArray = { 0x01 0x01 0x06 0x0a 0x0b 0x0c} 
   }
   else{
     return -1;

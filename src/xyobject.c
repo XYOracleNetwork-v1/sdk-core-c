@@ -107,10 +107,6 @@ void registerType(char id[2], void* creator){
   typeTable[id[0]][id[1]] = creator;
 }
 
-void* getType(char id[2]){
-  return typeTable[id[0]][id[1]];
-}
-
 void ArrayIteratorNext(){
 
 }
@@ -118,7 +114,7 @@ void ArrayIteratorNext(){
 XYResult* lookup(char id[2]){
   void* tableValue = typeTable[id[0]][id[1]];
   if(tableValue != 0){
-
+    return tableValue;
   }
   else {
     XYResult* return_result = malloc(sizeof(XYResult));
