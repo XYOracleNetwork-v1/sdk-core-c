@@ -3,15 +3,15 @@
 
 proactiveNetworkProvider* newProactiveNetworkProvider(){
   proactiveNetworkProvider* provider = malloc(sizeof(proactiveNetworkProvider));
-  provider->RequestConnection = NULL;
-  provider->SendData = NULL;
-  provider->Disconnect = NULL;
+  provider->requestConnection = NULL;
+  provider->sendData = NULL;
+  provider->disconnect = NULL;
   return provider;
 }
 
 reactiveNetworkProvider* newReactiveNetworkProvider(){
   reactiveNetworkProvider* provider = malloc(sizeof(reactiveNetworkProvider));
-  provider->Listen = NULL;
-  provider->Disconnect = NULL;
+  provider->listen = NULL;
+  provider->disconnect = NULL;
   return provider;
 }

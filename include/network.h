@@ -8,9 +8,9 @@ typedef struct {
    * This should return a unique identifier for that connection so
    * that the unique identifier can be referenced later in SendData.
    */
-  int (*RequestConnection)(char*);
-  char* (*SendData)(char*, int); // Send a given string to a given connection.
-  void (*Disconnect)(int); // disconnect from a given connection.
+  int (*requestConnection)(char*);
+  char* (*sendData)(char*, int); // Send a given string to a given connection.
+  void (*disconnect)(int); // disconnect from a given connection.
 } proactiveNetworkProvider;
 
 typedef struct {
@@ -21,6 +21,6 @@ typedef struct {
     * call the callback specified by the void* argument with the data
     * that the client sent. Returns a unique identifier for that connection.
     */
-  int (*Listen)(void*);
-  int (*Disconnect)(int); // Disconnect from a given connection.
+  int (*listen)(void*);
+  int (*disconnect)(int); // Disconnect from a given connection.
 } reactiveNetworkProvider;

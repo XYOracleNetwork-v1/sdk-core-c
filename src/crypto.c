@@ -8,7 +8,7 @@ char* cryptoGetId(CryptoCreator* object){
   return object->id;
 }
 
-char* GetPubKey(Signer* signer){
+char* getPublicKey(Signer* signer){
   return signer->publicKey;
 }
 
@@ -19,22 +19,21 @@ keyPairStruct* generateKeypair(){
     return keypair;
 }
 
-Signer* GetSigner(){
+Signer* getSigner(){
   Signer* sig = malloc(sizeof(Signer));
   keyPairStruct* keys = generateKeypair();
   sig->publicKey = keys->publicKey;
   sig->privateKey = keys->privateKey;
-  sig->GetPubKey = &GetPubKey;
-  sig->Sign = NULL;
-  sig->Verify = NULL;
-  sig->Verify = NULL;
+  sig->getPublicKey = &getPublicKey;
+  sig->sign = NULL;
+  sig->verify = NULL;
   return sig;
 }
 
 CryptoCreator* newCryptoCreator(){
   CryptoCreator* creator = malloc(sizeof(CryptoCreator));
   memset(creator->id, 0x00, 2);
-  creator->GetSigner = &GetSigner;
-  creator->GetId = &cryptoGetId;
+  creator->getSigner = &getSigner;
+  creator->getId = &cryptoGetId;
   return creator;
 }

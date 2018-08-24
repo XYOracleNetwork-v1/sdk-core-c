@@ -8,4 +8,5 @@ storageProvider* newStorageProvider(){
   store->GetAllKeys = NULL;
   store->remove = NULL;
   store->contains = NULL;
+  return store;
 }

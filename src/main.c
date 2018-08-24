@@ -15,8 +15,8 @@
 #include <stdio.h>
 #include <openssl/sha.h>
 
-int init(){
-  preallocated_result = malloc(XYResult);
+int main(){
+  preallocated_result = malloc(sizeof(struct XYResult));
   if(preallocated_result){
     initTable();
   }
