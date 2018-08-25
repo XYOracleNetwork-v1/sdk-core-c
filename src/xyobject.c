@@ -1,4 +1,5 @@
 #include "XYOHeuristicsBuilder.h"
+#include "serializer.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -13,20 +14,13 @@ void* GetPayload(struct XYObject* object){
 XYResult* newObject(char id[2], void* payload){
   struct XYObject* new_object = malloc(sizeof(struct XYObject));
   if(new_object != NULL){
-    if(!payload){
+    if(payload != 0){
       new_object->payload = payload;
     }
     else{
-      return NULL;
+      RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
     }
-    if(id[0] && id[1])
-    {
-      return NULL;
-    }
-    else
-    {
-      memcpy(new_object->id, id, 2);
-    }
+    memcpy(new_object->id, id, 2);
     new_object->GetId = &GetId;
     new_object->GetPayload = &GetPayload;
     preallocated_result->error = OK;
@@ -54,19 +48,7 @@ XYResult* initTable(){
     rssi_creator->create = &Heuristic_RSSI_Creator_create;
     rssi_creator->fromBytes = &Heuristic_RSSI_Creator_fromBytes;
     rssi_creator->toBytes = &Heuristic_RSSI_Creator_toBytes;
-    typeTable[9][1] = rssi_creator; //TODO: Change major and minor for RSSI when it's standardized.
-
-    XYResult* return_result = malloc(sizeof(XYResult));
-    if(return_result != NULL){
-      return_result->error = OK;
-      return_result->result = 0;
-      return return_result;
-    }
-    else {
-      preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-      preallocated_result->result = 0;
-      return preallocated_result;
-    }
+    typeTable[0x09][0x01] = rssi_creator; //TODO: Change major and minor for RSSI when it's standardized.
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -81,20 +63,19 @@ XYResult* initTable(){
     ByteStrongArray_creator->defaultSize = 0;
     ByteStrongArray_creator->create = &ByteStrongArray_creator_create;
     ByteStrongArray_creator->fromBytes = &ByteStrongArray_creator_fromBytes;
-    ByteStrongArray_creator->toBytes = 0;
-    typeTable[9][1] = rssi_creator; //TODO: Change major and minor for RSSI when it's standardized.
-
-    XYResult* return_result = malloc(sizeof(XYResult));
-    if(return_result != NULL){
-      return_result->error = OK;
-      return_result->result = 0;
-      return return_result;
-    }
-    else {
-      preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-      preallocated_result->result = 0;
-      return preallocated_result;
-    }
+    ByteStrongArray_creator->toBytes = &ByteStrongArray_creator_toBytes;
+    typeTable[0x01][0x01] = ByteStrongArray_creator; //TODO: Change major and minor for RSSI when it's standardized.
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+  XYResult* return_result = malloc(sizeof(XYResult));
+  if(return_result != NULL){
+    return_result->error = OK;
+    return_result->result = 0;
+    return return_result;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -112,22 +93,25 @@ void ArrayIteratorNext(){
 }
 
 XYResult* lookup(char id[2]){
+  printf("lookup id[0]: %c", id[0]);
+  printf("lookup id[1]: %c", id[1]);
   void* tableValue = typeTable[id[0]][id[1]];
-  if(tableValue != 0){
-    return tableValue;
-  }
-  else {
-    XYResult* return_result = malloc(sizeof(XYResult));
-    if(return_result != NULL){
+  XYResult* return_result = malloc(sizeof(XYResult));
+  if(return_result != NULL){
+    if(tableValue != 0){
+      return_result->error = OK;
+      return_result->result = tableValue;
+      return return_result;
+    }
+    else {
       return_result->error = ERR_KEY_DOES_NOT_EXIST;
       return_result->result = 0;
       return return_result;
     }
-    else {
-      preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-      preallocated_result->result = 0;
-      return preallocated_result;
-    }
   }
-  return typeTable[id[0]][id[1]];
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
 }

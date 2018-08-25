@@ -27,6 +27,7 @@ XYResult* Heuristic_RSSI_Creator_toBytes(struct XYObject* user_XYObect);
 
 XYResult* ByteStrongArray_creator_create(char id[2], void* user_data);
 XYResult* ByteStrongArray_creator_fromBytes(char* data);
+XYResult* ByteStrongArray_creator_toBytes(struct XYObject* user_XYObect);
 XYResult* ByteStrongArray_add(ByteStrongArray* self_ByteStrongArray, XYObject* user_XYObject);
 #define XYOHeuristicsBuilder_H
 #endif

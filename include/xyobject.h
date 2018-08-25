@@ -20,13 +20,13 @@ typedef struct ByteStrongArray ByteStrongArray;
  * Strong array.
  */
 
-struct ByteStrongArray {
+struct  __attribute__((__packed__)) ByteStrongArray {
+  uint8_t  size;
+  char     id[2];
+  void* payload;
   XYResult* (*add)(struct ByteStrongArray* self_ByteStrongArray, XYObject* user_XYObject);
   XYResult* (*remove)(struct ByteStrongArray* self_ByteStrongArray, int index);
   XYResult* (*get)(struct ByteStrongArray* self_ByteStrongArray, int index);
-  char     id[2];
-  uint8_t  size;
-  void* payload;
 } ; //0x01
 
 struct ShortStrongArray {
