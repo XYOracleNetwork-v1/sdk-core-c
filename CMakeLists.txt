@@ -17,7 +17,8 @@ else()
     # Error; with REQUIRED, pkg_search_module() will throw an error by it's own
 endif()
 
-file(GLOB SOURCES "src/*.c")
+file(GLOB_RECURSE SOURCES "src/*.c")
+
 
 # add the binary tree to the search path for include files
 # so that we will find TutorialConfig.h

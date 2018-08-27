@@ -23,13 +23,13 @@ typedef struct ByteStrongArray ByteStrongArray;
 struct  __attribute__((__packed__)) ByteStrongArray {
   uint8_t  size;
   char     id[2];
-  void* payload;
   XYResult* (*add)(struct ByteStrongArray* self_ByteStrongArray, XYObject* user_XYObject);
   XYResult* (*remove)(struct ByteStrongArray* self_ByteStrongArray, int index);
   XYResult* (*get)(struct ByteStrongArray* self_ByteStrongArray, int index);
+  char* payload;
 } ; //0x01
 
-struct ShortStrongArray {
+struct  __attribute__((__packed__))  ShortStrongArray {
   XYResult* (*add)(struct ShortStrongArray* self_ShortStrongArray, XYObject* user_XYObject);
   XYResult* (*remove)(struct ShortStrongArray* self_ShortStrongArray, int index);
   XYResult* (*get)(struct ShortStrongArray* self_ShortStrongArray, int index);
@@ -38,7 +38,7 @@ struct ShortStrongArray {
   void* payload;
 } ; //0x02
 
-struct IntStrongArray {
+struct  __attribute__((__packed__))  IntStrongArray {
   XYResult* (*add)(struct IntStrongArray* self_IntStrongArray, XYObject* user_XYObject);
   XYResult* (*remove)(struct IntStrongArray* self_IntStrongArray, int index);
   XYResult* (*get)(struct IntStrongArray* self_IntStrongArray, int index);
@@ -47,7 +47,7 @@ struct IntStrongArray {
   void* payload;
 } ; //0x03
 
-struct LongStrongArray {
+struct  __attribute__((__packed__))  LongStrongArray {
   XYResult* (*add)(struct LongStrongArray* self_LongStrongArray, XYObject* user_XYObject);
   XYResult* (*remove)(struct LongStrongArray* self_LongStrongArray, int index);
   XYResult* (*get)(struct LongStrongArray* self_LongStrongArray, int index);

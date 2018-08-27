@@ -12,7 +12,7 @@ void* GetPayload(struct XYObject* object){
 }
 
 XYResult* newObject(char id[2], void* payload){
-  struct XYObject* new_object = malloc(sizeof(struct XYObject));
+  struct XYObject* new_object = malloc(sizeof(XYObject));
   if(new_object != NULL){
     if(payload != 0){
       new_object->payload = payload;
@@ -20,11 +20,11 @@ XYResult* newObject(char id[2], void* payload){
     else{
       RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
     }
-    memcpy(new_object->id, id, 2);
+    strncpy(new_object->id, id, 2);
     new_object->GetId = &GetId;
     new_object->GetPayload = &GetPayload;
     preallocated_result->error = OK;
-    preallocated_result->result = &new_object;
+    preallocated_result->result = new_object;
     return preallocated_result;
   }
   else {
@@ -93,8 +93,6 @@ void ArrayIteratorNext(){
 }
 
 XYResult* lookup(char id[2]){
-  printf("lookup id[0]: %c", id[0]);
-  printf("lookup id[1]: %c", id[1]);
   void* tableValue = typeTable[id[0]][id[1]];
   XYResult* return_result = malloc(sizeof(XYResult));
   if(return_result != NULL){
