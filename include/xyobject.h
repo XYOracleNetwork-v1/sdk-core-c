@@ -6,6 +6,9 @@ typedef struct XYResult XYResult;
 typedef struct ArrayItr ArrayItr;
 typedef struct BoundWitness BoundWitness;
 typedef struct ByteStrongArray ByteStrongArray;
+typedef struct ShortStrongArray ShortStrongArray;
+typedef struct IntStrongArray IntStrongArray;
+typedef struct IntWeakArray IntWeakArray;
 
 /*
  * Our documentation uses the terminology of Multi or Single Element arrays.
@@ -30,61 +33,61 @@ struct  __attribute__((__packed__)) ByteStrongArray {
 } ; //0x01
 
 struct  __attribute__((__packed__))  ShortStrongArray {
+  uint16_t size;
+  char     id[2];
   XYResult* (*add)(struct ShortStrongArray* self_ShortStrongArray, XYObject* user_XYObject);
   XYResult* (*remove)(struct ShortStrongArray* self_ShortStrongArray, int index);
   XYResult* (*get)(struct ShortStrongArray* self_ShortStrongArray, int index);
-  char     id[2];
-  uint16_t size;
   void* payload;
 } ; //0x02
 
 struct  __attribute__((__packed__))  IntStrongArray {
+  uint32_t  size;
+  char      id[2];
   XYResult* (*add)(struct IntStrongArray* self_IntStrongArray, XYObject* user_XYObject);
   XYResult* (*remove)(struct IntStrongArray* self_IntStrongArray, int index);
   XYResult* (*get)(struct IntStrongArray* self_IntStrongArray, int index);
-  char      id[2];
-  uint32_t  size;
   void* payload;
 } ; //0x03
 
 struct  __attribute__((__packed__))  LongStrongArray {
+  uint64_t  size;
+  char      id[2];
   XYResult* (*add)(struct LongStrongArray* self_LongStrongArray, XYObject* user_XYObject);
   XYResult* (*remove)(struct LongStrongArray* self_LongStrongArray, int index);
   XYResult* (*get)(struct LongStrongArray* self_LongStrongArray, int index);
-  char      id[2];
-  uint64_t  size;
   void* payload;
 } ; //0x04
 
 struct ByteWeakArray {
+  uint8_t  size;
   XYResult* (*add)(struct ByteStrongArray* self_ByteStrongArray, XYObject* user_XYObject);
   XYResult* (*remove)(struct ByteStrongArray* self_ByteStrongArray, int index);
   XYResult* (*get)(struct ByteStrongArray* self_ByteStrongArray, int index);
-  uint8_t  size;
   void* payload;
 } ; //0x05
 
 struct ShortWeakArray {
+  uint16_t size;
   XYResult* (*add)(struct ShortStrongArray* self_ShortStrongArray, XYObject* user_XYObject);
   XYResult* (*remove)(struct ShortStrongArray* self_ShortStrongArray, int index);
   XYResult* (*get)(struct ShortStrongArray* self_ShortStrongArray, int index);
-  uint16_t size;
   void* payload;
 } ; //0x06
 
 struct IntWeakArray {
+  uint32_t  size;
   XYResult* (*add)(struct IntStrongArray* self_IntStrongArray, XYObject* user_XYObject);
   XYResult* (*remove)(struct IntStrongArray* self_IntStrongArray, int index);
   XYResult* (*get)(struct IntStrongArray* self_IntStrongArray, int index);
-  uint32_t  size;
   void* payload;
 } ; //0x07
 
 struct LongWeakArray {
+  uint64_t  size;
   XYResult* (*add)(struct LongStrongArray* self_LongStrongArray, XYObject* user_XYObject);
   XYResult* (*remove)(struct LongStrongArray* self_LongStrongArray, int index);
   XYResult* (*get)(struct LongStrongArray* self_LongStrongArray, int index);
-  uint64_t  size;
   void* payload;
 } ; //0x08
 

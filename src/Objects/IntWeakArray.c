@@ -6,22 +6,22 @@
 #include "XYOHeuristicsBuilder.h"
 #include <stdio.h>
 
+
 /*----------------------------------------------------------------------------*
 *  NAME
-*      ByteStrongArray_add
+*      IntWeakArray_add
 *
 *  DESCRIPTION
-*      Adds a supplied XYObject to a supplied ByteStrongArray
+*      Adds a supplied XYObject to a supplied IntWeakArray
 *
 *  PARAMETERS
-*     *self_ByteStrongArray  [in]       XYObject*
-*     *user_XYObject          [in]      ByteStrongArray*
+*     *self_IntWeakArray  [in]       XYObject*
+*     *user_XYObject          [in]      IntWeakArray*
 *
 *  RETURNS
 *      XYResult  [out]      bool       Returns EXyoErrors::OK if adding succeeded.
 *----------------------------------------------------------------------------*/
-XYResult* ByteStrongArray_add(ByteStrongArray* self_ByteStrongArray, XYObject* user_XYObject){ //TODO: consider changing self to XYObject
-
+XYResult* IntWeakArray_add(IntWeakArray* self_IntWeakArray, XYObject* user_XYObject){ //TODO: consider changing self to XYObject
   // Lookup the Object_Creator for the object so we can infer if the object has a default
   // size or a variable size per each element. We know every element in a single-type array
   // has the same type, but we don't know if they have uniform size. An array of Bound Witness
@@ -32,15 +32,15 @@ XYResult* ByteStrongArray_add(ByteStrongArray* self_ByteStrongArray, XYObject* u
 
     // First we calculate how much space we need for the payload with
     // the addition of this new element.
-    uint16_t newSize = 0;
-    uint8_t object_size = 0;
+    uint32_t newSize = 0;
+    uint32_t object_size = 0;
 
     if(user_object_creator->defaultSize != 0){
 
       // This object type is always going to have the same size so no additional
       // logic is needed to derrive the new total size of the array.
       object_size = user_object_creator->defaultSize;
-      newSize = (self_ByteStrongArray->size + object_size);
+      newSize = (self_IntWeakArray->size + object_size);
     }
     else if(user_object_creator->sizeIdentifierSize != 0){
 
@@ -50,38 +50,33 @@ XYResult* ByteStrongArray_add(ByteStrongArray* self_ByteStrongArray, XYObject* u
       int object_sizeIdentiferSize = user_object_creator->sizeIdentifierSize;
 
       // Get a pointer to beginning of the array to read the size.
-      char* object_payload = self_ByteStrongArray->payload;
+      char* object_payload = self_IntWeakArray->payload;
 
-      // Since the total size of the array is less than 255 bytes, the
-      // size identifier size for one element must be 1 byte.
-      // the Author doesn't bother checking sizeIdentifierSize
-      // even though typically we would.
-      object_size = object_payload[0];
-      newSize = (self_ByteStrongArray->size + object_size);
+      // A 32 bit size will be the first element in the payload.
+      object_size = to_uint32(object_payload);
+      newSize = (self_IntWeakArray->size + object_size);
     }
-
-    // Total size (expressed in bytes) of the Byte Strong Array can't exceed
-    // that which can be expressed by one byte. Thus the max acceptible totalSize
-    // is only 255 bytes.
-    if(newSize < 255){
+    breakpoint();
+    // Total Size should not exceed the size mandated by the type (Integer)
+    if(newSize < 16777216U){
 
       // Here we are increasing the size of the payload to be able to hold our new element.
-      if(self_ByteStrongArray->payload != NULL){
-        self_ByteStrongArray->payload = realloc(self_ByteStrongArray->payload, newSize);
+      if(self_IntWeakArray->payload != NULL){
+        self_IntWeakArray->payload = realloc(self_IntWeakArray->payload, newSize);
       }
       else {
-        self_ByteStrongArray->payload = malloc(newSize*sizeof(char));
+        self_IntWeakArray->payload = malloc(newSize*sizeof(char));
       }
 
-      if(self_ByteStrongArray->payload != NULL){
+      if(self_IntWeakArray->payload != NULL){
 
         // Get a pointer to the end of the array so we can insert an element there.
-        char* object_payload = self_ByteStrongArray->payload;
-        object_payload = &(object_payload[self_ByteStrongArray->size - (sizeof(char)*3)]);
+        char* object_payload = self_IntWeakArray->payload;
+        object_payload = &(object_payload[self_IntWeakArray->size - (sizeof(char)*4)]);
 
         // Finally copy the element into the array
         memcpy(object_payload, user_XYObject->payload, object_size);
-        self_ByteStrongArray->size = newSize;
+        self_IntWeakArray->size = newSize;
         XYResult* return_result = malloc(sizeof(XYResult));
         if(return_result != NULL){
           return_result->error = OK;
@@ -109,28 +104,29 @@ XYResult* ByteStrongArray_add(ByteStrongArray* self_ByteStrongArray, XYObject* u
 
 /*----------------------------------------------------------------------------*
 *  NAME
-*      ByteStrongArray_get
+*      IntWeakArray_get
 *
 *  DESCRIPTION
-*      Get an XYObject from a supplied ByteStrongArray at a supplied index.
+*      Get an XYObject from a supplied IntWeakArray at a supplied index.
 *
 *  PARAMETERS
-*     *self_ByteStrongArray  [in]       XYObject*
+*     *self_IntWeakArray  [in]       XYObject*
 *     *index                 [in]       Int;
 *
 *  RETURNS
 *      XYResult  [out]      bool       Returns EXyoErrors::OK if adding succeeded.
 *----------------------------------------------------------------------------*/
-XYResult* ByteStrongArray_get(ByteStrongArray* self_ByteStrongArray, int index) {
-  XYResult* general_result = lookup(self_ByteStrongArray->id);
+XYResult* IntWeakArray_get(IntWeakArray* self_IntWeakArray, int index) {
+  /*
+  XYResult* general_result = lookup(self_IntWeakArray->id);
   if(general_result->error == OK){
     Object_Creator* element_creator = general_result->result;
     if(element_creator->defaultSize != 0){
-      uint8_t totalSize = self_ByteStrongArray->size;
-      totalSize = totalSize - 3*sizeof(char);
+      uint8_t totalSize = self_IntWeakArray->size;
+      totalSize = totalSize - 4*sizeof(char);
       if((totalSize % element_creator->defaultSize) == 0){
-        char* array_elements = self_ByteStrongArray->payload;
-        return newObject(self_ByteStrongArray->id, &array_elements[element_creator->defaultSize*index]);
+        char* array_elements = self_IntWeakArray->payload;
+        return newObject(self_IntWeakArray->id, &array_elements[element_creator->defaultSize*index]);
       }
       else {
         RETURN_ERROR(ERR_BADDATA);
@@ -138,21 +134,21 @@ XYResult* ByteStrongArray_get(ByteStrongArray* self_ByteStrongArray, int index) 
     }
     else if(element_creator->sizeIdentifierSize != 0)
     {
-      uint8_t totalSize = self_ByteStrongArray->size;
-      char* array_elements = self_ByteStrongArray->payload;
-      uint8_t array_offset = 0;
+      uint32_t totalSize = self_IntWeakArray->size;
+      char* array_elements = self_IntWeakArray->payload;
+      uint32_t array_offset = 0;
       for(int i = 0; i<=index; i++){
         if(array_offset>totalSize){
           RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);
         }
         char* element_size = malloc(element_creator->sizeIdentifierSize);
         memcpy(element_size, &array_elements[array_offset], element_creator->sizeIdentifierSize);
-        uint16_t int_size = to_uint16(element_size);
+        uint32_t int_size = to_uint32(element_size);
         free(element_size);
         if(i == index){
           char* return_object_payload = malloc(int_size);
           memcpy(return_object_payload, &array_elements[array_offset], int_size);
-          XYResult* return_result = newObject(self_ByteStrongArray->id, return_object_payload);
+          XYResult* return_result = newObject(self_IntWeakArray->id, return_object_payload);
           return return_result;
         }
         else {
@@ -167,12 +163,12 @@ XYResult* ByteStrongArray_get(ByteStrongArray* self_ByteStrongArray, int index) 
   else {
     RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);
   }
-
+  */
 }
 
 /*----------------------------------------------------------------------------*
 *  NAME
-*      ByteStrongArray_creator_create
+*      IntWeakArray_creator_create
 *
 *  DESCRIPTION
 *      Create an empty Strong Byte Array
@@ -182,19 +178,20 @@ XYResult* ByteStrongArray_get(ByteStrongArray* self_ByteStrongArray, int index) 
 *     *user_data             [in]       void*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYObject* of the ByteStrongArray type.
+*      XYResult*            [out]      bool   Returns XYObject* of the IntWeakArray type.
 *----------------------------------------------------------------------------*/
-XYResult* ByteStrongArray_creator_create(char id[2], void* user_data){ // consider allowing someone to create array with one object
-  ByteStrongArray* ByteStrongArrayObject = malloc(sizeof(ByteStrongArray));
-  char byteStrongArrayID[2] = {0x01, 0x01};
-  XYResult* newObject_result = newObject(byteStrongArrayID, ByteStrongArrayObject);
-  if(newObject_result->error == OK && ByteStrongArrayObject != NULL){
-    ByteStrongArrayObject->id[0] = id[0];
-    ByteStrongArrayObject->id[1] = id[1];
-    ByteStrongArrayObject->size = 3;
-    ByteStrongArrayObject->add = &ByteStrongArray_add;
-    ByteStrongArrayObject->get = &ByteStrongArray_get;
-    ByteStrongArrayObject->payload = NULL;
+XYResult* IntWeakArray_creator_create(char id[2], void* user_data){ // consider allowing someone to create array with one object
+  /*
+  IntWeakArray* IntWeakArrayObject = malloc(sizeof(IntWeakArray));
+  char IntWeakArrayID[2] = {0x01, 0x06};
+  XYResult* newObject_result = newObject(IntWeakArrayID, IntWeakArrayObject);
+  if(newObject_result->error == OK && IntWeakArrayObject != NULL){
+    IntWeakArrayObject->id[0] = id[0];
+    IntWeakArrayObject->id[1] = id[1];
+    IntWeakArrayObject->size = 4;
+    IntWeakArrayObject->add = &IntWeakArray_add;
+    IntWeakArrayObject->get = &IntWeakArray_get;
+    IntWeakArrayObject->payload = NULL;
     XYResult* return_result = malloc(sizeof(XYResult));
     if(return_result != NULL){
       return_result->error = 0;
@@ -213,12 +210,12 @@ XYResult* ByteStrongArray_creator_create(char id[2], void* user_data){ // consid
     preallocated_result->result = 0;
     return preallocated_result;
   }
-
+  */
 }
 
 /*----------------------------------------------------------------------------*
 *  NAME
-*      ByteStrongArray_creator_fromBytes
+*      IntWeakArray_creator_fromBytes
 *
 *  DESCRIPTION
 *      Create an Strong Byte Array given a set of Bytes. Bytes must not include major and minor of array.
@@ -227,26 +224,28 @@ XYResult* ByteStrongArray_creator_create(char id[2], void* user_data){ // consid
 *     *data                  [in]       char*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYObject* of the ByteStrongArray type.
+*      XYResult*            [out]      bool   Returns XYResult* of the IntWeakArray type.
 *----------------------------------------------------------------------------*/
-XYResult* ByteStrongArray_creator_fromBytes(char* data){
+XYResult* IntWeakArray_creator_fromBytes(char* data){
+
   XYResult* return_result = malloc(sizeof(XYResult));
-  ByteStrongArray* return_array = malloc(sizeof(ByteStrongArray));
+  IntWeakArray* return_array = malloc(sizeof(IntWeakArray));
   if(return_result && return_array){
-      return_array->add = &ByteStrongArray_add;
+      return_array->add = &IntWeakArray_add;
       return_array->remove = NULL;
-      return_array->get = &ByteStrongArray_get;
-      return_array->size = data[0];
-      char array_id[3];
-      array_id[0] = data[1];
-      array_id[1] = data[2];
-      array_id[2] = '\00';
-      strcpy(return_array->id, array_id);
-      return_array->payload = malloc(sizeof(char)*(return_array->size-3));
-      memcpy(return_array->payload, &data[3], (return_array->size-3));
-      return_result->error = OK;
-      return_result->result = return_array;
-      return return_result;
+      return_array->get = &IntWeakArray_get;
+      return_array->size = to_uint32(data);
+      return_array->payload = malloc(sizeof(char)*(return_array->size-4));
+      if(return_array->payload != NULL){
+        memcpy(return_array->payload, &data[4], (return_array->size-4));
+        return_result->error = OK;
+        return_result->result = return_array;
+        return return_result;
+      }
+      else
+      {
+        RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+      }
   }
   else{
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
@@ -255,7 +254,7 @@ XYResult* ByteStrongArray_creator_fromBytes(char* data){
 
 /*----------------------------------------------------------------------------*
 *  NAME
-*      ByteStrongArray_creator_create
+*      IntWeakArray_creator_create
 *
 *  DESCRIPTION
 *      Given an XYObject of Byte Strong Array type this routine will serialize
@@ -267,17 +266,17 @@ XYResult* ByteStrongArray_creator_fromBytes(char* data){
 *  RETURNS
 *      XYResult*            [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
-XYResult* ByteStrongArray_creator_toBytes(struct XYObject* user_XYObect){
-  if(user_XYObect->id[0] == 0x01 && user_XYObect->id[1] == 0x01){
-    ByteStrongArray* ByteStrongArrayObject = malloc(sizeof(ByteStrongArray));
-    if(ByteStrongArrayObject != NULL){
-      ByteStrongArray* user_array = user_XYObect->GetPayload(user_XYObect);
+XYResult* IntWeakArray_creator_toBytes(struct XYObject* user_XYObect){
+  if(user_XYObect->id[0] == 0x01 && user_XYObect->id[1] == 0x06){
+    IntWeakArray* IntWeakArrayObject = malloc(sizeof(IntWeakArray));
+    if(IntWeakArrayObject != NULL){
+      IntWeakArray* user_array = user_XYObect->GetPayload(user_XYObect);
       uint8_t totalSize = user_array->size;
       char* byteBuffer = malloc(sizeof(char)*totalSize);
       XYResult* return_result = malloc(sizeof(XYResult));
       if(return_result != NULL && byteBuffer != NULL){
-        memcpy(byteBuffer, user_XYObect->GetPayload(user_XYObect), 3);
-        memcpy(byteBuffer+3, user_array->payload, sizeof(char)*(totalSize-3));
+        memcpy(byteBuffer, user_XYObect->GetPayload(user_XYObect), 4);
+        memcpy(byteBuffer+4, user_array->payload, sizeof(char)*(totalSize-4));
         return_result->error = OK;
         return_result->result = byteBuffer;
         return return_result;

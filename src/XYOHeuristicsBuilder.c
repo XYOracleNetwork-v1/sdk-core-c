@@ -16,6 +16,16 @@
  #include "XYOHeuristicsBuilder.h"
  #include <stdio.h>
 
+void breakpoint(){};
+
+ uint32_t to_uint32(char* data) {
+   return 16777216U*data[0] + 65536U*data[1] + 256U*data[2] + data[3];
+ }
+
+ uint16_t to_uint16(char* data) {
+   return 256U*data[0] + data[1];
+ }
+
 XYResult* Heuristic_RSSI_Creator_create(char id[2], void* rssi){
   return newObject(id, rssi);
 }

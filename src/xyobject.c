@@ -71,6 +71,54 @@ XYResult* initTable(){
     preallocated_result->result = 0;
     return preallocated_result;
   }
+
+  // Initialize Short Strong Array Creator
+  struct Object_Creator* ShortStrongArray_creator = malloc(sizeof(Object_Creator));
+  if(ShortStrongArray_creator != NULL){
+    ShortStrongArray_creator->sizeIdentifierSize = 2;
+    ShortStrongArray_creator->defaultSize = 0;
+    ShortStrongArray_creator->create = &ShortStrongArray_creator_create;
+    ShortStrongArray_creator->fromBytes = &ShortStrongArray_creator_fromBytes;
+    ShortStrongArray_creator->toBytes = &ShortStrongArray_creator_toBytes;
+    typeTable[0x01][0x02] = ShortStrongArray_creator; //TODO: Change major and minor for RSSI when it's standardized.
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
+  // Initialize Int Strong Array Creator
+  struct Object_Creator* IntStrongArray_creator = malloc(sizeof(Object_Creator));
+  if(ShortStrongArray_creator != NULL){
+    IntStrongArray_creator->sizeIdentifierSize = 4;
+    IntStrongArray_creator->defaultSize = 0;
+    IntStrongArray_creator->create = &IntStrongArray_creator_create;
+    IntStrongArray_creator->fromBytes = &IntStrongArray_creator_fromBytes;
+    IntStrongArray_creator->toBytes = &IntStrongArray_creator_toBytes;
+    typeTable[0x01][0x03] = IntStrongArray_creator; //TODO: Change major and minor for RSSI when it's standardized.
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+  // Initialize Int Weak Array Creator
+  struct Object_Creator* IntWeakArray_creator = malloc(sizeof(Object_Creator));
+  if(ShortStrongArray_creator != NULL){
+    ShortStrongArray_creator->sizeIdentifierSize = 4;
+    ShortStrongArray_creator->defaultSize = 0;
+    ShortStrongArray_creator->create = &IntWeakArray_creator_create;
+    ShortStrongArray_creator->fromBytes = &IntWeakArray_creator_fromBytes;
+    ShortStrongArray_creator->toBytes = &IntWeakArray_creator_toBytes;
+    typeTable[0x01][0x06] = IntWeakArray_creator; //TODO: Change major and minor for RSSI when it's standardized.
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
   XYResult* return_result = malloc(sizeof(XYResult));
   if(return_result != NULL){
     return_result->error = OK;

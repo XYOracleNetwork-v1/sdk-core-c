@@ -8,6 +8,8 @@
  * @Last modified time: 09-Aug-2018
  * @Copyright: XY - The Findables Company
  */
+
+ 
 #ifndef XYOHeuristicsBuilder_H
 #include "xyo.h"
 
@@ -21,6 +23,12 @@ typedef struct Object_Creator Object_Creator;
    struct XYResult*  (*toBytes)(struct XYObject*);
  };
 
+uint16_t to_uint16(char* data);
+uint32_t to_uint32(char* data);
+
+/* todo */
+void breakpoint();
+
 XYResult* Heuristic_RSSI_Creator_create(char id[2], void* rssi);
 XYResult* Heuristic_RSSI_Creator_fromBytes(char* heuristic_data);
 XYResult* Heuristic_RSSI_Creator_toBytes(struct XYObject* user_XYObect);
@@ -28,6 +36,23 @@ XYResult* Heuristic_RSSI_Creator_toBytes(struct XYObject* user_XYObect);
 XYResult* ByteStrongArray_creator_create(char id[2], void* user_data);
 XYResult* ByteStrongArray_creator_fromBytes(char* data);
 XYResult* ByteStrongArray_creator_toBytes(struct XYObject* user_XYObect);
-XYResult* ByteStrongArray_add(ByteStrongArray* self_ByteStrongArray, XYObject* user_XYObject);
+XYResult* ByteStrongArray_add(ByteStrongArray* self_ShortStrongArray, XYObject* user_XYObject);
+
+XYResult* ShortStrongArray_creator_create(char id[2], void* user_data);
+XYResult* ShortStrongArray_creator_fromBytes(char* data);
+XYResult* ShortStrongArray_creator_toBytes(struct XYObject* user_XYObect);
+XYResult* ShortStrongArray_add(ShortStrongArray* self_ShortStrongArray, XYObject* user_XYObject);
+
+XYResult* IntStrongArray_creator_create(char id[2], void* user_data);
+XYResult* IntStrongArray_creator_fromBytes(char* data);
+XYResult* IntStrongArray_creator_toBytes(struct XYObject* user_XYObect);
+XYResult* IntStrongArray_add(IntStrongArray* self_IntStrongArray, XYObject* user_XYObject);
+
+XYResult* IntWeakArray_creator_create(char id[2], void* user_data);
+XYResult* IntWeakArray_creator_fromBytes(char* data);
+XYResult* IntWeakArray_creator_toBytes(struct XYObject* user_XYObect);
+XYResult* IntWeakArray_add(IntWeakArray* self_IntWeakArray, XYObject* user_XYObject);
+
+
 #define XYOHeuristicsBuilder_H
 #endif
