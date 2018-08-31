@@ -3,13 +3,14 @@
 
 typedef struct XYObject XYObject;
 typedef struct XYResult XYResult;
-typedef struct ArrayItr ArrayItr;
 typedef struct BoundWitness BoundWitness;
 typedef struct ByteStrongArray ByteStrongArray;
 typedef struct ShortStrongArray ShortStrongArray;
 typedef struct IntStrongArray IntStrongArray;
 typedef struct IntWeakArray IntWeakArray;
-
+typedef struct ShortWeakArray ShortWeakArray;
+typedef struct ByteWeakArray ByteWeakArray;
+typedef struct NextPublicKey NextPublicKey;
 /*
  * Our documentation uses the terminology of Multi or Single Element arrays.
  * A Multi element array is one which can contain many different types within it.
@@ -23,7 +24,7 @@ typedef struct IntWeakArray IntWeakArray;
  * Strong array.
  */
 
-struct  __attribute__((__packed__)) ByteStrongArray {
+struct ByteStrongArray {
   uint8_t  size;
   char     id[2];
   XYResult* (*add)(struct ByteStrongArray* self_ByteStrongArray, XYObject* user_XYObject);
@@ -32,7 +33,7 @@ struct  __attribute__((__packed__)) ByteStrongArray {
   char* payload;
 } ; //0x01
 
-struct  __attribute__((__packed__))  ShortStrongArray {
+struct ShortStrongArray {
   uint16_t size;
   char     id[2];
   XYResult* (*add)(struct ShortStrongArray* self_ShortStrongArray, XYObject* user_XYObject);
@@ -41,7 +42,7 @@ struct  __attribute__((__packed__))  ShortStrongArray {
   void* payload;
 } ; //0x02
 
-struct  __attribute__((__packed__))  IntStrongArray {
+struct IntStrongArray {
   uint32_t  size;
   char      id[2];
   XYResult* (*add)(struct IntStrongArray* self_IntStrongArray, XYObject* user_XYObject);
@@ -50,7 +51,7 @@ struct  __attribute__((__packed__))  IntStrongArray {
   void* payload;
 } ; //0x03
 
-struct  __attribute__((__packed__))  LongStrongArray {
+struct LongStrongArray {
   uint64_t  size;
   char      id[2];
   XYResult* (*add)(struct LongStrongArray* self_LongStrongArray, XYObject* user_XYObject);
@@ -61,25 +62,25 @@ struct  __attribute__((__packed__))  LongStrongArray {
 
 struct ByteWeakArray {
   uint8_t  size;
-  XYResult* (*add)(struct ByteStrongArray* self_ByteStrongArray, XYObject* user_XYObject);
-  XYResult* (*remove)(struct ByteStrongArray* self_ByteStrongArray, int index);
-  XYResult* (*get)(struct ByteStrongArray* self_ByteStrongArray, int index);
+  XYResult* (*add)(struct ByteWeakArray* self_ByteWeakArray, XYObject* user_XYObject);
+  XYResult* (*remove)(struct ByteWeakArray* self_ByteWeakArray, int index);
+  XYResult* (*get)(struct ByteWeakArray* self_ByteWeakArray, int index);
   void* payload;
 } ; //0x05
 
 struct ShortWeakArray {
   uint16_t size;
-  XYResult* (*add)(struct ShortStrongArray* self_ShortStrongArray, XYObject* user_XYObject);
-  XYResult* (*remove)(struct ShortStrongArray* self_ShortStrongArray, int index);
-  XYResult* (*get)(struct ShortStrongArray* self_ShortStrongArray, int index);
+  XYResult* (*add)(struct ShortWeakArray* self_ShortWeakArray, XYObject* user_XYObject);
+  XYResult* (*remove)(struct ShortWeakArray* self_ShortWeakArray, int index);
+  XYResult* (*get)(struct ShortWeakArray* self_ShortWeakArray, int index);
   void* payload;
 } ; //0x06
 
 struct IntWeakArray {
   uint32_t  size;
-  XYResult* (*add)(struct IntStrongArray* self_IntStrongArray, XYObject* user_XYObject);
-  XYResult* (*remove)(struct IntStrongArray* self_IntStrongArray, int index);
-  XYResult* (*get)(struct IntStrongArray* self_IntStrongArray, int index);
+  XYResult* (*add)(struct IntWeakArray* self_IntWeakArray, XYObject* user_XYObject);
+  XYResult* (*remove)(struct IntWeakArray* self_IntWeakArray, int index);
+  XYResult* (*get)(struct IntWeakArray* self_IntWeakArray, int index);
   void* payload;
 } ; //0x07
 
@@ -120,20 +121,35 @@ struct XYResult{
   void* result;
 };
 
-struct ArrayItr {
-  void* start;
-  void* end;
-  uint16_t step;
-  void* (*next)(struct ArrayItr*);
-  void*(*previous)(struct ArrayItr*);
-};
-
 struct BoundWitness{
   uint32_t size;
-  struct ArrayItr keys; //SZBNSArray
-  struct ArrayItr SignedPayload; //IZBNSArray
-  struct ArrayItr UnsignedPayload; //IZBNSArray
-  struct ArrayItr signatures; //SZBNSArray
+  struct ShortStrongArray* publicKeys;
+  struct IntStrongArray* payload;
+  struct ShortStrongArray* signatures;
+};
+
+struct KeySet{
+  struct ShortWeakArray* keys;
+};
+
+struct SignatureSet{
+  struct ShortWeakArray* signatures;
+};
+
+struct Payload{
+  uint32_t size;
+  struct IntWeakArray* signedHeuristics;
+  struct IntWeakArray* unsignedHeuristics;
+};
+
+struct PreviousHash{
+  char id[2];
+  char* hash;
+};
+
+struct NextPublicKey{
+  char id[2];
+  char* publicKey;
 };
 
 struct XYObject{

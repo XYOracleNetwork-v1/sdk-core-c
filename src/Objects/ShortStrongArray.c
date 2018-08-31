@@ -1,10 +1,10 @@
 #include "xyobject.h"
 #include <stdlib.h>
 #include <string.h>
-#include "serializer.h"
 #include "xyo.h"
 #include "XYOHeuristicsBuilder.h"
 #include <stdio.h>
+#include <arpa/inet.h>
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -44,17 +44,23 @@ XYResult* ShortStrongArray_add(ShortStrongArray* self_ShortStrongArray, XYObject
     }
     else if(user_object_creator->sizeIdentifierSize != 0){
 
-      // If each object is independantly sized, we need to figure out how many
-      // bytes need to be read in order to interpret size, hence
-      // sizeIdentifierSize variable.
-      int object_sizeIdentiferSize = user_object_creator->sizeIdentifierSize;
-
       // Get a pointer to beginning of the array to read the size.
       char* object_payload = self_ShortStrongArray->payload;
 
-      // A 16 bit size will be the first element in the payload.
-      object_size = to_uint16(object_payload);
-      newSize = (self_ShortStrongArray->size + object_size);
+      // Size identifier Size tells you how many bytes to read for size
+      switch(user_object_creator->sizeIdentifierSize){
+        case 1:
+          object_size = object_payload[0];
+          break;
+        case 2:
+          object_size = to_uint16(object_payload);
+          break;
+        case 4:
+          object_size = to_uint32(object_payload);
+          break;
+      }
+
+      newSize = (self_ShortStrongArray->size + object_size) * sizeof(char);
     }
 
     // Total Size should not exceed the size mandated by the type (Short)
@@ -62,10 +68,10 @@ XYResult* ShortStrongArray_add(ShortStrongArray* self_ShortStrongArray, XYObject
 
       // Here we are increasing the size of the payload to be able to hold our new element.
       if(self_ShortStrongArray->payload != NULL){
-        self_ShortStrongArray->payload = realloc(self_ShortStrongArray->payload, newSize);
+        self_ShortStrongArray->payload = realloc(self_ShortStrongArray->payload, newSize-(sizeof(char)*4));
       }
       else {
-        self_ShortStrongArray->payload = malloc(newSize*sizeof(char));
+        self_ShortStrongArray->payload = malloc(newSize-(sizeof(char)*4));
       }
 
       if(self_ShortStrongArray->payload != NULL){
@@ -75,7 +81,9 @@ XYResult* ShortStrongArray_add(ShortStrongArray* self_ShortStrongArray, XYObject
         object_payload = &(object_payload[self_ShortStrongArray->size - (sizeof(char)*4)]);
 
         // Finally copy the element into the array
-        memcpy(object_payload, user_XYObject->payload, object_size);
+        XYResult* toBytes_result = user_object_creator->toBytes(user_XYObject);
+        memcpy(object_payload, toBytes_result->result, object_size);
+
         self_ShortStrongArray->size = newSize;
         XYResult* return_result = malloc(sizeof(XYResult));
         if(return_result != NULL){
@@ -98,7 +106,7 @@ XYResult* ShortStrongArray_add(ShortStrongArray* self_ShortStrongArray, XYObject
     }
   }
   else {
-    RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);
+    RETURN_ERROR(ERR_BADDATA);
   }
 }
 
@@ -160,9 +168,9 @@ XYResult* ShortStrongArray_get(ShortStrongArray* self_ShortStrongArray, int inde
     }
   }
   else {
-    RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);
+    RETURN_ERROR(ERR_BADDATA);
   }
-
+  RETURN_ERROR(ERR_BADDATA);
 }
 
 /*----------------------------------------------------------------------------*
@@ -269,17 +277,31 @@ XYResult* ShortStrongArray_creator_fromBytes(char* data){
 *  RETURNS
 *      XYResult*            [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
-XYResult* ShortStrongArray_creator_toBytes(struct XYObject* user_XYObect){
-  if(user_XYObect->id[0] == 0x01 && user_XYObect->id[1] == 0x02){
+XYResult* ShortStrongArray_creator_toBytes(struct XYObject* user_XYObject){
+  if(user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x02){
     ShortStrongArray* ShortStrongArrayObject = malloc(sizeof(ShortStrongArray));
     if(ShortStrongArrayObject != NULL){
-      ShortStrongArray* user_array = user_XYObect->GetPayload(user_XYObect);
+      ShortStrongArray* user_array = user_XYObject->GetPayload(user_XYObject);
       uint8_t totalSize = user_array->size;
       char* byteBuffer = malloc(sizeof(char)*totalSize);
       XYResult* return_result = malloc(sizeof(XYResult));
       if(return_result != NULL && byteBuffer != NULL){
-        memcpy(byteBuffer, user_XYObect->GetPayload(user_XYObect), 4);
+
+        /*
+         * Use the to_uint32 function to converter endian to Big Endian
+         * if the host architecture isn't already Big Endian.
+         * This switch happens so that when it's copied into a buffer we
+         * are in the network byte order.
+         */
+        if(littleEndian()){
+          user_array->size = to_uint16((char*)user_array);
+        }
+        
+        memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 4);
         memcpy(byteBuffer+4, user_array->payload, sizeof(char)*(totalSize-4));
+        if(littleEndian()){
+          user_array->size = ntohs(user_array->size);
+        }
         return_result->error = OK;
         return_result->result = byteBuffer;
         return return_result;

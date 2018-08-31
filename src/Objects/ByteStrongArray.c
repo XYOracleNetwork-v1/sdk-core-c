@@ -1,10 +1,10 @@
 #include "xyobject.h"
 #include <stdlib.h>
 #include <string.h>
-#include "serializer.h"
 #include "xyo.h"
 #include "XYOHeuristicsBuilder.h"
 #include <stdio.h>
+#include <arpa/inet.h>
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -44,20 +44,23 @@ XYResult* ByteStrongArray_add(ByteStrongArray* self_ByteStrongArray, XYObject* u
     }
     else if(user_object_creator->sizeIdentifierSize != 0){
 
-      // If each object is independantly sized, we need to figure out how many
-      // bytes need to be read in order to interpret size, hence
-      // sizeIdentifierSize variable.
-      int object_sizeIdentiferSize = user_object_creator->sizeIdentifierSize;
-
       // Get a pointer to beginning of the array to read the size.
       char* object_payload = self_ByteStrongArray->payload;
 
-      // Since the total size of the array is less than 255 bytes, the
-      // size identifier size for one element must be 1 byte.
-      // the Author doesn't bother checking sizeIdentifierSize
-      // even though typically we would.
-      object_size = object_payload[0];
-      newSize = (self_ByteStrongArray->size + object_size);
+      // Size identifier Size tells you how many bytes to read for size
+      switch(user_object_creator->sizeIdentifierSize){
+        case 1:
+          object_size = object_payload[0];
+          break;
+        case 2:
+          object_size = to_uint16(object_payload);
+          break;
+        case 4:
+          object_size = to_uint32(object_payload);
+          break;
+      }
+
+      newSize = (self_ByteStrongArray->size + object_size - (sizeof(char)*3));
     }
 
     // Total size (expressed in bytes) of the Byte Strong Array can't exceed
@@ -80,7 +83,9 @@ XYResult* ByteStrongArray_add(ByteStrongArray* self_ByteStrongArray, XYObject* u
         object_payload = &(object_payload[self_ByteStrongArray->size - (sizeof(char)*3)]);
 
         // Finally copy the element into the array
-        memcpy(object_payload, user_XYObject->payload, object_size);
+        XYResult* toBytes_result = user_object_creator->toBytes(user_XYObject);
+        memcpy(object_payload, toBytes_result->result, object_size);
+
         self_ByteStrongArray->size = newSize;
         XYResult* return_result = malloc(sizeof(XYResult));
         if(return_result != NULL){
@@ -103,7 +108,7 @@ XYResult* ByteStrongArray_add(ByteStrongArray* self_ByteStrongArray, XYObject* u
     }
   }
   else {
-    RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);
+    RETURN_ERROR(ERR_BADDATA);
   }
 }
 
@@ -165,9 +170,9 @@ XYResult* ByteStrongArray_get(ByteStrongArray* self_ByteStrongArray, int index) 
     }
   }
   else {
-    RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);
+    RETURN_ERROR(ERR_BADDATA);
   }
-
+  RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);
 }
 
 /*----------------------------------------------------------------------------*
@@ -267,16 +272,16 @@ XYResult* ByteStrongArray_creator_fromBytes(char* data){
 *  RETURNS
 *      XYResult*            [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
-XYResult* ByteStrongArray_creator_toBytes(struct XYObject* user_XYObect){
-  if(user_XYObect->id[0] == 0x01 && user_XYObect->id[1] == 0x01){
+XYResult* ByteStrongArray_creator_toBytes(struct XYObject* user_XYObject){
+  if(user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x01){
     ByteStrongArray* ByteStrongArrayObject = malloc(sizeof(ByteStrongArray));
     if(ByteStrongArrayObject != NULL){
-      ByteStrongArray* user_array = user_XYObect->GetPayload(user_XYObect);
+      ByteStrongArray* user_array = user_XYObject->GetPayload(user_XYObject);
       uint8_t totalSize = user_array->size;
       char* byteBuffer = malloc(sizeof(char)*totalSize);
       XYResult* return_result = malloc(sizeof(XYResult));
       if(return_result != NULL && byteBuffer != NULL){
-        memcpy(byteBuffer, user_XYObect->GetPayload(user_XYObect), 3);
+        memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 3);
         memcpy(byteBuffer+3, user_array->payload, sizeof(char)*(totalSize-3));
         return_result->error = OK;
         return_result->result = byteBuffer;
