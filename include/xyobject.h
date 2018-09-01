@@ -11,6 +11,7 @@ typedef struct IntWeakArray IntWeakArray;
 typedef struct ShortWeakArray ShortWeakArray;
 typedef struct ByteWeakArray ByteWeakArray;
 typedef struct NextPublicKey NextPublicKey;
+typedef struct PreviousHash PreviousHash;
 /*
  * Our documentation uses the terminology of Multi or Single Element arrays.
  * A Multi element array is one which can contain many different types within it.
@@ -106,7 +107,7 @@ enum EXyoErrors{
   ERR_BADDATA, // Returned if data is malformed e.g. too big.
   ERR_BADPUBKEY, // Returned if the public key is invalid.
   ERR_BADSIG, // Returned if the signature encoding is improper.
-  ERR_CORRUPTDATA, // Returned if data is improperly encrypted.
+  ERR_CORRUPTDATA, // Returned if data is improperly encrypdefaultSize = ted.
   ERR_KEY_ALREADY_EXISTS, // Returned if can't insert because key is already mapped.
   ERR_INSUFFICIENT_MEMORY, // Returned if there wasn't enough memory to store.
   ERR_INTERNAL_ERROR, // Returned if there was a hardware error.

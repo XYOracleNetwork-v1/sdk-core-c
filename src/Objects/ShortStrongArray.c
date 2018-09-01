@@ -53,14 +53,24 @@ XYResult* ShortStrongArray_add(ShortStrongArray* self_ShortStrongArray, XYObject
           object_size = object_payload[0];
           break;
         case 2:
-          object_size = to_uint16(object_payload);
+          /* First we read 2 bytes of the payload to get the size,
+           * the to_uint16 function reads ints in big endian.
+           * ntohs converts this big endian number to a number
+           * that is garanteed to be compatible with the host.
+           */
+          object_size = to_uint16(object_payload); //TODO: Check compatibility on big endian devices.
+          if(littleEndian()){
+            object_size = ntohs(object_size);
+          }
           break;
         case 4:
           object_size = to_uint32(object_payload);
+          if(littleEndian()){
+            object_size = ntohl(object_size);
+          }
           break;
       }
-
-      newSize = (self_ShortStrongArray->size + object_size) * sizeof(char);
+      newSize = (self_ShortStrongArray->size + object_size * sizeof(char));
     }
 
     // Total Size should not exceed the size mandated by the type (Short)
@@ -296,7 +306,7 @@ XYResult* ShortStrongArray_creator_toBytes(struct XYObject* user_XYObject){
         if(littleEndian()){
           user_array->size = to_uint16((char*)user_array);
         }
-        
+
         memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 4);
         memcpy(byteBuffer+4, user_array->payload, sizeof(char)*(totalSize-4));
         if(littleEndian()){

@@ -41,6 +41,11 @@ XYResult* NextPublicKey_creator_create(char id[2], void* user_data);
 XYResult* NextPublicKey_creator_fromBytes(char* pubkey_data);
 XYResult* NextPublicKey_creator_toBytes(struct XYObject* user_XYObect);
 
+XYResult* PreviousHash_creator_create(char id[2], void* user_data);
+XYResult* PreviousHash_creator_fromBytes(char* hash_data);
+XYResult* PreviousHash_creator_toBytes(struct XYObject* user_XYObect);
+
+
 XYResult* ByteStrongArray_creator_create(char id[2], void* user_data);
 XYResult* ByteStrongArray_creator_fromBytes(char* data);
 XYResult* ByteStrongArray_creator_toBytes(struct XYObject* user_XYObect);

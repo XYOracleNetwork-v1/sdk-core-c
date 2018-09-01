@@ -103,6 +103,38 @@ XYResult* initTable(){
     return preallocated_result;
   }
 
+  // Initialize Previous Hash Creator
+  struct Object_Creator* PreviousHash_creator = malloc(sizeof(Object_Creator));
+  if(PreviousHash_creator != NULL){
+    PreviousHash_creator->sizeIdentifierSize = 0;
+    PreviousHash_creator->defaultSize = 34;
+    PreviousHash_creator->create = PreviousHash_creator_create;
+    PreviousHash_creator->fromBytes = PreviousHash_creator_fromBytes;
+    PreviousHash_creator->toBytes = PreviousHash_creator_toBytes;
+    typeTable[0x02][0x06] = PreviousHash_creator;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
+  // Initialize SHA256 Hash Creator
+  struct Object_Creator* SHA256_creator = malloc(sizeof(Object_Creator));
+  if(SHA256_creator != NULL){
+    SHA256_creator->sizeIdentifierSize = 0;
+    SHA256_creator->defaultSize = 34;
+    SHA256_creator->create = NULL;
+    SHA256_creator->fromBytes = NULL;
+    SHA256_creator->toBytes = NULL;
+    typeTable[0x03][0x05] = SHA256_creator;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
   // Initialize Byte Strong Array Creator
   struct Object_Creator* ByteStrongArray_creator = malloc(sizeof(Object_Creator));
   if(ByteStrongArray_creator != NULL){

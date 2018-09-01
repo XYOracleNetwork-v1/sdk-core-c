@@ -36,6 +36,7 @@ XYResult* ByteWeakArray_add(ByteWeakArray* self_ByteWeakArray, XYObject* user_XY
     uint32_t object_size = 0;
 
     if(user_object_creator->defaultSize != 0){
+      breakpoint();
 
       // This object type is always going to have the same size so no additional
       // logic is needed to derrive the new total size of the array.
