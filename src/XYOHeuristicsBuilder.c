@@ -71,9 +71,9 @@ XYResult* Heuristic_RSSI_Creator_fromBytes(char* heuristic_data){
   return newObject(id, &rssi);
 }
 
-XYResult* Heuristic_RSSI_Creator_toBytes(struct XYObject* user_XYObect){
+XYResult* Heuristic_RSSI_Creator_toBytes(struct XYObject* user_XYObject){
   char encoded_bytes;
-  char* rssi = (char*)user_XYObect->payload;
+  char* rssi = (char*)user_XYObject->payload;
   encoded_bytes = rssi[0];
 
   struct XYResult* return_result = malloc(sizeof(struct XYResult));
@@ -102,8 +102,8 @@ XYResult* Heuristic_Text_Creator_fromBytes(char* heuristic_data){
   return newObject(id, payload_bytes);
 }
 
-XYResult* Heuristic_Text_Creator_toBytes(struct XYObject* user_XYObect){
-  char* text = user_XYObect->payload;
+XYResult* Heuristic_Text_Creator_toBytes(struct XYObject* user_XYObject){
+  char* text = user_XYObject->payload;
   uint16_t size = to_uint16(text);
   uint16_t encodedSize = size;
   if(littleEndian()){

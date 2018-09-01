@@ -45,6 +45,9 @@ XYResult* PreviousHash_creator_create(char id[2], void* user_data);
 XYResult* PreviousHash_creator_fromBytes(char* hash_data);
 XYResult* PreviousHash_creator_toBytes(struct XYObject* user_XYObect);
 
+XYResult* Index_creator_create(char id[2], void* user_data);
+XYResult* Index_creator_fromBytes(char* hash_data);
+XYResult* Index_creator_toBytes(struct XYObject* user_XYObect);
 
 XYResult* ByteStrongArray_creator_create(char id[2], void* user_data);
 XYResult* ByteStrongArray_creator_fromBytes(char* data);

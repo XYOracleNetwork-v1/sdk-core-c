@@ -57,7 +57,6 @@ int main(){
       result = lookup(rssi_id);
       Object_Creator* rssi_creator = result->result;
       create_result = rssi_creator->create(rssi_id, &rssi);
-      //breakpoint();
       ByteWeakArray_raw->add(ByteWeakArray_raw, create_result->result);
 
       char* publicKey = "4444";
@@ -91,6 +90,17 @@ int main(){
       strcpy(&buffer3[4], testText3);
       create_result = textHeuristic_creator->fromBytes(buffer3);
       ByteWeakArray_raw->add(ByteWeakArray_raw, create_result->result);
+
+      uint32_t index = 1;
+      char index_id[2];
+      index_id[0] = 0x02;
+      index_id[1] = 0x05;
+      result = lookup(index_id);
+      Object_Creator* index_creator = result->result;
+      breakpoint();
+      create_result = index_creator->create(index_id, &index);
+      ByteWeakArray_raw->add(ByteWeakArray_raw, create_result->result);
+
       /* Strong Array Test */
       if(result->error == OK){
       char testArray[9] = { 0x00, 0x00, 0x00, 0x09, 0x09, 0x01, 0x09, 0x09, 0x01 };

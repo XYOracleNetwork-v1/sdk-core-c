@@ -39,101 +39,6 @@ XYResult* initTable(){
   for(x = 0; x < 16; x ++) {
       for(y = 0; y < 16; y ++) typeTable[x][y] = 0;
   }
-  // Initialize RSSI Heuristic Creator
-  struct Object_Creator* rssi_creator = malloc(sizeof(Object_Creator));
-  if(rssi_creator != NULL){
-    rssi_creator->sizeIdentifierSize = 0;
-    rssi_creator->defaultSize = 1;
-    rssi_creator->create = &Heuristic_RSSI_Creator_create;
-    rssi_creator->fromBytes = &Heuristic_RSSI_Creator_fromBytes;
-    rssi_creator->toBytes = &Heuristic_RSSI_Creator_toBytes;
-    typeTable[0x09][0x01] = rssi_creator; //TODO: Change major and minor for RSSI when it's standardized.
-  }
-  else {
-    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-    preallocated_result->result = 0;
-    return preallocated_result;
-  }
-
-  // Initialize Text Heuristic Creator
-  struct Object_Creator* text_creator = malloc(sizeof(Object_Creator));
-  if(text_creator != NULL){
-    text_creator->sizeIdentifierSize = 2;
-    text_creator->defaultSize = 0;
-    text_creator->create = &Heuristic_Text_Creator_create;
-    text_creator->fromBytes = &Heuristic_Text_Creator_fromBytes;
-    text_creator->toBytes = &Heuristic_Text_Creator_toBytes;
-    typeTable[0x10][0x01] = text_creator;
-  }
-  else {
-    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-    preallocated_result->result = 0;
-    return preallocated_result;
-  }
-
-  // Initialize Next Public Key Creator
-  struct Object_Creator* NPK_creator = malloc(sizeof(Object_Creator));
-  if(NPK_creator != NULL){
-    NPK_creator->sizeIdentifierSize = 0;
-    NPK_creator->defaultSize = 0;
-    NPK_creator->create = &NextPublicKey_creator_create;
-    NPK_creator->fromBytes = &NextPublicKey_creator_fromBytes;
-    NPK_creator->toBytes = &NextPublicKey_creator_toBytes;
-    typeTable[0x02][0x07] = NPK_creator;
-  }
-  else {
-    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-    preallocated_result->result = 0;
-    return preallocated_result;
-  }
-
-  // Initialize Custom Next Public Key Creator
-  struct Object_Creator* NPKU_creator = malloc(sizeof(Object_Creator));
-  if(NPKU_creator != NULL){
-    NPKU_creator->sizeIdentifierSize = 0;
-    NPKU_creator->defaultSize = 6;
-    NPKU_creator->create = NULL;
-    NPKU_creator->fromBytes = NULL;
-    NPKU_creator->toBytes = NULL;
-    typeTable[0x04][0x03] = NPKU_creator;
-  }
-  else {
-    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-    preallocated_result->result = 0;
-    return preallocated_result;
-  }
-
-  // Initialize Previous Hash Creator
-  struct Object_Creator* PreviousHash_creator = malloc(sizeof(Object_Creator));
-  if(PreviousHash_creator != NULL){
-    PreviousHash_creator->sizeIdentifierSize = 0;
-    PreviousHash_creator->defaultSize = 34;
-    PreviousHash_creator->create = PreviousHash_creator_create;
-    PreviousHash_creator->fromBytes = PreviousHash_creator_fromBytes;
-    PreviousHash_creator->toBytes = PreviousHash_creator_toBytes;
-    typeTable[0x02][0x06] = PreviousHash_creator;
-  }
-  else {
-    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-    preallocated_result->result = 0;
-    return preallocated_result;
-  }
-
-  // Initialize SHA256 Hash Creator
-  struct Object_Creator* SHA256_creator = malloc(sizeof(Object_Creator));
-  if(SHA256_creator != NULL){
-    SHA256_creator->sizeIdentifierSize = 0;
-    SHA256_creator->defaultSize = 34;
-    SHA256_creator->create = NULL;
-    SHA256_creator->fromBytes = NULL;
-    SHA256_creator->toBytes = NULL;
-    typeTable[0x03][0x05] = SHA256_creator;
-  }
-  else {
-    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-    preallocated_result->result = 0;
-    return preallocated_result;
-  }
 
   // Initialize Byte Strong Array Creator
   struct Object_Creator* ByteStrongArray_creator = malloc(sizeof(Object_Creator));
@@ -224,6 +129,118 @@ XYResult* initTable(){
     IntWeakArray_creator->fromBytes = &IntWeakArray_creator_fromBytes;
     IntWeakArray_creator->toBytes = &IntWeakArray_creator_toBytes;
     typeTable[0x01][0x06] = IntWeakArray_creator;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
+  // Initialize Next Public Key Creator
+  struct Object_Creator* Index_creator = malloc(sizeof(Object_Creator));
+  if(Index_creator != NULL){
+    Index_creator->sizeIdentifierSize = 0;
+    Index_creator->defaultSize = 4;
+    Index_creator->create = &Index_creator_create;
+    Index_creator->fromBytes = &Index_creator_fromBytes;
+    Index_creator->toBytes = &Index_creator_toBytes;
+    typeTable[0x02][0x05] = Index_creator;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
+  // Initialize Previous Hash Creator
+  struct Object_Creator* PreviousHash_creator = malloc(sizeof(Object_Creator));
+  if(PreviousHash_creator != NULL){
+    PreviousHash_creator->sizeIdentifierSize = 0;
+    PreviousHash_creator->defaultSize = 34;
+    PreviousHash_creator->create = PreviousHash_creator_create;
+    PreviousHash_creator->fromBytes = PreviousHash_creator_fromBytes;
+    PreviousHash_creator->toBytes = PreviousHash_creator_toBytes;
+    typeTable[0x02][0x06] = PreviousHash_creator;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
+  // Initialize Next Public Key Creator
+  struct Object_Creator* NPK_creator = malloc(sizeof(Object_Creator));
+  if(NPK_creator != NULL){
+    NPK_creator->sizeIdentifierSize = 0;
+    NPK_creator->defaultSize = 0;
+    NPK_creator->create = &NextPublicKey_creator_create;
+    NPK_creator->fromBytes = &NextPublicKey_creator_fromBytes;
+    NPK_creator->toBytes = &NextPublicKey_creator_toBytes;
+    typeTable[0x02][0x07] = NPK_creator;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
+  // Initialize SHA256 Hash Creator
+  struct Object_Creator* SHA256_creator = malloc(sizeof(Object_Creator));
+  if(SHA256_creator != NULL){
+    SHA256_creator->sizeIdentifierSize = 0;
+    SHA256_creator->defaultSize = 34;
+    SHA256_creator->create = NULL;
+    SHA256_creator->fromBytes = NULL;
+    SHA256_creator->toBytes = NULL;
+    typeTable[0x03][0x05] = SHA256_creator;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
+  // Initialize Custom Next Public Key Creator
+  struct Object_Creator* NPKU_creator = malloc(sizeof(Object_Creator));
+  if(NPKU_creator != NULL){
+    NPKU_creator->sizeIdentifierSize = 0;
+    NPKU_creator->defaultSize = 6;
+    NPKU_creator->create = NULL;
+    NPKU_creator->fromBytes = NULL;
+    NPKU_creator->toBytes = NULL;
+    typeTable[0x04][0x03] = NPKU_creator;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
+  // Initialize RSSI Heuristic Creator
+  struct Object_Creator* rssi_creator = malloc(sizeof(Object_Creator));
+  if(rssi_creator != NULL){
+    rssi_creator->sizeIdentifierSize = 0;
+    rssi_creator->defaultSize = 1;
+    rssi_creator->create = &Heuristic_RSSI_Creator_create;
+    rssi_creator->fromBytes = &Heuristic_RSSI_Creator_fromBytes;
+    rssi_creator->toBytes = &Heuristic_RSSI_Creator_toBytes;
+    typeTable[0x09][0x01] = rssi_creator; //TODO: Change major and minor for RSSI when it's standardized.
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
+  // Initialize Text Heuristic Creator
+  struct Object_Creator* text_creator = malloc(sizeof(Object_Creator));
+  if(text_creator != NULL){
+    text_creator->sizeIdentifierSize = 2;
+    text_creator->defaultSize = 0;
+    text_creator->create = &Heuristic_Text_Creator_create;
+    text_creator->fromBytes = &Heuristic_Text_Creator_fromBytes;
+    text_creator->toBytes = &Heuristic_Text_Creator_toBytes;
+    typeTable[0x10][0x01] = text_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
