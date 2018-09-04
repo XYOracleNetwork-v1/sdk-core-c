@@ -136,7 +136,23 @@ XYResult* initTable(){
     return preallocated_result;
   }
 
-  // Initialize Next Public Key Creator
+  // Initialize Payload Creator
+  struct Object_Creator* Payload_creator = malloc(sizeof(Object_Creator));
+  if(Payload_creator != NULL){
+    Payload_creator->sizeIdentifierSize = 4;
+    Payload_creator->defaultSize = 0;
+    Payload_creator->create = &Payload_creator_create;
+    Payload_creator->fromBytes = &Payload_creator_fromBytes;
+    Payload_creator->toBytes = &Payload_creator_toBytes;
+    typeTable[0x02][0x04] = Payload_creator;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
+  // Initialize Index Creator
   struct Object_Creator* Index_creator = malloc(sizeof(Object_Creator));
   if(Index_creator != NULL){
     Index_creator->sizeIdentifierSize = 0;

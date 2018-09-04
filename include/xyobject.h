@@ -12,6 +12,7 @@ typedef struct ShortWeakArray ShortWeakArray;
 typedef struct ByteWeakArray ByteWeakArray;
 typedef struct NextPublicKey NextPublicKey;
 typedef struct PreviousHash PreviousHash;
+typedef struct Payload Payload;
 /*
  * Our documentation uses the terminology of Multi or Single Element arrays.
  * A Multi element array is one which can contain many different types within it.

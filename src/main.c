@@ -24,12 +24,12 @@ int main(){
       XYResult* result = initTable();
       char id[2];
       id[0] = 0x01;
-      id[1] = 0x04;
+      id[1] = 0x06;
       XYResult* lookup_result = lookup(id);
-      Object_Creator* ByteWeakArray_creator = lookup_result->result;
-      XYResult* create_result = ByteWeakArray_creator->create(NULL, NULL);
-      XYObject* ByteWeakArray_object = create_result->result;
-      ByteWeakArray* ByteWeakArray_raw = ByteWeakArray_object->payload;
+      Object_Creator* IntWeakArray_creator = lookup_result->result;
+      XYResult* create_result = IntWeakArray_creator->create(NULL, NULL);
+      XYObject* IntWeakArray_object = create_result->result;
+      IntWeakArray* IntWeakArray_raw = IntWeakArray_object->payload;
 
       id[0] = 0x10;
       id[1] = 0x01;
@@ -40,7 +40,7 @@ int main(){
       strcpy(&buffer1[4], testText1);
       create_result = textHeuristic_creator->fromBytes(buffer1);
       XYObject* testObject = create_result->result;
-      ByteWeakArray_raw->add(ByteWeakArray_raw, create_result->result);
+      IntWeakArray_raw->add(IntWeakArray_raw, create_result->result);
 
       id[0] = 0x10;
       id[1] = 0x01;
@@ -48,7 +48,7 @@ int main(){
       char buffer2[6] = { 0x10, 0x01, 4, 0, 0, 0 };
       strcpy(&buffer2[4], testText2);
       create_result = textHeuristic_creator->fromBytes(buffer2);
-      ByteWeakArray_raw->add(ByteWeakArray_raw, create_result->result);
+      IntWeakArray_raw->add(IntWeakArray_raw, create_result->result);
 
       uint8_t rssi = 0x05;
       char rssi_id[2];
@@ -57,7 +57,7 @@ int main(){
       result = lookup(rssi_id);
       Object_Creator* rssi_creator = result->result;
       create_result = rssi_creator->create(rssi_id, &rssi);
-      ByteWeakArray_raw->add(ByteWeakArray_raw, create_result->result);
+      IntWeakArray_raw->add(IntWeakArray_raw, create_result->result);
 
       char* publicKey = "4444";
       char bufferPubKey[10] = { 0x02, 0x07, 0x04, 0x03, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00 };
@@ -70,7 +70,7 @@ int main(){
       create_result = NPK_creator->fromBytes(&bufferPubKey);
       XYObject* NextPublicKey_object = create_result->result;
       XYResult* new_object_result = newObject(public_key_id, NextPublicKey_object);
-      ByteWeakArray_raw->add(ByteWeakArray_raw, new_object_result->result);
+      IntWeakArray_raw->add(IntWeakArray_raw, new_object_result->result);
 
       char* hashBytes = "SHA256 is the best SHA123456789K";
       char bufferHash[36] = { 0x02, 0x06, 0x03, 0x05 };
@@ -83,13 +83,14 @@ int main(){
       create_result = NH_creator->fromBytes(&bufferHash);
       XYObject* PreviousHash_object = create_result->result;
       new_object_result = newObject(hash_id, PreviousHash_object);
-      ByteWeakArray_raw->add(ByteWeakArray_raw, new_object_result->result);
+      IntWeakArray_raw->add(IntWeakArray_raw, new_object_result->result);
 
       char* testText3 = "333";
       char buffer3[7] = { 0x10, 0x01, 5, 0, 0, 0, 0};
       strcpy(&buffer3[4], testText3);
       create_result = textHeuristic_creator->fromBytes(buffer3);
-      ByteWeakArray_raw->add(ByteWeakArray_raw, create_result->result);
+      IntWeakArray_raw->add(IntWeakArray_raw, create_result->result);
+
 
       uint32_t index = 1;
       char index_id[2];
@@ -97,9 +98,24 @@ int main(){
       index_id[1] = 0x05;
       result = lookup(index_id);
       Object_Creator* index_creator = result->result;
-      breakpoint();
       create_result = index_creator->create(index_id, &index);
-      ByteWeakArray_raw->add(ByteWeakArray_raw, create_result->result);
+      IntWeakArray_raw->add(IntWeakArray_raw, create_result->result);
+
+      char payloadBuffer[21] = { 0, 0, 0, 21, 0, 0, 0, 10, 0x02, 0x05, 0, 0, 0, 65, 0, 0, 0, 7, 0x09, 0x01, 56 };
+      char payload_id[2];
+      payload_id[0] = 0x02;
+      payload_id[1] = 0x04;
+      result = lookup(payload_id);
+      Object_Creator* payload_creator = result->result;
+      XYResult* fromBytes_result = payload_creator->fromBytes(&payloadBuffer);
+      Payload* Payload_raw = fromBytes_result->result;
+      IntWeakArray* array1 = Payload_raw->signedHeuristics;
+      IntWeakArray* array2 = Payload_raw->unsignedHeuristics;
+      XYResult* newObject_result = newObject(payload_id, Payload_raw);
+      XYObject* Payload_object = newObject_result->result;
+      breakpoint();
+      IntWeakArray_raw->add(IntWeakArray_raw, Payload_object);
+
 
       /* Strong Array Test */
       if(result->error == OK){
@@ -158,11 +174,11 @@ int main(){
             XYObject* rssi_object8 = result7->result;
             XYResult* result9 = arrayPointer->get(arrayPointer, 2);
             XYObject* rssi_object9 = result7->result;
-            XYResult* array_add_result = ByteWeakArray_raw->add(ByteWeakArray_raw, arrayObject);
-            XYResult* get_result = ByteWeakArray_raw->get(ByteWeakArray_raw, 1);
+            XYResult* array_add_result = IntWeakArray_raw->add(IntWeakArray_raw, arrayObject);
+            XYResult* get_result = IntWeakArray_raw->get(IntWeakArray_raw, 1);
             XYObject* got_object = get_result->result;
 
-            XYResult* toBytes_result = ByteWeakArray_creator->toBytes(ByteWeakArray_object);
+            XYResult* toBytes_result = IntWeakArray_creator->toBytes(IntWeakArray_object);
             char* theBytes = toBytes_result->result;
 
             breakpoint();

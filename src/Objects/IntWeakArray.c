@@ -73,6 +73,30 @@ XYResult* IntWeakArray_add(IntWeakArray* self_IntWeakArray, XYObject* user_XYObj
       }
       newSize = (self_IntWeakArray->size + object_size + (sizeof(char)*2));
     }
+    else
+    {
+      /*
+       * If both the SizeOfSize identifier and defaultSize are 0,
+       * we have to read one layer deeper to retrieve the defaultSize
+       */
+       char* user_object_payload = user_XYObject->payload;
+       char id[2];
+       memcpy(id, user_object_payload, 2);
+       lookup_result = lookup(id);
+       if(lookup_result->error == OK){
+         Object_Creator* deeper_object_creator = lookup_result->result;
+         if(deeper_object_creator->defaultSize != 0){
+
+           // defaultSize + 2 Bytes representing ID
+           object_size = deeper_object_creator->defaultSize + (sizeof(char)*2);
+
+           newSize = (self_IntWeakArray->size + object_size + (sizeof(char)*2));
+         }
+         else if(deeper_object_creator->sizeIdentifierSize != 0){
+           /* Unimplemented */
+         }
+       }
+    }
     // Total Size should not exceed the size mandated by the type (Integer)
     if(newSize < 16777216U){
 
@@ -309,7 +333,6 @@ XYResult* IntWeakArray_creator_toBytes(struct XYObject* user_XYObject){
       if(littleEndian()){
         user_array->size = to_uint32((char*)user_array);
       }
-
       memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 4);
       memcpy(byteBuffer+4, user_array->payload, sizeof(char)*(totalSize-4));
       if(littleEndian()){
