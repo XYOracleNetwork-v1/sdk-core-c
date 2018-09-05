@@ -13,6 +13,7 @@ typedef struct ByteWeakArray ByteWeakArray;
 typedef struct NextPublicKey NextPublicKey;
 typedef struct PreviousHash PreviousHash;
 typedef struct Payload Payload;
+typedef struct SignatureSet SignatureSet;
 /*
  * Our documentation uses the terminology of Multi or Single Element arrays.
  * A Multi element array is one which can contain many different types within it.
@@ -53,22 +54,13 @@ struct IntStrongArray {
   void* payload;
 } ; //0x03
 
-struct LongStrongArray {
-  uint64_t  size;
-  char      id[2];
-  XYResult* (*add)(struct LongStrongArray* self_LongStrongArray, XYObject* user_XYObject);
-  XYResult* (*remove)(struct LongStrongArray* self_LongStrongArray, int index);
-  XYResult* (*get)(struct LongStrongArray* self_LongStrongArray, int index);
-  void* payload;
-} ; //0x04
-
 struct ByteWeakArray {
   uint8_t  size;
   XYResult* (*add)(struct ByteWeakArray* self_ByteWeakArray, XYObject* user_XYObject);
   XYResult* (*remove)(struct ByteWeakArray* self_ByteWeakArray, int index);
   XYResult* (*get)(struct ByteWeakArray* self_ByteWeakArray, int index);
   void* payload;
-} ; //0x05
+} ; //0x04
 
 struct ShortWeakArray {
   uint16_t size;
@@ -76,7 +68,7 @@ struct ShortWeakArray {
   XYResult* (*remove)(struct ShortWeakArray* self_ShortWeakArray, int index);
   XYResult* (*get)(struct ShortWeakArray* self_ShortWeakArray, int index);
   void* payload;
-} ; //0x06
+} ; //0x05
 
 struct IntWeakArray {
   uint32_t  size;
@@ -84,15 +76,7 @@ struct IntWeakArray {
   XYResult* (*remove)(struct IntWeakArray* self_IntWeakArray, int index);
   XYResult* (*get)(struct IntWeakArray* self_IntWeakArray, int index);
   void* payload;
-} ; //0x07
-
-struct LongWeakArray {
-  uint64_t  size;
-  XYResult* (*add)(struct LongStrongArray* self_LongStrongArray, XYObject* user_XYObject);
-  XYResult* (*remove)(struct LongStrongArray* self_LongStrongArray, int index);
-  XYResult* (*get)(struct LongStrongArray* self_LongStrongArray, int index);
-  void* payload;
-} ; //0x08
+} ; //0x06
 
 enum EXyoErrors{
   OK,

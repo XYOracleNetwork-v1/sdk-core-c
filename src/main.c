@@ -21,177 +21,176 @@
 int main(){
   preallocated_result = malloc(sizeof(struct XYResult));
   if(preallocated_result){
-      XYResult* result = initTable();
-      char id[2];
-      id[0] = 0x01;
-      id[1] = 0x06;
-      XYResult* lookup_result = lookup(id);
-      Object_Creator* IntWeakArray_creator = lookup_result->result;
-      XYResult* create_result = IntWeakArray_creator->create(NULL, NULL);
-      XYObject* IntWeakArray_object = create_result->result;
-      IntWeakArray* IntWeakArray_raw = IntWeakArray_object->payload;
-
-      id[0] = 0x10;
-      id[1] = 0x01;
-      lookup_result = lookup(id);
-      Object_Creator* textHeuristic_creator = lookup_result->result;
-      char* testText1 = "1";
-      char buffer1[5] = { 0x10, 0x01, 3, 0, 0 };
-      strcpy(&buffer1[4], testText1);
-      create_result = textHeuristic_creator->fromBytes(buffer1);
-      XYObject* testObject = create_result->result;
-      IntWeakArray_raw->add(IntWeakArray_raw, create_result->result);
-
-      id[0] = 0x10;
-      id[1] = 0x01;
-      char* testText2 = "22";
-      char buffer2[6] = { 0x10, 0x01, 4, 0, 0, 0 };
-      strcpy(&buffer2[4], testText2);
-      create_result = textHeuristic_creator->fromBytes(buffer2);
-      IntWeakArray_raw->add(IntWeakArray_raw, create_result->result);
-
-      uint8_t rssi = 0x05;
-      char rssi_id[2];
-      rssi_id[0] = 0x09;
-      rssi_id[1] = 0x01;
-      result = lookup(rssi_id);
-      Object_Creator* rssi_creator = result->result;
-      create_result = rssi_creator->create(rssi_id, &rssi);
-      IntWeakArray_raw->add(IntWeakArray_raw, create_result->result);
-
-      char* publicKey = "4444";
-      char bufferPubKey[10] = { 0x02, 0x07, 0x04, 0x03, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00 };
-      char public_key_id[2];
-      public_key_id[0] = 0x02;
-      public_key_id[1] = 0x07;
-      result = lookup(public_key_id);
-      Object_Creator* NPK_creator = result->result;
-      strcpy(&bufferPubKey[6], publicKey);
-      create_result = NPK_creator->fromBytes(&bufferPubKey);
-      XYObject* NextPublicKey_object = create_result->result;
-      XYResult* new_object_result = newObject(public_key_id, NextPublicKey_object);
-      IntWeakArray_raw->add(IntWeakArray_raw, new_object_result->result);
-
-      char* hashBytes = "SHA256 is the best SHA123456789K";
-      char bufferHash[36] = { 0x02, 0x06, 0x03, 0x05 };
-      char hash_id[2];
-      hash_id[0] = 0x02;
-      hash_id[1] = 0x06;
-      result = lookup(hash_id);
-      Object_Creator* NH_creator = result->result;
-      strcpy(&bufferHash[4], hashBytes);
-      create_result = NH_creator->fromBytes(&bufferHash);
-      XYObject* PreviousHash_object = create_result->result;
-      new_object_result = newObject(hash_id, PreviousHash_object);
-      IntWeakArray_raw->add(IntWeakArray_raw, new_object_result->result);
-
-      char* testText3 = "333";
-      char buffer3[7] = { 0x10, 0x01, 5, 0, 0, 0, 0};
-      strcpy(&buffer3[4], testText3);
-      create_result = textHeuristic_creator->fromBytes(buffer3);
-      IntWeakArray_raw->add(IntWeakArray_raw, create_result->result);
-
-
-      uint32_t index = 1;
-      char index_id[2];
-      index_id[0] = 0x02;
-      index_id[1] = 0x05;
-      result = lookup(index_id);
-      Object_Creator* index_creator = result->result;
-      create_result = index_creator->create(index_id, &index);
-      IntWeakArray_raw->add(IntWeakArray_raw, create_result->result);
-
-      char payloadBuffer[21] = { 0, 0, 0, 21, 0, 0, 0, 10, 0x02, 0x05, 0, 0, 0, 65, 0, 0, 0, 7, 0x09, 0x01, 56 };
-      char payload_id[2];
-      payload_id[0] = 0x02;
-      payload_id[1] = 0x04;
-      result = lookup(payload_id);
-      Object_Creator* payload_creator = result->result;
-      XYResult* fromBytes_result = payload_creator->fromBytes(&payloadBuffer);
-      Payload* Payload_raw = fromBytes_result->result;
-      IntWeakArray* array1 = Payload_raw->signedHeuristics;
-      IntWeakArray* array2 = Payload_raw->unsignedHeuristics;
-      XYResult* newObject_result = newObject(payload_id, Payload_raw);
-      XYObject* Payload_object = newObject_result->result;
-      breakpoint();
-      IntWeakArray_raw->add(IntWeakArray_raw, Payload_object);
-
-
-      /* Strong Array Test */
-      if(result->error == OK){
-      char testArray[9] = { 0x00, 0x00, 0x00, 0x09, 0x09, 0x01, 0x09, 0x09, 0x01 };
-      char id[2];
-      id[0] = 0x01;
-      id[1] = 0x03;
-      result = lookup(id);
-      Object_Creator* arrayCreator = result->result;
-      result = arrayCreator->fromBytes(&testArray);
-      if(result->error == OK){
-        IntStrongArray* array = (IntStrongArray*)result->result;
-        printf("Array id: %d %d\n", array->id[0], array->id[1]);
-        printf("Array size: %d\n", array->size);
-        printf("End fromBytes.\n");
-
-        char array_id[2];
-        array_id[0] = 0x01;
-        array_id[1] = 0x06;
-        result = newObject(array_id, array);
-        XYObject* object = result->result;
-        if(result->error == OK){
-          result = arrayCreator->toBytes(result->result);
-          IntStrongArray* datapointer = result->result;
-          printf("Array id: %d %d\n", array->id[0], array->id[1]);
-          printf("Array size: %d\n", array->size);
-          printf("End toBytes.\n");
+    initTable();
+    char BoundWitness_id[2] = { 0x02, 0x01 };
+    char ShortStrongArray_id[2] = { 0x01, 0x02 };
+    char ShortWeakArray_id[2] = { 0x01, 0x05 };
+    char IntStrongArray_id[2] = { 0x01, 0x03 };
+    char IntWeakArray_id[2] = { 0x01, 0x06 };
+    char Payload_id[2] = { 0x02, 0x04 };
+    char SignatureSet_id[2] = { 0x02, 0x03 };
+    char NextPublicKey_id[2] = { 0x02, 0x07 };
+    char Rssi_id[2] = { 0x08, 0x01 };
+    XYResult* lookup_result = lookup(BoundWitness_id);
+    if(lookup_result->error == OK){
+      Object_Creator* BoundWitness_creator = lookup_result->result;
+      //free(lookup_result);
+      BoundWitness* BoundWitness_raw = malloc(sizeof(BoundWitness));
+      XYObject* BoundWitness_object;
+      if(BoundWitness_raw){
+        XYResult* create_result = BoundWitness_creator->create(BoundWitness_id, BoundWitness_raw);
+        if(create_result->error != OK){
+          return create_result->result;
         }
-        rssi_id[0] = 0x09;
-        rssi_id[1] = 0x01;
-        result = arrayCreator->create(rssi_id, NULL);
+        BoundWitness_object = create_result->result;
+      } else {
+        RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+      }
+      lookup_result = lookup(ShortStrongArray_id);
+      if(lookup_result->error == OK){
+        Object_Creator* SSA_Creator = lookup_result->result;
+        //free(lookup_result);
+        lookup_result = lookup(IntStrongArray_id);
+        if(lookup_result->error == OK){
+          Object_Creator* ISA_Creator = lookup_result->result;
+          //free(lookup_result);
+          XYResult* create_result = SSA_Creator->create(ShortWeakArray_id, NULL);
+          if(create_result->error != OK){
+            return create_result->result;
+          }
+          // Set up Public Keys Array
+          XYObject*  publicKeys_object = create_result->result;
+          ShortStrongArray* publicKeys_raw = publicKeys_object->payload;
+          //free(create_result);
+          char bufferPubKey[8] = { 0x02, 0x07, 0x04, 0x03, 0x00, 0x04, 0x00, 0x00 };
+          lookup_result = lookup(NextPublicKey_id);
+          Object_Creator* NPK_creator = lookup_result->result;
+          //free(lookup_result);
+          create_result = NPK_creator->fromBytes(&bufferPubKey);
+          XYObject* NextPublicKey_object = create_result->result;
+          //free(create_result);
+          XYResult* newObject_result = newObject(NextPublicKey_id, NextPublicKey_object);
+          if(newObject_result->error != OK){
+            return newObject_result->result;
+          }
+          XYResult* add_result = publicKeys_raw->add(publicKeys_raw, newObject_result->result);
+          if(add_result->error != OK){
+            return add_result->result;
+          }
+          //free(newObject_result);
 
-        if(result->error == OK){
-          XYObject* arrayObject = result->result;
-          IntStrongArray* arrayPointer = arrayObject->payload;
-          uint8_t rssi1 = 0x10;
-          uint8_t rssi2 = 0x12;
-          uint8_t rssi3 = 0x13;
-          rssi_id[0] = 0x09;
-          rssi_id[1] = 0x01;
-          result = lookup(rssi_id);
-          if(result->error == OK){
-            Object_Creator* rssiCreator = result->result;
-            XYResult* result1 = rssiCreator->create(rssi_id, &rssi1);
-            XYResult* result4 = arrayPointer->add(arrayPointer, result1->result);
+          // Set up Payload Array
+          create_result = ISA_Creator->create(Payload_id, NULL);
+          if(create_result->error != OK){
+            return create_result->result;
+          }
+          XYObject* payload_object = create_result->result;
+          IntStrongArray* payload_raw = payload_object->payload;
+          //free(create_result);
+          lookup_result = lookup(ShortWeakArray_id);
+          if(lookup_result->error != OK){
+            return lookup_result->result;
+          }
+          /**/
+          Object_Creator* SWA_Creator = lookup_result->result;
+          create_result = SWA_Creator->create(NULL, NULL);
+          if(create_result->error != OK){
+            return create_result->result;
+          }
+          XYObject* user_signedHeuristics_object = create_result->result;
+          IntWeakArray* user_signedHeuristics = user_signedHeuristics_object->payload;
+          //free(create_result);
 
-            XYResult* result2 = rssiCreator->create(rssi_id, &rssi2);
-            XYResult* result5 = arrayPointer->add(arrayPointer, result2->result);
+          create_result = SWA_Creator->create(NULL, NULL);
+          if(create_result->error != OK){
+            return create_result->result;
+          }
+          XYObject* user_unsignedHeuristics_object = create_result->result;
+          IntWeakArray* user_unsignedHeuristics = user_unsignedHeuristics_object->payload;
+          //free(create_result);
 
-            XYResult* result3 = rssiCreator->create(rssi_id, &rssi3);
-            XYResult* result6 = arrayPointer->add(arrayPointer, result3->result);
+          // Add RSSI Heuristics to unsigned and signed payload
+          lookup_result = lookup(Rssi_id);
+          if(lookup_result->error != OK){
+            return lookup_result->result;
+          }
+          Object_Creator* Rssi_Creator = lookup_result->result;
+          char rssi_val = 0xC4;
+          create_result = Rssi_Creator->create(Rssi_id, &rssi_val);
+          if(create_result->error != OK){
+            return create_result->result;
+          }
+          add_result = user_signedHeuristics->add(user_signedHeuristics, create_result->result);
+          if(add_result->error != OK){
+            return add_result->result;
+          }
+          //free(add_result);
+          add_result = user_unsignedHeuristics->add(user_unsignedHeuristics, create_result->result);
+          if(add_result->error != OK){
+            return add_result->result;
+          }
+          breakpoint();
+          add_result = payload_raw->add(payload_raw, user_signedHeuristics_object);
+          add_result = payload_raw->add(payload_raw, user_unsignedHeuristics_object);
+          //free(add_result);
+          //free(create_result);
+          //free(Rssi_Creator);
+          // Set up Signatures Array
+          create_result = SSA_Creator->create(SignatureSet_id, NULL);
+          if(create_result->error != OK){
+            return create_result->result;
+          }
+          XYObject* signatures_object = create_result->result;
+          ShortStrongArray* signatures_raw = signatures_object->payload;
+          //free(create_result);
+          /*
+          lookup_result = lookup(ShortWeakArray_id);
+          if(lookup_result->error != OK){
+            return lookup_result->result;
+          }
+          Object_Creator* SWA_Creator = lookup_result->result;
+          */
+          create_result = SWA_Creator->create(NULL, NULL);
+          if(create_result->error != OK){
+            return create_result->result;
+          }
+          XYObject* user_signatures_object = create_result->result;
+          ShortWeakArray* user_signatures = user_signatures_object->payload;
 
-            XYResult* result7 = arrayPointer->get(arrayPointer, 0);
-            XYObject* rssi_object7 = result7->result;
-            XYResult* result8 = arrayPointer->get(arrayPointer, 1);
-            XYObject* rssi_object8 = result7->result;
-            XYResult* result9 = arrayPointer->get(arrayPointer, 2);
-            XYObject* rssi_object9 = result7->result;
-            XYResult* array_add_result = IntWeakArray_raw->add(IntWeakArray_raw, arrayObject);
-            XYResult* get_result = IntWeakArray_raw->get(IntWeakArray_raw, 1);
-            XYObject* got_object = get_result->result;
-
-            XYResult* toBytes_result = IntWeakArray_creator->toBytes(IntWeakArray_object);
-            char* theBytes = toBytes_result->result;
-
-            breakpoint();
-            printf("end test\n");
+          char rssi_val2 = 0x44;
+          create_result = Rssi_Creator->create(Rssi_id, &rssi_val2);
+          if(create_result->error != OK){
+            return create_result->result;
           }
 
+          add_result = user_signatures->add(user_signatures, create_result->result);
+          //free(create_result);
+          newObject_result = newObject(ShortWeakArray_id, user_signatures);
+          if(newObject_result->error != OK){
+            return newObject_result->result;
+          }
+          //breakpoint();
+          add_result = signatures_raw->add(signatures_raw, newObject_result->result);
+          if(add_result->error != OK){
+            return add_result->result;
+          }
+          if(publicKeys_raw && payload_raw && signatures_raw){
+            BoundWitness_raw->publicKeys = publicKeys_raw;
+            BoundWitness_raw->payload = payload_raw;
+            BoundWitness_raw->signatures = signatures_raw;
+            BoundWitness_raw->size = publicKeys_raw->size + payload_raw->size + signatures_raw->size + (4 * sizeof(char));
+            XYResult* toBytes_result = BoundWitness_creator->toBytes(BoundWitness_object);
+            char* theBytes = toBytes_result->result;
+            breakpoint();
+            printf("End Test <3");
+          }
+        } else {
+          return lookup_result->result;
         }
-      }
-      else {
-        return -1;
+      } else {
+        return lookup_result->result;
       }
     }
-
   }
   else{
     return -1;

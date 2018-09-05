@@ -44,7 +44,7 @@ XYResult* IntStrongArray_add(IntStrongArray* self_IntStrongArray, XYObject* user
     else if(user_object_creator->sizeIdentifierSize != 0){
 
       // Get a pointer to beginning of the array to read the size.
-      char* object_payload = self_IntStrongArray->payload;
+      char* object_payload = user_XYObject->payload;
 
       // Size identifier Size tells you how many bytes to read for size
       switch(user_object_creator->sizeIdentifierSize){
@@ -70,6 +70,29 @@ XYResult* IntStrongArray_add(IntStrongArray* self_IntStrongArray, XYObject* user
           break;
       }
       newSize = (self_IntStrongArray->size + object_size * sizeof(char));
+    }
+    else
+    {
+      /*
+       * If both the SizeOfSize identifier and defaultSize are 0,
+       * we have to read one layer deeper to retrieve the defaultSize
+       */
+       char* user_object_payload = user_XYObject->payload;
+       char id[2];
+       memcpy(id, user_object_payload, 2);
+       lookup_result = lookup(id);
+       if(lookup_result->error == OK){
+         Object_Creator* deeper_object_creator = lookup_result->result;
+         if(deeper_object_creator->defaultSize != 0){
+
+           object_size = deeper_object_creator->defaultSize;
+
+           newSize = (self_IntStrongArray->size + object_size);
+         }
+         else if(deeper_object_creator->sizeIdentifierSize != 0){
+           /* Unimplemented */
+         }
+       }
     }
     // Total Size should not exceed the size mandated by the type (Integer)
     if(newSize < 16777216U){

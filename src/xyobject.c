@@ -136,6 +136,22 @@ XYResult* initTable(){
     return preallocated_result;
   }
 
+  // Initialize Bound Witness Creator
+  struct Object_Creator* BoundWitness_creator = malloc(sizeof(Object_Creator));
+  if(BoundWitness_creator != NULL){
+    BoundWitness_creator->sizeIdentifierSize = 4;
+    BoundWitness_creator->defaultSize = 0;
+    BoundWitness_creator->create = &BoundWitness_creator_create;
+    BoundWitness_creator->fromBytes = &BoundWitness_creator_fromBytes;
+    BoundWitness_creator->toBytes = &BoundWitness_creator_toBytes;
+    typeTable[0x02][0x01] = BoundWitness_creator;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
   // Initialize Payload Creator
   struct Object_Creator* Payload_creator = malloc(sizeof(Object_Creator));
   if(Payload_creator != NULL){
@@ -240,7 +256,7 @@ XYResult* initTable(){
     rssi_creator->create = &Heuristic_RSSI_Creator_create;
     rssi_creator->fromBytes = &Heuristic_RSSI_Creator_fromBytes;
     rssi_creator->toBytes = &Heuristic_RSSI_Creator_toBytes;
-    typeTable[0x09][0x01] = rssi_creator; //TODO: Change major and minor for RSSI when it's standardized.
+    typeTable[0x08][0x01] = rssi_creator; //TODO: Change major and minor for RSSI when it's standardized.
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;

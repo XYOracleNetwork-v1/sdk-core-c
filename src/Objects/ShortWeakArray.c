@@ -317,7 +317,7 @@ XYResult* ShortWeakArray_creator_fromBytes(char* data){
 *      XYResult*            [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
 XYResult* ShortWeakArray_creator_toBytes(struct XYObject* user_XYObject){
-  if(user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x06){
+  if(user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x05){
     ShortWeakArray* user_array = user_XYObject->GetPayload(user_XYObject);
     uint16_t totalSize = user_array->size;
     char* byteBuffer = malloc(sizeof(char)*totalSize);
