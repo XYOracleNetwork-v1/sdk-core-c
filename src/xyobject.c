@@ -232,6 +232,22 @@ XYResult* initTable(){
     return preallocated_result;
   }
 
+  // Initialize ECDSA Secp256k1 Uncompressed Key
+  struct Object_Creator* secp256k1_creator = malloc(sizeof(Object_Creator));
+  if(secp256k1_creator != NULL){
+    secp256k1_creator->sizeIdentifierSize = 0;
+    secp256k1_creator->defaultSize = 64;
+    secp256k1_creator->create = &ECDSA_secp256k1Uncompressed_creator_create;
+    secp256k1_creator->fromBytes = &ECDSA_secp256k1Uncompressed_creator_fromBytes;
+    secp256k1_creator->toBytes = &ECDSA_secp256k1Uncompressed_creator_toBytes;
+    typeTable[0x04][0x01] = secp256k1_creator;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
   // Initialize Custom Next Public Key Creator
   struct Object_Creator* NPKU_creator = malloc(sizeof(Object_Creator));
   if(NPKU_creator != NULL){

@@ -176,7 +176,6 @@ XYResult* BoundWitness_creator_toBytes(struct XYObject* user_XYObject){
   uint16_t user_signaturesSize = user_signatures->size;
   newObject_result = newObject(ShortStrongArray_id, user_signatures);
   if(newObject_result->error == OK){
-    breakpoint();
     XYResult* toBytes_result = SSA_Creator->toBytes(newObject_result->result);
     //free(newObject_result);
     if(toBytes_result->error == OK){

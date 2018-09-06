@@ -126,3 +126,116 @@ XYResult* Heuristic_Text_Creator_toBytes(struct XYObject* user_XYObject){
     return preallocated_result;
   }
 }
+
+XYResult* ECDSA_secp256k1Uncompressed_creator_create(char id[2], void* text){
+  return newObject(id, text);
+}
+
+XYResult* ECDSA_secp256k1Uncompressed_creator_fromBytes(char* heuristic_data){
+  char id[2];
+  memcpy(id, heuristic_data, 2);
+  char* payload_bytes = malloc(64*sizeof(char));
+  memcpy(payload_bytes, &heuristic_data[2], 64);
+  return newObject(id, payload_bytes);
+}
+
+XYResult* ECDSA_secp256k1Uncompressed_creator_toBytes(struct XYObject* user_XYObject){
+  char* text = user_XYObject->payload;
+  char* encoded_bytes = malloc(sizeof(char)*64);
+
+  if(encoded_bytes == NULL){
+    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+  }
+
+  memcpy(encoded_bytes, user_XYObject->payload, 64*sizeof(char));
+
+  struct XYResult* return_result = malloc(sizeof(struct XYResult));
+  if(return_result != NULL){
+    return_result->error = OK;
+    return_result->result = encoded_bytes;
+    return return_result;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = NULL;
+    return preallocated_result;
+  }
+}
+/*
+XYResult* Payload_creator_create(char id[2], void* text){
+  return newObject(id, text);
+}
+
+XYResult* Payload_creator_fromBytes(char* payload_data){
+  Payload* return_payload = malloc(sizeof(Payload));
+  char id[2];
+  memcpy(id, payload_data, 2);
+  char IntWeakArray_id = { 0x01, 0x03 };
+  XYResult* lookup_result = lookup(IntWeakArray_id);
+  if(lookup_result->error!=OK){
+    return lookup_result;
+  }
+  Object_Creator* IntWeak_creator = lookup_result->result;
+
+  XYResult* create_result = IntWeak_creator->fromBytes(payload_data[6*sizeof(char)]);
+  uint32_t signedArraySize = to_uint32(payload_data[6]);
+  if(create_result->error!=OK){
+    return create_result;
+  }
+  XYObject* signed_object = create_result->result;
+  return_payload->signedHeuristics = signed_object->payload;
+
+  create_result = IntWeak_creator->fromBytes(payload_data[6+signedArraySize*sizeof(char)]);
+  uint32_t unsignedArraySize = to_uint32(payload_data[6+signedArraySize*sizeof(char)]);
+  if(create_result->error!=OK){
+    return create_result;
+  }
+  XYObject* unsigned_object = create_result->result;
+  return_payload->unsignedHeuristics = unsigned_object->payload;
+  return_payload->size = unsignedArraySize + signedArraySize + sizeof(char)*4;
+
+  return newObject(id, return_payload);
+}
+
+XYResult* Payload_creator_toBytes(struct XYObject* user_XYObject){
+  Payload* user_payload = user_XYObject->payload;
+  uint32_t totalSize = user_payload->size;
+  IntWeakArray* signedHeuristics = user_payload->signedHeuristics;
+  IntWeakArray* unsignedHeuristics = user_payload->unsignedHeuristics;
+  char IntWeakArray_id[2] = { 0x01, 0x06 };
+  breakpoint();
+  XYResult* lookup_result = lookup(IntWeakArray_id);
+  if(lookup_result->error!=OK){
+    return lookup_result;
+  }
+  Object_Creator* IntWeak_creator = lookup_result->result;
+  XYResult* newObject_result = newObject(IntWeakArray_id, signedHeuristics);
+  XYResult* toBytes_result = IntWeak_creator->toBytes(newObject_result->result);
+  char* signedBytes = toBytes_result->result;
+
+  newObject_result = newObject(IntWeakArray_id, unsignedHeuristics);
+  toBytes_result = IntWeak_creator->toBytes(newObject_result->result);
+  char* unsignedBytes = toBytes_result->result;
+
+  char* byteBuffer = malloc(totalSize*sizeof(char));
+  uint32_t signedSize = to_uint32(signedBytes);
+  uint32_t unsignedSize = to_uint32(unsignedBytes);
+
+  if(littleEndian()){
+    uint32_t encodedSize = to_uint32(&totalSize);
+    memcpy(byteBuffer, &encodedSize, 4*sizeof(char));
+  } else {
+    memcpy(byteBuffer, &totalSize, 4*sizeof(char));
+  }
+  memcpy(byteBuffer+(sizeof(char)*4), signedBytes, signedSize);
+  memcpy(byteBuffer+(sizeof(char)*4+signedSize), unsignedBytes, unsignedSize);
+
+  XYResult* return_result = malloc(sizeof(XYResult));
+  if(return_result){
+    return_result->error = OK;
+    return_result->result = byteBuffer;
+  } else {
+    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+  }
+}
+*/

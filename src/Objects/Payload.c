@@ -141,7 +141,7 @@ XYResult* Payload_creator_toBytes(struct XYObject* user_XYObject){
   }
 
   char* return_buffer = malloc(sizeof(char)*size);
-  uint32_t encoded_size = size;
+  uint32_t encoded_size = size1 + size2 + (4*sizeof(char));
   if(littleEndian()){
     //tempArrayPointer1->size = to_uint32((char*)tempArrayPointer1);
     //tempArrayPointer2->size = to_uint32((char*)tempArrayPointer2);

@@ -144,8 +144,7 @@ XYResult* NextPublicKey_creator_toBytes(struct XYObject* user_XYObject){
           case 2:
             element_size = to_uint16(&casted_NPK[0]);
             uint16_t encodedSize16 = element_size;
-            int mallocNumber = 2*sizeof(char) + (element_size*sizeof(char));
-            byteBuffer = malloc(mallocNumber);
+            byteBuffer = malloc(2*sizeof(char) + (element_size*sizeof(char)));
             if(littleEndian()){
                encodedSize16 = to_uint16((char*)&element_size);
             }

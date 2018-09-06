@@ -14,6 +14,7 @@ typedef struct NextPublicKey NextPublicKey;
 typedef struct PreviousHash PreviousHash;
 typedef struct Payload Payload;
 typedef struct SignatureSet SignatureSet;
+typedef struct ECDSA_secp256k1_uncompressed ECDSA_secp256k1_uncompressed;
 /*
  * Our documentation uses the terminology of Multi or Single Element arrays.
  * A Multi element array is one which can contain many different types within it.
@@ -136,6 +137,11 @@ struct PreviousHash{
 struct NextPublicKey{
   char id[2];
   char* publicKey;
+};
+
+struct ECDSA_secp256k1_uncompressed{
+  char point_x[32];
+  char point_y[32];
 };
 
 struct XYObject{

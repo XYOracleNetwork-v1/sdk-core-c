@@ -88,7 +88,7 @@ XYResult* IntWeakArray_add(IntWeakArray* self_IntWeakArray, XYObject* user_XYObj
          if(deeper_object_creator->defaultSize != 0){
 
            // defaultSize + 2 Bytes representing ID
-           object_size = deeper_object_creator->defaultSize + (sizeof(char)*2);
+           object_size = deeper_object_creator->defaultSize;
 
            newSize = (self_IntWeakArray->size + object_size + (sizeof(char)*2));
          }
