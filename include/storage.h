@@ -1,9 +1,14 @@
 #include "xyobject.h"
+#ifndef STORAGE_H
+typedef struct StorageProvider StorageProvider;
 
-typedef struct {
-  int (*put)(char*, char*); // Insert into hashmap
-  struct XYObject* (*get)(char*); // Get from hashmap
-  struct XYObject* (*GetAllKeys)(); // Get all keys in hashmap
-  int (*remove)(char*); // Remove element from hashmap
-  void (*contains)(char*, void (*f)(char*)); // Is element in hashmap
+#define STORAGE_H
+#endif
+
+struct StorageProvider{
+  XYResult* (*write)(ByteArray*, ByteArray*); // Insert into dictionary
+  XYResult* (*read)(ByteArray*); // Get from dictionary
+  XYObject* (*GetAllKeys)(); // Get all keys in dictionary TODO
+  XYResult* (*delete)(ByteArray*); // Remove element from hashmap TODO
+  XYResult* (*contains)(ByteArray*, void (*f)(ByteArray*)); // Is element in hashmap TODO
 } storageProvider;

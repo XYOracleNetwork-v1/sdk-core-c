@@ -22,6 +22,7 @@ int main(){
   preallocated_result = malloc(sizeof(struct XYResult));
   if(preallocated_result){
     initTable();
+    /*
     char BoundWitness_id[2] = { 0x02, 0x01 };
     char ShortStrongArray_id[2] = { 0x01, 0x02 };
     char ShortWeakArray_id[2] = { 0x01, 0x05 };
@@ -33,7 +34,7 @@ int main(){
     char NextPublicKey_id[2] = { 0x02, 0x07 };
     char SECP256K1_id[2] = { 0x04, 0x01 };
     char Rssi_id[2] = { 0x08, 0x01 };
-
+    */
     XYResult* lookup_result = lookup(BoundWitness_id);
     if(lookup_result->error == OK){
       Object_Creator* BoundWitness_creator = lookup_result->result;
@@ -82,7 +83,7 @@ int main(){
           //free(create_result);
           strcpy(publicKey->point_x, "Hello");
           strcpy(publicKey->point_y, "World!");
-          XYResult* newObject_result = newObject(SECP256K1_id, publicKey);
+          XYResult* newObject_result = newObject(ECDSASecp256k1_id, publicKey);
           if(newObject_result->error != OK){
             return newObject_result->error;
           }
@@ -152,14 +153,12 @@ int main(){
           user_payload->unsignedHeuristics = user_unsignedHeuristics;
           newObject_result = newObject(Payload_id, user_payload);
           add_result = payload_raw->add(payload_raw, newObject_result->result);
-          breakpoint();
           Payload* user_payload2 = malloc(sizeof(Payload));
           user_payload2->size = user_signedHeuristics->size + user_unsignedHeuristics->size + 4;
           user_payload2->signedHeuristics = user_signedHeuristics;
           user_payload2->unsignedHeuristics = user_unsignedHeuristics;
           newObject_result = newObject(Payload_id, user_payload2);
           add_result = payload_raw->add(payload_raw, newObject_result->result);
-          breakpoint();
           //free(add_result);
           //free(create_result);
           //free(Rssi_Creator);
@@ -204,11 +203,15 @@ int main(){
           }
           if(publicKeys_raw && payload_raw && signatures_raw){
             BoundWitness_raw->publicKeys = publicKeys_raw;
-            BoundWitness_raw->payload = payload_raw;
+            BoundWitness_raw->payloads = payload_raw;
             BoundWitness_raw->signatures = signatures_raw;
             BoundWitness_raw->size = publicKeys_raw->size + payload_raw->size + signatures_raw->size + (4 * sizeof(char));
+            BoundWitness_raw->GetSigningData = &BoundWitness_GetSigningData;
             XYResult* toBytes_result = BoundWitness_creator->toBytes(BoundWitness_object);
             char* theBytes = toBytes_result->result;
+            breakpoint();
+            XYResult* GetSigningData_result = BoundWitness_raw->GetSigningData(BoundWitness_raw);
+            char* signingBytes = GetSigningData_result->result;
             breakpoint();
             printf("End Test <3");
           }

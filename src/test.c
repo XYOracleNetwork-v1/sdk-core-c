@@ -51,38 +51,31 @@ int test(){
       IntWeakArray_raw->add(IntWeakArray_raw, create_result->result);
 
       uint8_t rssi = 0x05;
-      char rssi_id[2];
-      rssi_id[0] = 0x08;
-      rssi_id[1] = 0x01;
-      result = lookup(rssi_id);
+      result = lookup(Rssi_id);
       Object_Creator* rssi_creator = result->result;
-      create_result = rssi_creator->create(rssi_id, &rssi);
+      create_result = rssi_creator->create(Rssi_id, &rssi);
       IntWeakArray_raw->add(IntWeakArray_raw, create_result->result);
 
       char* publicKey = "4444";
       char bufferPubKey[10] = { 0x02, 0x07, 0x04, 0x03, 0x00, 0x06, 0x00, 0x00, 0x00, 0x00 };
-      char public_key_id[2];
-      public_key_id[0] = 0x02;
-      public_key_id[1] = 0x07;
-      result = lookup(public_key_id);
+      NextPublicKey_id[0] = 0x02;
+      NextPublicKey_id[1] = 0x07;
+      result = lookup(NextPublicKey_id);
       Object_Creator* NPK_creator = result->result;
       strcpy(&bufferPubKey[6], publicKey);
       create_result = NPK_creator->fromBytes(&bufferPubKey);
       XYObject* NextPublicKey_object = create_result->result;
-      XYResult* new_object_result = newObject(public_key_id, NextPublicKey_object);
+      XYResult* new_object_result = newObject(NextPublicKey_id, NextPublicKey_object);
       IntWeakArray_raw->add(IntWeakArray_raw, new_object_result->result);
 
       char* hashBytes = "SHA256 is the best SHA123456789K";
       char bufferHash[36] = { 0x02, 0x06, 0x03, 0x05 };
-      char hash_id[2];
-      hash_id[0] = 0x02;
-      hash_id[1] = 0x06;
-      result = lookup(hash_id);
+      result = lookup(PreviousHash_id);
       Object_Creator* NH_creator = result->result;
       strcpy(&bufferHash[4], hashBytes);
       create_result = NH_creator->fromBytes(&bufferHash);
       XYObject* PreviousHash_object = create_result->result;
-      new_object_result = newObject(hash_id, PreviousHash_object);
+      new_object_result = newObject(PreviousHash_id, PreviousHash_object);
       IntWeakArray_raw->add(IntWeakArray_raw, new_object_result->result);
 
       char* testText3 = "333";
@@ -93,25 +86,19 @@ int test(){
 
 
       uint32_t index = 1;
-      char index_id[2];
-      index_id[0] = 0x02;
-      index_id[1] = 0x05;
-      result = lookup(index_id);
+      result = lookup(Index_id);
       Object_Creator* index_creator = result->result;
-      create_result = index_creator->create(index_id, &index);
+      create_result = index_creator->create(Index_id, &index);
       IntWeakArray_raw->add(IntWeakArray_raw, create_result->result);
 
       char payloadBuffer[21] = { 0, 0, 0, 21, 0, 0, 0, 10, 0x02, 0x05, 0, 0, 0, 65, 0, 0, 0, 7, 0x09, 0x01, 56 };
-      char payload_id[2];
-      payload_id[0] = 0x02;
-      payload_id[1] = 0x04;
-      result = lookup(payload_id);
+      result = lookup(Payload_id);
       Object_Creator* payload_creator = result->result;
       XYResult* fromBytes_result = payload_creator->fromBytes(&payloadBuffer);
       Payload* Payload_raw = fromBytes_result->result;
       IntWeakArray* array1 = Payload_raw->signedHeuristics;
       IntWeakArray* array2 = Payload_raw->unsignedHeuristics;
-      XYResult* newObject_result = newObject(payload_id, Payload_raw);
+      XYResult* newObject_result = newObject(Payload_id, Payload_raw);
       XYObject* Payload_object = newObject_result->result;
       breakpoint();
       IntWeakArray_raw->add(IntWeakArray_raw, Payload_object);
@@ -132,10 +119,7 @@ int test(){
         printf("Array size: %d\n", array->size);
         printf("End fromBytes.\n");
 
-        char array_id[2];
-        array_id[0] = 0x01;
-        array_id[1] = 0x06;
-        result = newObject(array_id, array);
+        result = newObject(IntWeakArray_id, array);
         XYObject* object = result->result;
         if(result->error == OK){
           result = arrayCreator->toBytes(result->result);
@@ -144,9 +128,9 @@ int test(){
           printf("Array size: %d\n", array->size);
           printf("End toBytes.\n");
         }
-        rssi_id[0] = 0x08;
-        rssi_id[1] = 0x01;
-        result = arrayCreator->create(rssi_id, NULL);
+        Rssi_id[0] = 0x08;
+        Rssi_id[1] = 0x01;
+        result = arrayCreator->create(Rssi_id, NULL);
 
         if(result->error == OK){
           XYObject* arrayObject = result->result;
@@ -154,18 +138,18 @@ int test(){
           uint8_t rssi1 = 0x10;
           uint8_t rssi2 = 0x12;
           uint8_t rssi3 = 0x13;
-          rssi_id[0] = 0x08;
-          rssi_id[1] = 0x01;
-          result = lookup(rssi_id);
+          Rssi_id[0] = 0x08;
+          Rssi_id[1] = 0x01;
+          result = lookup(Rssi_id);
           if(result->error == OK){
             Object_Creator* rssiCreator = result->result;
-            XYResult* result1 = rssiCreator->create(rssi_id, &rssi1);
+            XYResult* result1 = rssiCreator->create(Rssi_id, &rssi1);
             XYResult* result4 = arrayPointer->add(arrayPointer, result1->result);
 
-            XYResult* result2 = rssiCreator->create(rssi_id, &rssi2);
+            XYResult* result2 = rssiCreator->create(Rssi_id, &rssi2);
             XYResult* result5 = arrayPointer->add(arrayPointer, result2->result);
 
-            XYResult* result3 = rssiCreator->create(rssi_id, &rssi3);
+            XYResult* result3 = rssiCreator->create(Rssi_id, &rssi3);
             XYResult* result6 = arrayPointer->add(arrayPointer, result3->result);
 
             XYResult* result7 = arrayPointer->get(arrayPointer, 0);

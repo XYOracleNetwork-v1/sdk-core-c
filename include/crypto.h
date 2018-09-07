@@ -1,6 +1,6 @@
 #ifndef XYCrypto
-typedef struct Signer Signer, *sop;
-typedef struct CryptoCreator CryptoCreator, *ccp;
+typedef struct Signer Signer;
+typedef struct CryptoCreator CryptoCreator;
 typedef struct{
   char* publicKey;
   char* privateKey;

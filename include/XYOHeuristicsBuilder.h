@@ -60,6 +60,7 @@ XYResult* Payload_creator_toBytes(struct XYObject* user_XYObect);
 XYResult* BoundWitness_creator_create(char id[2], void* user_data);
 XYResult* BoundWitness_creator_fromBytes(char* BoundWitness_data);
 XYResult* BoundWitness_creator_toBytes(struct XYObject* user_XYObect);
+XYResult* BoundWitness_GetSigningData(BoundWitness* user_BoundWitness);
 
 XYResult* ByteStrongArray_creator_create(char id[2], void* user_data);
 XYResult* ByteStrongArray_creator_fromBytes(char* data);

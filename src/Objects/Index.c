@@ -63,7 +63,7 @@ XYResult* Index_creator_toBytes(struct XYObject* user_XYObject){
   char* index = (char*)user_XYObject->payload;
   encoded_bytes = to_uint32(&index[0]);
   if(!littleEndian()){
-    encoded_bytes = to_uint32(encoded_bytes);
+    encoded_bytes = to_uint32((char*)&encoded_bytes);
   }
 
 

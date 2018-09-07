@@ -1,12 +1,12 @@
 #include <stdlib.h>
 #include "storage.h"
 
-storageProvider* newStorageProvider(){
-  storageProvider* store = malloc(sizeof(storageProvider));
-  store->put = NULL;
-  store->get = NULL;
+StorageProvider* newStorageProvider(){
+  StorageProvider* store = malloc(sizeof(storageProvider));
+  store->write = NULL;
+  store->read = NULL;
   store->GetAllKeys = NULL;
-  store->remove = NULL;
+  store->delete = NULL;
   store->contains = NULL;
   return store;
 }

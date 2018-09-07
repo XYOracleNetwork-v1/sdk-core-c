@@ -1,5 +1,6 @@
 #include <stdint.h>
 #ifndef XYOBJECT_H
+#include "hash.h"
 
 typedef struct XYObject XYObject;
 typedef struct XYResult XYResult;
@@ -15,6 +16,7 @@ typedef struct PreviousHash PreviousHash;
 typedef struct Payload Payload;
 typedef struct SignatureSet SignatureSet;
 typedef struct ECDSA_secp256k1_uncompressed ECDSA_secp256k1_uncompressed;
+typedef struct ByteArray ByteArray;
 /*
  * Our documentation uses the terminology of Multi or Single Element arrays.
  * A Multi element array is one which can contain many different types within it.
@@ -111,8 +113,10 @@ struct XYResult{
 struct BoundWitness{
   uint32_t size;
   struct ShortStrongArray* publicKeys;
-  struct IntStrongArray* payload;
+  struct IntStrongArray* payloads;
   struct ShortStrongArray* signatures;
+  struct XYResult*  (*GetSigningData)(BoundWitness*);
+  struct XYResult* (*GetHash)(BoundWitness*);
 };
 
 struct KeySet{
@@ -142,6 +146,12 @@ struct NextPublicKey{
 struct ECDSA_secp256k1_uncompressed{
   char point_x[32];
   char point_y[32];
+};
+
+struct ByteArray{
+  uint32_t size;
+  char reserved[2];
+  char* payload;
 };
 
 struct XYObject{

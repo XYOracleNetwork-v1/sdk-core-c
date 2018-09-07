@@ -113,11 +113,6 @@ XYResult* Payload_creator_toBytes(struct XYObject* user_XYObject){
   IntWeakArray* tempArrayPointer1 = user_Payload->signedHeuristics;
   IntWeakArray* tempArrayPointer2 = user_Payload->unsignedHeuristics;
 
-  if(littleEndian()){
-    //tempArrayPointer1->size = to_uint32((char*)tempArrayPointer1);
-    //tempArrayPointer2->size = to_uint32((char*)tempArrayPointer2);
-  }
-
   XYResult* newObject_result1 = newObject(IntWeakArrayID, user_Payload->signedHeuristics);
   if(newObject_result1->error == OK){
     toBytes_result1 = weakArrayCreator->toBytes( newObject_result1->result );
@@ -143,8 +138,6 @@ XYResult* Payload_creator_toBytes(struct XYObject* user_XYObject){
   char* return_buffer = malloc(sizeof(char)*size);
   uint32_t encoded_size = size1 + size2 + (4*sizeof(char));
   if(littleEndian()){
-    //tempArrayPointer1->size = to_uint32((char*)tempArrayPointer1);
-    //tempArrayPointer2->size = to_uint32((char*)tempArrayPointer2);
     encoded_size = to_uint32((char*)&encoded_size);
   }
   char* signedHeuristicBytes = toBytes_result1->result;

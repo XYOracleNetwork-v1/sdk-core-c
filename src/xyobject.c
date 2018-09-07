@@ -22,9 +22,14 @@ XYResult* newObject(char id[2], void* payload){
     strncpy(new_object->id, id, 2);
     new_object->GetId = &GetId;
     new_object->GetPayload = &GetPayload;
-    preallocated_result->error = OK;
-    preallocated_result->result = new_object;
-    return preallocated_result;
+    XYResult* return_result = malloc(sizeof(XYResult));
+    if(return_result){
+      return_result->error = OK;
+      return_result->result = new_object;
+      return return_result;
+    } else {
+      RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+    }
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -145,6 +150,22 @@ XYResult* initTable(){
     BoundWitness_creator->fromBytes = &BoundWitness_creator_fromBytes;
     BoundWitness_creator->toBytes = &BoundWitness_creator_toBytes;
     typeTable[0x02][0x01] = BoundWitness_creator;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
+  // Initialize Keyset
+  struct Object_Creator* KeySet_creator = malloc(sizeof(Object_Creator));
+  if(KeySet_creator != NULL){
+    KeySet_creator->sizeIdentifierSize = 2;
+    KeySet_creator->defaultSize = 0;
+    KeySet_creator->create = &ShortWeakArray_creator_create;
+    KeySet_creator->fromBytes = &ShortWeakArray_creator_fromBytes;
+    KeySet_creator->toBytes = &ShortWeakArray_creator_toBytes;
+    typeTable[0x02][0x02] = KeySet_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
