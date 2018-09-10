@@ -12,10 +12,12 @@ typedef struct OriginChainNavigator OriginChainNavigator;
 #endif
 
 struct OriginChainNavigator {
-  XYResult* (*getOriginBlockByPreviousHash)(struct OriginChainNavigator*, char* originBlockHash);
-  XYResult* (*getOriginBlockByBlockHash)(struct OriginChainNavigator*, char* originBlockHash);
-  XYResult* (*removeOriginBlock)(OriginChainNavigator*, char* originBlockHash);
+  XYResult* (*getOriginBlockByPreviousHash)(OriginChainNavigator*, ByteArray* originBlockHash);
+  XYResult* (*getOriginBlockByBlockHash)(OriginChainNavigator*, ByteArray* originBlockHash);
+  XYResult* (*removeOriginBlock)(OriginChainNavigator*, ByteArray* originBlockHash);
   XYResult* (*addBoundWitness)(BoundWitness*);
+  XYResult* (*getHash)(BoundWitness* user_BoundWitness, HashProvider* user_HashProvider);
+  XYResult* (*findPreviousBlocks)(OriginChainNavigator* self_OriginChainNavigator, BoundWitness* user_BoundWitness);
   StorageProvider* Storage;
-
+  HashProvider* Hash;
 };

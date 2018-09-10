@@ -1,10 +1,6 @@
 #include "xyobject.h"
-#include <stdlib.h>
-#include <string.h>
 #include "xyo.h"
 #include "XYOHeuristicsBuilder.h"
-#include <stdio.h>
-#include <arpa/inet.h>
 
 /*----------------------------------------------------------------------------*
 *  NAME

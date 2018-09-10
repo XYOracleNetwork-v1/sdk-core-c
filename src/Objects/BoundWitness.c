@@ -2,7 +2,7 @@
 
 /*----------------------------------------------------------------------------*
 *  NAME
-*      BoundWitness_GetSigningData
+*      BoundWitness_getSigningData
 *
 *  DESCRIPTION
 *      Retrieves and orders the bound witness data so that it can be signed or hashed.
@@ -13,7 +13,7 @@
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* with a byteBuffer as the result.
 *----------------------------------------------------------------------------*/
-XYResult* BoundWitness_GetSigningData(BoundWitness* user_BoundWitness){
+XYResult* BoundWitness_getSigningData(BoundWitness* user_BoundWitness){
   uint32_t publicKeysSize = user_BoundWitness->publicKeys->size;
   uint32_t firstHeuristicsSize;
   uint32_t secondHeuristicsSize;
@@ -32,7 +32,9 @@ XYResult* BoundWitness_GetSigningData(BoundWitness* user_BoundWitness){
   free(get_result);
   secondHeuristicsSize = to_uint32((char*)user_secondPayload+(4*sizeof(char)));
 
-  char* byteBuffer = malloc(sizeof(char)*publicKeysSize+firstHeuristicsSize+secondHeuristicsSize);
+  uint32_t totalSize = publicKeysSize+firstHeuristicsSize+secondHeuristicsSize+4;
+
+  char* byteBuffer = malloc(sizeof(char)*totalSize);
 
   /* Copy all elements of BoundWitness.publicKeys, followed by
    * BoundWiness.payloads[0].signed_heuristics and BoundWiness.payloads[1].signed_heuristics
@@ -42,11 +44,11 @@ XYResult* BoundWitness_GetSigningData(BoundWitness* user_BoundWitness){
   if(byteBuffer){
     // Copy Public Keys in.
 
-    XYResult* newObject_result = newObject(ShortStrongArray_id, user_BoundWitness->publicKeys);
+    XYResult* newObject_result = newObject((char*)&ShortStrongArray_id, user_BoundWitness->publicKeys);
     if(newObject_result->error!=OK){
       return newObject_result;
     }
-    XYResult* lookup_result = lookup(ShortStrongArray_id);
+    XYResult* lookup_result = lookup((char*)&ShortStrongArray_id);
     if(lookup_result->error!=OK){
       return lookup_result;
     }
@@ -71,11 +73,13 @@ XYResult* BoundWitness_GetSigningData(BoundWitness* user_BoundWitness){
     memcpy(byteBuffer+(publicKeysSize+firstHeuristicsSize*sizeof(char)), user_secondPayload+(4*sizeof(char)), secondHeuristicsSize*sizeof(char));
     free(toBytes_result);
 
+    ByteArray* return_bytes = malloc(sizeof(ByteArray));
     XYResult* return_result = malloc(sizeof(XYResult));
-    if(return_result){
+    if(return_result && return_bytes){
+      return_bytes->size = totalSize;
+      return_bytes->payload = byteBuffer;
       return_result->error = OK;
-      return_result->result = byteBuffer;
-      breakpoint();
+      return_result->result = return_bytes;
       return return_result;
     } else {
       RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
@@ -88,10 +92,10 @@ XYResult* BoundWitness_GetSigningData(BoundWitness* user_BoundWitness){
 
 /*----------------------------------------------------------------------------*
 *  NAME
-*      BoundWitness_GetSigningData
+*      BoundWitness_getHash
 *
 *  DESCRIPTION
-*      Retrieves and orders the bound witness data so that it can be signed or hashed.
+*      Retrieves the bound witness data hash so that it can be used.
 *
 *  PARAMETERS
 *     *user_BoundWitness                    [in]       BoundWitness*
@@ -99,11 +103,13 @@ XYResult* BoundWitness_GetSigningData(BoundWitness* user_BoundWitness){
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* with a byteBuffer as the result.
 *----------------------------------------------------------------------------*/
-XYResult* BoundWitness_GetHash(BoundWitness* user_BoundWitness){
-  XYResult* signingData_result = user_BoundWitness->GetSigningData(user_BoundWitness);
+XYResult* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider* user_HashProvider){
+  XYResult* signingData_result = user_BoundWitness->getSigningData(user_BoundWitness);
   if(signingData_result->error != OK){
     return signingData_result;
   }
+  ByteArray* signingData = signingData_result->result;
+  return user_HashProvider->Hash(signingData);
 
 }
 
@@ -153,7 +159,7 @@ XYResult* BoundWitness_creator_fromBytes(char* data){
    * at the end. First is publicKeys.
    */
   uint32_t publicKeysSize = to_uint32(&data[4]);
-  XYResult* lookup_result = lookup(ShortStrongArray_id);
+  XYResult* lookup_result = lookup((char*)&ShortStrongArray_id);
   if(lookup_result->error == OK){
     Object_Creator* SWA_Creator = lookup_result->result;
     XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&data[4*sizeof(char)]);
@@ -171,7 +177,7 @@ XYResult* BoundWitness_creator_fromBytes(char* data){
   // Payload
   uint32_t payloadSize = to_uint32((char*)&data[4+publicKeysSize*sizeof(char)]);
  //free(lookup_result);
-  lookup_result = lookup(IntStrongArray_id);
+  lookup_result = lookup((char*)&IntStrongArray_id);
   if(lookup_result->error == OK){
     Object_Creator* SWA_Creator = lookup_result->result;
     XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&data[4+publicKeysSize*sizeof(char)]);
@@ -189,7 +195,7 @@ XYResult* BoundWitness_creator_fromBytes(char* data){
 
   // Signatures
  //free(lookup_result);
-  lookup_result = lookup(ShortStrongArray_id);
+  lookup_result = lookup((char*)&ShortStrongArray_id);
   if(lookup_result->error == OK){
     Object_Creator* SWA_Creator = lookup_result->result;
     XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&data[4+publicKeysSize+payloadSize*sizeof(char)]);
@@ -234,10 +240,10 @@ XYResult* BoundWitness_creator_fromBytes(char* data){
 *----------------------------------------------------------------------------*/
 XYResult* BoundWitness_creator_toBytes(struct XYObject* user_XYObject){
   BoundWitness* user_BoundWitness = user_XYObject->payload;
-  XYResult* lookup_result = lookup(ShortStrongArray_id);
+  XYResult* lookup_result = lookup((char*)&ShortStrongArray_id);
   Object_Creator* SSA_Creator = lookup_result->result;
  //free(lookup_result);
-  lookup_result = lookup(IntStrongArray_id);
+  lookup_result = lookup((char*)&IntStrongArray_id);
   Object_Creator* ISA_Creator = lookup_result->result;
   char* byteBuffer = malloc(user_BoundWitness->size*sizeof(char));
   if(littleEndian()){
@@ -249,7 +255,7 @@ XYResult* BoundWitness_creator_toBytes(struct XYObject* user_XYObject){
 
   ShortStrongArray* user_publicKeys = user_BoundWitness->publicKeys;
   uint16_t user_publicKeysSize = user_publicKeys->size;
-  XYResult* newObject_result = newObject(ShortStrongArray_id, user_publicKeys);
+  XYResult* newObject_result = newObject((char*)&ShortStrongArray_id, user_publicKeys);
   if(newObject_result->error == OK){
     XYResult* toBytes_result = SSA_Creator->toBytes(newObject_result->result);
    //free(newObject_result);
@@ -261,7 +267,7 @@ XYResult* BoundWitness_creator_toBytes(struct XYObject* user_XYObject){
 
   IntStrongArray* user_payload = user_BoundWitness->payloads;
   uint32_t user_payloadSize = user_payload->size;
-  newObject_result = newObject(IntStrongArray_id, user_payload);
+  newObject_result = newObject((char*)&IntStrongArray_id, user_payload);
   if(newObject_result->error == OK){
     XYResult* toBytes_result = ISA_Creator->toBytes(newObject_result->result);
     if(toBytes_result->error == OK){
@@ -272,7 +278,7 @@ XYResult* BoundWitness_creator_toBytes(struct XYObject* user_XYObject){
 
   ShortStrongArray* user_signatures = user_BoundWitness->signatures;
   uint16_t user_signaturesSize = user_signatures->size;
-  newObject_result = newObject(ShortStrongArray_id, user_signatures);
+  newObject_result = newObject((char*)&ShortStrongArray_id, user_signatures);
   if(newObject_result->error == OK){
     XYResult* toBytes_result = SSA_Creator->toBytes(newObject_result->result);
     //free(newObject_result);

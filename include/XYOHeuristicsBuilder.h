@@ -13,19 +13,6 @@
 #ifndef XYOHeuristicsBuilder_H
 #include "xyo.h"
 
-typedef struct Object_Creator Object_Creator;
-
- struct Object_Creator {
-   int        sizeIdentifierSize;
-   int        defaultSize;
-   struct XYResult*  (*create)(char[2], void*);
-   struct XYResult*  (*fromBytes)(char*);
-   struct XYResult*  (*toBytes)(struct XYObject*);
- };
-
-uint16_t to_uint16(char* data);
-uint32_t to_uint32(char* data);
-
 /* todo */
 void breakpoint();
 
@@ -60,7 +47,8 @@ XYResult* Payload_creator_toBytes(struct XYObject* user_XYObect);
 XYResult* BoundWitness_creator_create(char id[2], void* user_data);
 XYResult* BoundWitness_creator_fromBytes(char* BoundWitness_data);
 XYResult* BoundWitness_creator_toBytes(struct XYObject* user_XYObect);
-XYResult* BoundWitness_GetSigningData(BoundWitness* user_BoundWitness);
+XYResult* BoundWitness_getSigningData(BoundWitness* user_BoundWitness);
+XYResult* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider*);
 
 XYResult* ByteStrongArray_creator_create(char id[2], void* user_data);
 XYResult* ByteStrongArray_creator_fromBytes(char* data);

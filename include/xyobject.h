@@ -1,6 +1,10 @@
-#include <stdint.h>
 #ifndef XYOBJECT_H
 #include "hash.h"
+#include <stdint.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdio.h>
+#include <arpa/inet.h>
 
 typedef struct XYObject XYObject;
 typedef struct XYResult XYResult;
@@ -115,8 +119,8 @@ struct BoundWitness{
   struct ShortStrongArray* publicKeys;
   struct IntStrongArray* payloads;
   struct ShortStrongArray* signatures;
-  struct XYResult*  (*GetSigningData)(BoundWitness*);
-  struct XYResult* (*GetHash)(BoundWitness*);
+  struct XYResult*  (*getSigningData)(BoundWitness*);
+  struct XYResult* (*getHash)(BoundWitness*, HashProvider*);
 };
 
 struct KeySet{
@@ -167,6 +171,39 @@ void* typeTable[16][16];
 struct XYResult* newObject(char id[2], void* payload);
 struct XYResult* lookup(char id[2]);
 XYResult* initTable();
+uint16_t to_uint16(char* data);
+uint32_t to_uint32(char* data);
+
+/* Standard Object IDs */
+static const char ByteStrongArray_id[2]   = { 0x01, 0x01 };
+static const char ShortStrongArray_id[2]  = { 0x01, 0x02 };
+static const char IntStrongArray_id[2]    = { 0x01, 0x03 };
+static const char ByteWeakArray_id[2]     = { 0x01, 0x04 };
+static const char ShortWeakArray_id[2]    = { 0x01, 0x05 };
+static const char IntWeakArray_id[2]      = { 0x01, 0x06 };
+
+static const char BoundWitness_id[2]      = { 0x02, 0x01 };
+static const char KeySet_id[2]            = { 0x02, 0x02 };
+static const char SignatureSet_id[2]      = { 0x02, 0x03 };
+static const char Payload_id[2]           = { 0x02, 0x04 };
+static const char Index_id[2]             = { 0x02, 0x05 };
+static const char PreviousHash_id[2]      = { 0x02, 0x06 };
+static const char NextPublicKey_id[2]     = { 0x02, 0x07 };
+
+static const char Sha256_id[2]            = { 0x03, 0x05 };
+static const char ECDSASecp256k1_id[2]    = { 0x04, 0x01 };
+static const char ECDSASecp256k1Sig_id[2] = { 0x05, 0x01 };
+static const char Rssi_id[2]              = { 0x08, 0x01 };
+
+typedef struct Object_Creator Object_Creator;
+
+ struct Object_Creator {
+   int        sizeIdentifierSize;
+   int        defaultSize;
+   struct XYResult*  (*create)(char[2], void*);
+   struct XYResult*  (*fromBytes)(char*);
+   struct XYResult*  (*toBytes)(struct XYObject*);
+ };
 
 #define XYOBJECT_H
 #endif

@@ -241,7 +241,7 @@ XYResult* initTable(){
   struct Object_Creator* SHA256_creator = malloc(sizeof(Object_Creator));
   if(SHA256_creator != NULL){
     SHA256_creator->sizeIdentifierSize = 0;
-    SHA256_creator->defaultSize = 34;
+    SHA256_creator->defaultSize = 32;
     SHA256_creator->create = NULL;
     SHA256_creator->fromBytes = NULL;
     SHA256_creator->toBytes = NULL;
