@@ -1,4 +1,6 @@
 #include "XYOHeuristicsBuilder.h"
+#include "BoundWitness.h"
+#include "hash.h"
 
 /*----------------------------------------------------------------------------*
 *  NAME

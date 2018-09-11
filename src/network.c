@@ -1,3 +1,4 @@
+/*
 #include <stdlib.h>
 #include "network.h"
 
@@ -15,3 +16,4 @@ reactiveNetworkProvider* newReactiveNetworkProvider(){
   provider->disconnect = NULL;
   return provider;
 }
+*/

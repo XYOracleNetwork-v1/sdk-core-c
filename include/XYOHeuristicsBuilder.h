@@ -12,7 +12,8 @@
 
 #ifndef XYOHeuristicsBuilder_H
 #include "xyo.h"
-
+#include "hash.h"
+#include "BoundWitness.h"
 /* todo */
 void breakpoint();
 

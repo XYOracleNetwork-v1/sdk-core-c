@@ -22,19 +22,7 @@ int main(){
   preallocated_result = malloc(sizeof(struct XYResult));
   if(preallocated_result){
     initTable();
-    /*
-    char BoundWitness_id[2] = { 0x02, 0x01 };
-    char ShortStrongArray_id[2] = { 0x01, 0x02 };
-    char ShortWeakArray_id[2] = { 0x01, 0x05 };
-    char IntStrongArray_id[2] = { 0x01, 0x03 };
-    char IntWeakArray_id[2] = { 0x01, 0x06 };
-    char Payload_id[2] = { 0x02, 0x04 };
-    char SignatureSet_id[2] = { 0x02, 0x03 };
-    char KeySet_id[2] = { 0x02, 0x02 };
-    char NextPublicKey_id[2] = { 0x02, 0x07 };
-    char SECP256K1_id[2] = { 0x04, 0x01 };
-    char Rssi_id[2] = { 0x08, 0x01 };
-    */
+    
     XYResult* lookup_result = lookup((char*)&BoundWitness_id);
     if(lookup_result->error == OK){
       Object_Creator* BoundWitness_creator = lookup_result->result;

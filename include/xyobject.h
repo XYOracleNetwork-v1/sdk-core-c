@@ -1,5 +1,4 @@
 #ifndef XYOBJECT_H
-#include "hash.h"
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
@@ -8,7 +7,6 @@
 
 typedef struct XYObject XYObject;
 typedef struct XYResult XYResult;
-typedef struct BoundWitness BoundWitness;
 typedef struct ByteStrongArray ByteStrongArray;
 typedef struct ShortStrongArray ShortStrongArray;
 typedef struct IntStrongArray IntStrongArray;
@@ -112,15 +110,6 @@ enum EXyoErrors{
 struct XYResult{
   enum EXyoErrors error;
   void* result;
-};
-
-struct BoundWitness{
-  uint32_t size;
-  struct ShortStrongArray* publicKeys;
-  struct IntStrongArray* payloads;
-  struct ShortStrongArray* signatures;
-  struct XYResult*  (*getSigningData)(BoundWitness*);
-  struct XYResult* (*getHash)(BoundWitness*, HashProvider*);
 };
 
 struct KeySet{
