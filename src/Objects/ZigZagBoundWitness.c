@@ -17,144 +17,233 @@
 *----------------------------------------------------------------------------*/
 XYResult* incomingData(ZigZagBoundWitness* self, BoundWitness* boundWitness, int endpoint){
 
-  if(boundWitness == NULL){
-    RETURN_ERROR(ERR_BADDATA);
+  /*
+  * get size of signature array
+  * to send and appened in progress boundWitness to local
+  * BoundWitness object
+  */
+  int signatureRecievedSize = 0;
+
+  if(boundWitness != NULL){
+    int success = self->addTransfer(self, boundWitness);
+    signatureRecievedSize = boundWitness->signatures->size;
+    if(!success){
+      RETURN_ERROR(ERR_BADDATA);
+    }
   }
 
-  /*
-   * First we generate three arrays.
-   * publicKeys, payloads, and signatures to send
-   */
-  XYResult* lookup_result = lookup((char*)&ShortStrongArray_id);
-  if(lookup_result->error != OK){
-    RETURN_ERROR(ERR_CRITICAL);
+  if(!self->hasSentKeysAndPayload){
+   self->dynamicPublicKeys->add(self->dynamicPublicKeys, makeSelfKeyset());
+   self->dynamicPayloads->add(self->dynamicPayloads, self->payload);
+   self->hasSentKeysAndPayload = 0;
   }
-  Object_Creator* SSA_Creator = lookup_result->result;
+
+  BoundWitness* BoundWitness_raw = malloc(sizeof(BoundWitness));
+
+  if(endpoint){
+    XYResult* signForSelf_result = self->signForSelf(self);
+    if(signForSelf_result->error != OK)
+      return signForSelf_result;
+    free(signForSelf_result);
+  }
+
+  BoundWitness_raw->size = self->dynamicPublicKeys->size + self->dynamicPayloads->size + self->dynamicSignatures->size +(4*sizeof(char));
+  BoundWitness_raw->publicKeys = self->dynamicPublicKeys;
+  BoundWitness_raw->payloads = self->dynamicPayloads;
+  BoundWitness_raw->signatures = self->dynamicSignatures;
+  BoundWitness_raw->getSigningData = &BoundWitness_getSigningData;
+  BoundWitness_raw->toTransfer = &BoundWitness_toTransfer;
+  self->boundWitness = BoundWitness_raw;
+
+  return BoundWitness_raw->toTransfer(BoundWitness_raw);
+}
+
+/*----------------------------------------------------------------------------*
+*  NAME
+*      addTransfer
+*
+*  DESCRIPTION
+*  Adds data from an in progress BoundWitness.
+*
+*  PARAMETERS
+*     *boundWitness  [in]           BoundWitness*   The semi-formed BoudnWitness
+*
+*  RETURNS
+*      XYResult  [out]      bool       Returns Bool True if it succeeded.
+*----------------------------------------------------------------------------*/
+int addTransfer(ZigZagBoundWitness* self, BoundWitness* boundWitness){
+ if(!boundWitness){
+   return 1;
+ }
+
+ if(boundWitness->publicKeys)
+ {
+   int result = addIncomingKeys(self, boundWitness->publicKeys);
+   if(result) return result;
+ } else if (boundWitness->payloads) {
+   int result = addIncomingPayload(self, boundWitness->payloads);
+   if(result) return result;
+ } else if (boundWitness->signatures) {
+   int result = addIncomingSignatures(self, boundWitness->signatures);
+   if(result) return result;
+ } else {
+   return 2;
+ }
+ return 0;
+
+}
+
+/*----------------------------------------------------------------------------*
+*  NAME
+*      addIncomingKeys
+*
+*  DESCRIPTION
+*  Adds KeySet from an incoming payload
+*
+*  PARAMETERS
+*     *incomingKeySets     [in]    XYObject*   The keyset which will be added.
+*
+*  RETURNS
+*      XYResult  [out]      bool       Returns Bool True if it succeeded.
+*----------------------------------------------------------------------------*/
+int addIncomingKeys(ZigZagBoundWitness* self, ShortStrongArray* incomingKeySets){
+  for(int i = 0; ; i++){
+    XYResult* get_result = incomingKeySets->get(incomingKeySets, i);
+    XYObject* xyobject = get_result->result;
+    if(xyobject->id[0] == 0x02 && xyobject->id[1] == 0x02){
+      XYResult* add_result = self->boundWitness->publicKeys->add(self->boundWitness->publicKeys, xyobject);
+      if(add_result->error != OK) return 1;
+    } else {
+      return 2;
+    }
+  }
+  return 0;
+}
+
+/*----------------------------------------------------------------------------*
+*  NAME
+*      addIncomingPayload
+*
+*  DESCRIPTION
+*  Adds KeySet from an incoming payload
+*
+*  PARAMETERS
+*     *incomingKeySets     [in]    XYObject*   The payload which will be added.
+*
+*  RETURNS
+*      XYResult  [out]      bool       Returns Bool True if it succeeded.
+*----------------------------------------------------------------------------*/
+int addIncomingPayload(ZigZagBoundWitness* self, IntStrongArray* incomingPayloads){
+  for(int i = 0; ; i++){
+    XYResult* get_result = incomingPayloads->get(incomingPayloads, i);
+    XYObject* xyobject = get_result->result;
+    if(xyobject->id[0] == 0x02 && xyobject->id[1] == 0x02){
+      XYResult* add_result = self->boundWitness->payloads->add(self->boundWitness->payloads, xyobject);
+      if(add_result->error != OK) return 1;
+    } else {
+      return 2;
+    }
+  }
+  return 0;
+}
+
+/*----------------------------------------------------------------------------*
+*  NAME
+*      addIncomingSignatures
+*
+*  DESCRIPTION
+*  Adds KeySet from an incoming payload
+*
+*  PARAMETERS
+*     *incomingKeySets     [in]    XYObject*   The signatures which will be added.
+*
+*  RETURNS
+*      XYResult  [out]      bool       Returns Bool True if it succeeded.
+*----------------------------------------------------------------------------*/
+int addIncomingSignatures(ZigZagBoundWitness* self, ShortStrongArray* incomingSignatures){
+  for(int i = 0; ; i++){
+    XYResult* get_result = incomingSignatures->get(incomingSignatures, i);
+    XYObject* xyobject = get_result->result;
+    if(xyobject->id[0] == 0x02 && xyobject->id[1] == 0x02){
+      XYResult* add_result = self->boundWitness->signatures->add(self->boundWitness->signatures, xyobject);
+      if(add_result->error != OK) return 1;
+    } else {
+      return 2;
+    }
+  }
+  return 0;
+}
+
+/*----------------------------------------------------------------------------*
+*  NAME
+*      makeSelfKeySet
+*
+*  DESCRIPTION
+*  Adds KeySet from an incoming payload
+*
+*  PARAMETERS
+*     *incomingKeySets     [in]    XYObject*   The signatures which will be added.
+*
+*  RETURNS
+*      XYResult  [out]      bool       Returns Bool True if it succeeded.
+*----------------------------------------------------------------------------*/
+XYResult* makeSelfKeySet(ZigZagBoundWitness* self){
+  // Get a copy of the public key we are using currently
+  XYResult* getPublicKey_result = self->signer->getPublicKey(self->signer);
+  if(getPublicKey_result->error != 0){
+    return getPublicKey_result;
+  }
+  XYObject* publicKey = getPublicKey_result->result;
+  free(getPublicKey_result);
+
+  // Create Keyset Array
+  XYResult* lookup_result = lookup((char*)&KeySet_id);
+  if(lookup_result->error != OK){
+    return lookup_result;
+  }
+  Object_Creator* KeySet_creator = lookup_result->result;
+  XYResult* create_result = KeySet_creator->create((char*)&KeySet_id, NULL);
+  XYObject* keysetObject = create_result->result;
+  ShortWeakArray* keysetArray = keysetObject->payload;
   free(lookup_result);
 
-  lookup_result = lookup((char*)&IntStrongArray_id);
-  if(lookup_result->error != OK){
-    RETURN_ERROR(ERR_CRITICAL);
+  // Add public key object to keyset array
+  XYResult* add_result = keysetArray->add(keysetArray, publicKey);
+  if(add_result->error != OK){
+    return add_result;
   }
-  Object_Creator* ISA_Creator = lookup_result->result;
-  free(lookup_result);
-
-  // Generate KeySet Array
-  XYResult* create_result = SSA_Creator->create((char*)&KeySet_id, NULL);
-  if(create_result->error != OK){
-    return create_result->error;
+  free(add_result);
+  XYResult* return_result = malloc(sizeof(XYResult));
+  if(return_result){
+    return_result->error = OK;
+    return_result->result = keysetObject;
+    return return_result;
+  } else {
+    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
-  XYObject*  publicKeys_object = create_result->result;
-  ShortStrongArray* keysToSend = publicKeys_object->payload;
-  free(create_result);
+}
 
-  // Generate Payloads Array
-  create_result = ISA_Creator->create((char*)&Payload_id, NULL);
-  if(create_result->error != OK){
-    return create_result->error;
-  }
-  XYObject*  payloads_object = create_result->result;
-  IntStrongArray* payloadsToSend = payloads_object->payload;
-  free(create_result);
+/*----------------------------------------------------------------------------*
+*  NAME
+*      BoundWitness_signForSelf
+*
+*  DESCRIPTION
+*      Method somewhat similar to BoundWitness_creator_toBytes that creates a
+*      Byte array with the XYO Bound Witness Transfer object type bytes.
+*
+*  PARAMETERS
+*     *user_BoundWitness                    [in]       BoundWitness*
+*
+*  RETURNS
+*      XYResult*            [out]      bool   Returns XYObject* with a byteBuffer as the result.
+*----------------------------------------------------------------------------*/
+XYResult* signForSelf(ZigZagBoundWitness* self){
+  XYResult* signingData_result = self->boundWitness->getSigningData(self);
+  ByteArray* signingData = signingData_result->result;
+  XYResult* sign_result = self->signer->sign(self->signer, signingData);
+  ByteArray* signature = sign_result->result;
 
-  // Generate Signature Array
-  create_result = SSA_Creator->create((char*)&SignatureSet_id, NULL);
-  if(create_result->error != OK){
-    return create_result->error;
-  }
-  XYObject*  signatures_object = create_result->result;
-  ShortStrongArray* signaturesToSend = signatures_object->payload;
-  free(create_result);
-
-  /*
-   * get size of signature to send and
-   * add it to the ZZBW object
-   */
-   int signatureRecievedSize = 0;
-   signatureRecievedSize = boundWitness->signatures->size;
-   self->addTransfer(self, self->boundWitness);
-
-   if(!self->hasSentKeysAndPayload){
-     keysToSend->add(keysToSend, makeSelfKeyset());
-     payloadsToSend->add(payloadsToSend, self->payload);
-     self->hasSentKeysAndPayload = 0;
-   }
-
-   if(signaturesToSend->size != keysToSend->size){
-     if(signaturesToSend->size == 0 && !endPoint){
-       keysToSend.add()
-     }
-   }
-
- }
-
- /*----------------------------------------------------------------------------*
- *  NAME
- *      addTransfer
- *
- *  DESCRIPTION
- *  Adds data from an in progress BoundWitness.
- *
- *  PARAMETERS
- *     *boundWitness  [in]           BoundWitness*   The semi-formed BoudnWitness
- *
- *  RETURNS
- *      XYResult  [out]      bool       Returns Bool True if it succeeded.
- *----------------------------------------------------------------------------*/
- int addTransfer(BoundWitness* boundWitness){
-
- }
-
- /*----------------------------------------------------------------------------*
- *  NAME
- *      addIncomingKeys
- *
- *  DESCRIPTION
- *  Adds KeySet from an incoming payload
- *
- *  PARAMETERS
- *     *incomingKeySets     [in]    XYObject*   The keyset which will be added.
- *
- *  RETURNS
- *      XYResult  [out]      bool       Returns Bool True if it succeeded.
- *----------------------------------------------------------------------------*/
- int addIncomingKeys(XYObject* incomingKeySets){
-
- }
-
- /*----------------------------------------------------------------------------*
- *  NAME
- *      addIncomingPayload
- *
- *  DESCRIPTION
- *  Adds KeySet from an incoming payload
- *
- *  PARAMETERS
- *     *incomingKeySets     [in]    XYObject*   The payload which will be added.
- *
- *  RETURNS
- *      XYResult  [out]      bool       Returns Bool True if it succeeded.
- *----------------------------------------------------------------------------*/
- int addIncomingPayload(XYObject* incomingPayloads){
-
- }
-
- /*----------------------------------------------------------------------------*
- *  NAME
- *      addIncomingSignatures
- *
- *  DESCRIPTION
- *  Adds KeySet from an incoming payload
- *
- *  PARAMETERS
- *     *incomingKeySets     [in]    XYObject*   The signatures which will be added.
- *
- *  RETURNS
- *      XYResult  [out]      bool       Returns Bool True if it succeeded.
- *----------------------------------------------------------------------------*/
- int addIncomingSignatures(XYObject* incomingSignatures){
-
- }
+}
 
 #define ORIGINCHAIN_H
 #endif

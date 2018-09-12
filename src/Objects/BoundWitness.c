@@ -117,6 +117,111 @@ XYResult* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider* us
 
 /*----------------------------------------------------------------------------*
 *  NAME
+*      BoundWitness_toTransfer
+*
+*  DESCRIPTION
+*      Method somewhat similar to BoundWitness_creator_toBytes that creates a
+*      Byte array with the XYO Bound Witness Transfer object type bytes.
+*
+*  PARAMETERS
+*     *user_BoundWitness                    [in]       BoundWitness*
+*
+*  RETURNS
+*      XYResult*            [out]      bool   Returns XYObject* with a char* as the result.
+*----------------------------------------------------------------------------*/
+XYResult* BoundWitness_toTransfer(BoundWitness* user_BoundWitness){
+  uint32_t totalSize = 4;
+  uint32_t publicKeysSize = 0;
+  uint32_t payloadsSize = 0;
+  uint32_t signaturesSize = 0;
+
+  XYResult* lookup_result = lookup((char*)&ShortStrongArray_id);
+  if(lookup_result->error =! OK){
+   RETURN_ERROR(ERR_CRITICAL);
+  }
+  Object_Creator* ShortStrongArray_creator = lookup_result->result;
+  free(lookup_result);
+
+  lookup_result = lookup((char*)&IntStrongArray_id);
+  if(lookup_result->error =! OK){
+   RETURN_ERROR(ERR_CRITICAL);
+  }
+  Object_Creator* IntStrongArray_creator = lookup_result->result;
+  free(lookup_result);
+
+  XYResult* newObject_result;
+  XYResult* publicKeysBytes_result;
+  XYResult* payloadsBytes_result;
+  XYResult* signaturesBytes_result;
+
+  if(user_BoundWitness->publicKeys)
+  {
+    totalSize += user_BoundWitness->publicKeys->size;
+    publicKeysSize = user_BoundWitness->publicKeys->size;
+    newObject_result = newObject((char*)&ShortStrongArray_id, user_BoundWitness->publicKeys);
+    if(newObject_result->error!=OK){
+      return newObject_result;
+    }
+    publicKeysBytes_result = ShortStrongArray_creator->toBytes(newObject_result->result);
+    free(newObject_result->result);
+    free(newObject_result);
+  } else if(user_BoundWitness->payloads) {
+    totalSize += user_BoundWitness->payloads->size;
+    payloadsSize = user_BoundWitness->payloads->size;
+    newObject_result = newObject((char*)&IntStrongArray_id, user_BoundWitness->payloads);
+    if(newObject_result->error!=OK){
+      return newObject_result;
+    }
+    payloadsBytes_result = IntStrongArray_creator->toBytes(newObject_result->result);
+    free(newObject_result->result);
+    free(newObject_result);
+  } else if(user_BoundWitness->signatures) {
+    totalSize += user_BoundWitness->signatures->size;
+    signaturesSize = user_BoundWitness->signatures->size;
+    newObject_result = newObject((char*)&ShortStrongArray_id, user_BoundWitness->signatures);
+    if(newObject_result->error!=OK){
+      return newObject_result;
+    }
+    signaturesBytes_result = ShortStrongArray_creator->toBytes(newObject_result->result);
+    free(newObject_result->result);
+    free(newObject_result);
+  } else {
+    RETURN_ERROR(ERR_BADDATA);
+  }
+
+  char* return_bytes = malloc(totalSize*sizeof(char));
+  if(!return_bytes){
+    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+  }
+
+  uint32_t encodedSize = totalSize;
+  if(littleEndian()){
+    encodedSize = to_uint32((char*)&totalSize);
+  }
+  uint32_t offset = 4*sizeof(char);
+  memcpy(return_bytes, &encodedSize, 4*sizeof(char));
+
+  if(user_BoundWitness->publicKeys){
+    memcpy(return_bytes+offset, publicKeysBytes_result->result, publicKeysSize);
+    offset+=publicKeysSize;
+  } else if(user_BoundWitness->payloads) {
+    memcpy(return_bytes+offset, payloadsBytes_result->result, payloadsSize);
+    offset+=payloadsSize;
+  } else if(user_BoundWitness->signatures){
+    memcpy(return_bytes+offset, signaturesBytes_result->result, signaturesSize);
+    offset+=signaturesSize;
+  }
+  XYResult* return_result = malloc(sizeof(XYResult));
+  if(return_result){
+    return_result->error = OK;
+    return_result->result = return_bytes;
+  } else {
+    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+  }
+}
+
+/*----------------------------------------------------------------------------*
+*  NAME
 *      BoundWitness_creator_create
 *
 *  DESCRIPTION

@@ -50,6 +50,7 @@ XYResult* BoundWitness_creator_fromBytes(char* BoundWitness_data);
 XYResult* BoundWitness_creator_toBytes(struct XYObject* user_XYObect);
 XYResult* BoundWitness_getSigningData(BoundWitness* user_BoundWitness);
 XYResult* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider*);
+XYResult* BoundWitness_toTransfer(BoundWitness* user_BoundWitness);
 
 XYResult* ByteStrongArray_creator_create(char id[2], void* user_data);
 XYResult* ByteStrongArray_creator_fromBytes(char* data);

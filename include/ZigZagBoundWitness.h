@@ -2,7 +2,9 @@
 #include <stdint.h>
 #include "xyo.h"
 #include "xyobject.h"
+#include "crypto.h"
 #include "BoundWitness.h"
+#include "XYOHeuristicsBuilder.h"
 
 typedef struct ZigZagBoundWitness ZigZagBoundWitness;
 
@@ -20,16 +22,22 @@ struct ZigZagBoundWitness {
    * @param endPoint If not already turned around, decide if what to send sign and send back.
    * @return A XyoBoundWitnessTransfer to send to the other party wrapped in a XYResult.
    */
-   struct XYResult* (*incomingData)(ZigZagBoundWitness* self, BoundWitness* boundWitness, int endpoint);
+   XYResult* (*incomingData)(ZigZagBoundWitness* self, BoundWitness* boundWitness, int endpoint);
    int (*addTransfer)(ZigZagBoundWitness* self, BoundWitness* boundWitness);
-   int (*addIncomingKeys)(ZigZagBoundWitness* self, XYObject* incomingKeySets);
-   int (*addIncomingPayload)(ZigZagBoundWitness* self, XYObject* incomingPayloads);
-   int (*addIncomingSignatures)(ZigZagBoundWitness* self, XYObject* incomingSignatures);
-   struct XYObject* (*makeSelfKeySet)(ZigZagBoundWitness* self);
-   struct XYResult* (*signBoundWitness)(ZigZagBoundWitness* self);
+   int (*addIncomingKeys)(ZigZagBoundWitness* self, ShortStrongArray* incomingKeySets);
+   int (*addIncomingPayload)(ZigZagBoundWitness* self, IntStrongArray* incomingPayloads);
+   int (*addIncomingSignatures)(ZigZagBoundWitness* self, ShortStrongArray* incomingSignatures);
+   XYResult* (*makeSelfKeySet)(ZigZagBoundWitness* self);
+   XYResult* (*signForSelf)(ZigZagBoundWitness* self);
    Signer* signer;
    XYObject* payload;
 };
+
+XYResult* incomingData(ZigZagBoundWitness* self, BoundWitness* boundWitness, int endpoint);
+int addTransfer(ZigZagBoundWitness* self, BoundWitness* boundWitness);
+int addIncomingKeys(ZigZagBoundWitness* self, ShortStrongArray* incomingKeySets);
+int addIncomingPayload(ZigZagBoundWitness* self, IntStrongArray* incomingPayloads);
+int addIncomingSignatures(ZigZagBoundWitness* self, ShortStrongArray* incomingSignatures);
 
 #define ZIGZAGBOUNDWITNES_H
 #endif
