@@ -131,23 +131,64 @@ XYResult* ECDSA_secp256k1Uncompressed_creator_create(char id[2], void* text){
   return newObject(id, text);
 }
 
-XYResult* ECDSA_secp256k1Uncompressed_creator_fromBytes(char* heuristic_data){
+XYResult* ECDSA_secp256k1Uncompressed_creator_fromBytes(char* key_data){
   char id[2];
-  memcpy(id, heuristic_data, 2);
-  char* payload_bytes = malloc(64*sizeof(char));
-  memcpy(payload_bytes, &heuristic_data[2], 64);
-  return newObject(id, payload_bytes);
+  memcpy(id, key_data, 2);
+  ECDSA_secp256k1_uncompressed* key = malloc(sizeof(ECDSA_secp256k1_uncompressed));
+  memcpy(key->point_x, &key_data[2], 32*sizeof(char));
+  memcpy(key->point_y, &key_data[2+32], 32*sizeof(char));
+  return newObject(id, key);
 }
 
 XYResult* ECDSA_secp256k1Uncompressed_creator_toBytes(struct XYObject* user_XYObject){
-  char* text = user_XYObject->payload;
-  char* encoded_bytes = malloc(sizeof(char)*64);
+  ECDSA_secp256k1_uncompressed* raw_key = user_XYObject->payload;
+  char* encoded_bytes = malloc(64*sizeof(char));
 
   if(encoded_bytes == NULL){
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
 
-  memcpy(encoded_bytes, user_XYObject->payload, 64*sizeof(char));
+  memcpy(encoded_bytes, raw_key->point_x , 32*sizeof(char));
+  memcpy(encoded_bytes+32*sizeof(char), raw_key->point_y , 32*sizeof(char));
+
+  struct XYResult* return_result = malloc(sizeof(struct XYResult));
+  if(return_result != NULL){
+    return_result->error = OK;
+    return_result->result = encoded_bytes;
+    return return_result;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = NULL;
+    return preallocated_result;
+  }
+}
+
+XYResult* ECDSA_secp256k1Sig_creator_create(char id[2], void* text){
+  return newObject(id, text);
+}
+
+XYResult* ECDSA_secp256k1Sig_creator_fromBytes(char* heuristic_data){
+  char id[2];
+  memcpy(id, heuristic_data, 2);
+  uint8_t size = heuristic_data[3];
+  char* payload_bytes = malloc(size-(1*sizeof(char)));
+  memcpy(payload_bytes, &heuristic_data[2], size);
+  secp256k1Signature* return_signature = malloc(sizeof(secp256k1Signature));
+  return_signature->size = size;
+  return_signature->signature = payload_bytes;
+  return newObject(id, payload_bytes);
+}
+
+XYResult* ECDSA_secp256k1Sig_creator_toBytes(struct XYObject* user_XYObject){
+  secp256k1Signature* raw_signature = user_XYObject->payload;
+  char* encoded_bytes = malloc(raw_signature->size);
+
+  if(encoded_bytes == NULL){
+    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+  }
+
+  memcpy(encoded_bytes, user_XYObject->payload, raw_signature->size-(1*sizeof(char)));
 
   struct XYResult* return_result = malloc(sizeof(struct XYResult));
   if(return_result != NULL){

@@ -9,7 +9,7 @@
 typedef struct ZigZagBoundWitness ZigZagBoundWitness;
 
 struct ZigZagBoundWitness {
-  BoundWitness* boundWitness;
+  BoundWitnessTransfer* boundWitness;
   ShortStrongArray* dynamicPublicKeys;
   IntStrongArray* dynamicPayloads;
   ShortStrongArray* dynamicSignatures;
@@ -38,6 +38,7 @@ int addTransfer(ZigZagBoundWitness* self, BoundWitness* boundWitness);
 int addIncomingKeys(ZigZagBoundWitness* self, ShortStrongArray* incomingKeySets);
 int addIncomingPayload(ZigZagBoundWitness* self, IntStrongArray* incomingPayloads);
 int addIncomingSignatures(ZigZagBoundWitness* self, ShortStrongArray* incomingSignatures);
+XYResult* makeSelfKeySet(ZigZagBoundWitness* self);
 
 #define ZIGZAGBOUNDWITNES_H
 #endif

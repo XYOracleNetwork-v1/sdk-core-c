@@ -18,6 +18,7 @@ typedef struct PreviousHash PreviousHash;
 typedef struct Payload Payload;
 typedef struct SignatureSet SignatureSet;
 typedef struct ECDSA_secp256k1_uncompressed ECDSA_secp256k1_uncompressed;
+typedef struct secp256k1Signature secp256k1Signature;
 typedef struct ByteArray ByteArray;
 /*
  * Our documentation uses the terminology of Multi or Single Element arrays.
@@ -141,11 +142,17 @@ struct ECDSA_secp256k1_uncompressed{
   char point_y[32];
 };
 
+struct secp256k1Signature{
+  uint8_t size;
+  char* signature;
+};
+
 struct ByteArray{
   uint32_t size;
   char reserved[2];
   char* payload;
 };
+
 
 struct XYObject{
   char id[2];
@@ -164,25 +171,26 @@ uint16_t to_uint16(char* data);
 uint32_t to_uint32(char* data);
 
 /* Standard Object IDs */
-static const char ByteStrongArray_id[2]   = { 0x01, 0x01 };
-static const char ShortStrongArray_id[2]  = { 0x01, 0x02 };
-static const char IntStrongArray_id[2]    = { 0x01, 0x03 };
-static const char ByteWeakArray_id[2]     = { 0x01, 0x04 };
-static const char ShortWeakArray_id[2]    = { 0x01, 0x05 };
-static const char IntWeakArray_id[2]      = { 0x01, 0x06 };
+static const char ByteStrongArray_id[2]       = { 0x01, 0x01 };
+static const char ShortStrongArray_id[2]      = { 0x01, 0x02 };
+static const char IntStrongArray_id[2]        = { 0x01, 0x03 };
+static const char ByteWeakArray_id[2]         = { 0x01, 0x04 };
+static const char ShortWeakArray_id[2]        = { 0x01, 0x05 };
+static const char IntWeakArray_id[2]          = { 0x01, 0x06 };
 
-static const char BoundWitness_id[2]      = { 0x02, 0x01 };
-static const char KeySet_id[2]            = { 0x02, 0x02 };
-static const char SignatureSet_id[2]      = { 0x02, 0x03 };
-static const char Payload_id[2]           = { 0x02, 0x04 };
-static const char Index_id[2]             = { 0x02, 0x05 };
-static const char PreviousHash_id[2]      = { 0x02, 0x06 };
-static const char NextPublicKey_id[2]     = { 0x02, 0x07 };
+static const char BoundWitness_id[2]          = { 0x02, 0x01 };
+static const char KeySet_id[2]                = { 0x02, 0x02 };
+static const char SignatureSet_id[2]          = { 0x02, 0x03 };
+static const char Payload_id[2]               = { 0x02, 0x04 };
+static const char Index_id[2]                 = { 0x02, 0x05 };
+static const char PreviousHash_id[2]          = { 0x02, 0x06 };
+static const char NextPublicKey_id[2]         = { 0x02, 0x07 };
+static const char BoundWitnessTransfer_id[2]  = { 0x02, 0x01 };
 
-static const char Sha256_id[2]            = { 0x03, 0x05 };
-static const char ECDSASecp256k1_id[2]    = { 0x04, 0x01 };
-static const char ECDSASecp256k1Sig_id[2] = { 0x05, 0x01 };
-static const char Rssi_id[2]              = { 0x08, 0x01 };
+static const char Sha256_id[2]                = { 0x03, 0x05 };
+static const char ECDSASecp256k1_id[2]        = { 0x04, 0x01 };
+static const char ECDSASecp256k1Sig_id[2]     = { 0x05, 0x01 };
+static const char Rssi_id[2]                  = { 0x08, 0x01 };
 
 typedef struct Object_Creator Object_Creator;
 

@@ -237,6 +237,22 @@ XYResult* initTable(){
     return preallocated_result;
   }
 
+  // Initialize Bound Witness Transfer
+  struct Object_Creator* BWT_creator = malloc(sizeof(Object_Creator));
+  if(BWT_creator != NULL){
+    BWT_creator->sizeIdentifierSize = 0;
+    BWT_creator->defaultSize = 0;
+    BWT_creator->create = &BoundWitness_creator_create;
+    BWT_creator->fromBytes = &BoundWitnessTransfer_fromBytes;
+    BWT_creator->toBytes = &BoundWitnessTransfer_toBytes;
+    typeTable[0x02][0x08] = BWT_creator;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
   // Initialize SHA256 Hash Creator
   struct Object_Creator* SHA256_creator = malloc(sizeof(Object_Creator));
   if(SHA256_creator != NULL){
@@ -253,7 +269,7 @@ XYResult* initTable(){
     return preallocated_result;
   }
 
-  // Initialize ECDSA Secp256k1 Uncompressed Key
+  // Initialize ECDSA Secp256k1 Uncompressed Key TODO
   struct Object_Creator* secp256k1_creator = malloc(sizeof(Object_Creator));
   if(secp256k1_creator != NULL){
     secp256k1_creator->sizeIdentifierSize = 0;
@@ -278,6 +294,22 @@ XYResult* initTable(){
     NPKU_creator->fromBytes = NULL;
     NPKU_creator->toBytes = NULL;
     typeTable[0x04][0x03] = NPKU_creator;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
+  // Initialize SECP256k1 Signature type
+  struct Object_Creator* secp256k1sig_creator = malloc(sizeof(Object_Creator));
+  if(secp256k1sig_creator != NULL){
+    secp256k1sig_creator->sizeIdentifierSize = 1;
+    secp256k1sig_creator->defaultSize = 0;
+    secp256k1sig_creator->create = NULL;
+    secp256k1sig_creator->fromBytes = NULL;
+    secp256k1sig_creator->toBytes = NULL;
+    typeTable[0x04][0x03] = secp256k1sig_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;

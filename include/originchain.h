@@ -1,5 +1,6 @@
 #include "xyo.h"
 #include "XYOHeuristicsBuilder.h"
+#include "BoundWitness.h"
 #include "storage.h"
 #include <stdlib.h>
 #include <stdio.h>

@@ -11,6 +11,7 @@
 
 #include "xyo.h"
 #include "XYOHeuristicsBuilder.h"
+#include "BoundWitness.h"
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
@@ -22,7 +23,7 @@ int main(){
   preallocated_result = malloc(sizeof(struct XYResult));
   if(preallocated_result){
     initTable();
-    
+
     XYResult* lookup_result = lookup((char*)&BoundWitness_id);
     if(lookup_result->error == OK){
       Object_Creator* BoundWitness_creator = lookup_result->result;
@@ -36,7 +37,7 @@ int main(){
         }
         BoundWitness_object = create_result->result;
       } else {
-        RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+        return 1;
       }
       lookup_result = lookup((char*)&ShortStrongArray_id);
       if(lookup_result->error == OK){

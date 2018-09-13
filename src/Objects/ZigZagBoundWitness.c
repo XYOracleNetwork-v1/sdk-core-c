@@ -1,4 +1,4 @@
-#ifndef ORIGINCHAIN_H
+#ifndef ZIGZAGBOUNDWITNESS_H
 #include "ZigZagBoundWitness.h"
 
 /*----------------------------------------------------------------------------*
@@ -33,12 +33,13 @@ XYResult* incomingData(ZigZagBoundWitness* self, BoundWitness* boundWitness, int
   }
 
   if(!self->hasSentKeysAndPayload){
-   self->dynamicPublicKeys->add(self->dynamicPublicKeys, makeSelfKeyset());
-   self->dynamicPayloads->add(self->dynamicPayloads, self->payload);
-   self->hasSentKeysAndPayload = 0;
+    XYResult* keyset_results = makeSelfKeySet(self);
+    self->dynamicPublicKeys->add(self->dynamicPublicKeys, keyset_results->result);
+    self->dynamicPayloads->add(self->dynamicPayloads, self->payload);
+    self->hasSentKeysAndPayload = 0;
   }
 
-  BoundWitness* BoundWitness_raw = malloc(sizeof(BoundWitness));
+  BoundWitnessTransfer* BoundWitness_raw = malloc(sizeof(BoundWitness));
 
   if(endpoint){
     XYResult* signForSelf_result = self->signForSelf(self);
@@ -52,10 +53,15 @@ XYResult* incomingData(ZigZagBoundWitness* self, BoundWitness* boundWitness, int
   BoundWitness_raw->payloads = self->dynamicPayloads;
   BoundWitness_raw->signatures = self->dynamicSignatures;
   BoundWitness_raw->getSigningData = &BoundWitness_getSigningData;
-  BoundWitness_raw->toTransfer = &BoundWitness_toTransfer;
   self->boundWitness = BoundWitness_raw;
 
-  return BoundWitness_raw->toTransfer(BoundWitness_raw);
+  XYResult* lookup_result = lookup((char*)&BoundWitnessTransfer_id);
+  if(lookup_result->error != OK) return lookup_result;
+  Object_Creator* BountWitnessTransfer_creator = lookup_result->result;
+  XYResult* newObject_result = newObject((char*)&BoundWitnessTransfer_id, BoundWitness_raw);
+  free(newObject_result);
+  if(newObject_result->result != OK) return newObject_result;
+  return BountWitnessTransfer_creator->toBytes(newObject_result->result);
 }
 
 /*----------------------------------------------------------------------------*
@@ -228,8 +234,8 @@ XYResult* makeSelfKeySet(ZigZagBoundWitness* self){
 *      BoundWitness_signForSelf
 *
 *  DESCRIPTION
-*      Method somewhat similar to BoundWitness_creator_toBytes that creates a
-*      Byte array with the XYO Bound Witness Transfer object type bytes.
+*      Routine that retrieves all the signing data, signs it, and appeneds that
+*      signature to the ZigZagBoundWitness
 *
 *  PARAMETERS
 *     *user_BoundWitness                    [in]       BoundWitness*
@@ -238,12 +244,32 @@ XYResult* makeSelfKeySet(ZigZagBoundWitness* self){
 *      XYResult*            [out]      bool   Returns XYObject* with a byteBuffer as the result.
 *----------------------------------------------------------------------------*/
 XYResult* signForSelf(ZigZagBoundWitness* self){
-  XYResult* signingData_result = self->boundWitness->getSigningData(self);
+  // Get signing data and sign it
+  XYResult* signingData_result = self->boundWitness->getSigningData(self->boundWitness);
   ByteArray* signingData = signingData_result->result;
   XYResult* sign_result = self->signer->sign(self->signer, signingData);
-  ByteArray* signature = sign_result->result;
+  XYObject* signatureObject = sign_result->result;
+
+  // Create SignatureSet Array
+  XYResult* lookup_result = lookup((char*)&SignatureSet_id);
+  if(lookup_result->error != OK){
+    return lookup_result;
+  }
+  Object_Creator* SignatureSet_creator = lookup_result->result;
+  XYResult* create_result = SignatureSet_creator->create((char*)&KeySet_id, NULL);
+  if(create_result->result != OK){
+    return create_result;
+  }
+  XYObject* signatureSetObject = create_result->result;
+  ShortWeakArray* keysetArray = signatureSetObject->payload;
+  free(lookup_result);
+  free(sign_result);
+  free(create_result);
+
+  return keysetArray->add(keysetArray, signatureObject);
+
 
 }
 
-#define ORIGINCHAIN_H
+#define ZIGZAGBOUNDWITNESS_H
 #endif

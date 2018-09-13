@@ -1,6 +1,5 @@
-#include "XYOHeuristicsBuilder.h"
 #include "BoundWitness.h"
-#include "hash.h"
+
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -117,33 +116,34 @@ XYResult* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider* us
 
 /*----------------------------------------------------------------------------*
 *  NAME
-*      BoundWitness_toTransfer
+*      BoundWitnessTransfer_toBytes
 *
 *  DESCRIPTION
 *      Method somewhat similar to BoundWitness_creator_toBytes that creates a
 *      Byte array with the XYO Bound Witness Transfer object type bytes.
 *
 *  PARAMETERS
-*     *user_BoundWitness                    [in]       BoundWitness*
+*     *user_XYObject                     [in]       BoundWitness*
 *
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* with a char* as the result.
 *----------------------------------------------------------------------------*/
-XYResult* BoundWitness_toTransfer(BoundWitness* user_BoundWitness){
+XYResult* BoundWitnessTransfer_toBytes(XYObject* user_XYObect){
+  BoundWitnessTransfer* user_BoundWitness = user_XYObect->payload;
   uint32_t totalSize = 4;
   uint32_t publicKeysSize = 0;
   uint32_t payloadsSize = 0;
   uint32_t signaturesSize = 0;
 
   XYResult* lookup_result = lookup((char*)&ShortStrongArray_id);
-  if(lookup_result->error =! OK){
+  if((lookup_result->error =! OK)){
    RETURN_ERROR(ERR_CRITICAL);
   }
   Object_Creator* ShortStrongArray_creator = lookup_result->result;
   free(lookup_result);
 
   lookup_result = lookup((char*)&IntStrongArray_id);
-  if(lookup_result->error =! OK){
+  if((lookup_result->error =! OK)){
    RETURN_ERROR(ERR_CRITICAL);
   }
   Object_Creator* IntStrongArray_creator = lookup_result->result;
@@ -215,9 +215,184 @@ XYResult* BoundWitness_toTransfer(BoundWitness* user_BoundWitness){
   if(return_result){
     return_result->error = OK;
     return_result->result = return_bytes;
+    return return_result;
   } else {
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
+}
+
+/*----------------------------------------------------------------------------*
+*  NAME
+*      BoundWitness_fromTransfer
+*
+*  DESCRIPTION
+*      Method somewhat similar to BoundWitness_creator_toBytes that creates a
+*      Byte array with the XYO Bound Witness Transfer object type bytes.
+*
+*  PARAMETERS
+*     *user_BoundWitness                    [in]       BoundWitness*
+*
+*  RETURNS
+*      XYResult*            [out]      bool   Returns XYObject* with a char* as the result.
+*----------------------------------------------------------------------------*/
+XYResult* BoundWitnessTransfer_fromBytes(char* user_Transfer){
+  BoundWitnessTransfer* return_BoundWitness = malloc(sizeof(BoundWitnessTransfer));
+  uint32_t BoundWitnessSize = to_uint32((char*)&user_Transfer);
+  if(littleEndian()){
+    BoundWitnessSize = to_uint32((char*)&BoundWitnessSize);
+  }
+  uint8_t choice = user_Transfer[4];
+  uint32_t offset = 5;
+
+  return_BoundWitness->size = BoundWitnessSize;
+  return_BoundWitness->choice = choice;
+  ShortStrongArray* publicKeysPtr = NULL;
+  IntStrongArray* payloadPtr = NULL;
+  ShortStrongArray* signaturesPtr = NULL;
+
+  if(choice == 0x01){
+
+    // Set up the Public Key Array
+    uint32_t publicKeysSize = to_uint32((char*)&user_Transfer[4]);
+    XYResult* lookup_result = lookup((char*)&ShortStrongArray_id);
+    if(lookup_result->error == OK){
+      Object_Creator* SWA_Creator = lookup_result->result;
+      XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[4*sizeof(char)]);
+      if(fromBytes_result->error == OK)
+      {
+        publicKeysPtr = fromBytes_result->result;
+        free(fromBytes_result);
+      } else {
+        return fromBytes_result;
+      }
+    } else {
+      return lookup_result;
+    }
+
+    // Payload
+    lookup_result = lookup((char*)&IntStrongArray_id);
+    if(lookup_result->error == OK){
+      Object_Creator* SWA_Creator = lookup_result->result;
+      XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[4+publicKeysSize*sizeof(char)]);
+
+      if(fromBytes_result->error == OK)
+      {
+        payloadPtr = fromBytes_result->result;
+        free(fromBytes_result);
+      } else {
+        return fromBytes_result;
+      }
+    } else {
+      return lookup_result;
+    }
+
+
+  } else if(choice == 0x02){
+    // Set up the Public Key Array
+    uint32_t publicKeysSize = to_uint32((char*)&user_Transfer[4]);
+    XYResult* lookup_result = lookup((char*)&ShortStrongArray_id);
+    if(lookup_result->error == OK){
+      Object_Creator* SWA_Creator = lookup_result->result;
+      free(lookup_result);
+      XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[4*sizeof(char)]);
+      if(fromBytes_result->error == OK)
+      {
+        publicKeysPtr = fromBytes_result->result;
+        free(fromBytes_result);
+      } else {
+        return fromBytes_result;
+      }
+    } else {
+      return lookup_result;
+    }
+
+    // Payload
+    uint32_t payloadSize = to_uint32((char*)&user_Transfer[4+publicKeysSize*sizeof(char)]);
+    lookup_result = lookup((char*)&IntStrongArray_id);
+    if(lookup_result->error == OK){
+      Object_Creator* SWA_Creator = lookup_result->result;
+      free(lookup_result);
+      XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[4+publicKeysSize*sizeof(char)]);
+
+      if(fromBytes_result->error == OK)
+      {
+        payloadPtr = fromBytes_result->result;
+        free(fromBytes_result);
+      } else {
+        return fromBytes_result;
+      }
+    } else {
+      return lookup_result;
+    }
+
+    // Signatures
+    lookup_result = lookup((char*)&ShortStrongArray_id);
+    if(lookup_result->error == OK){
+      Object_Creator* SWA_Creator = lookup_result->result;
+      free(lookup_result);
+      XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[4+publicKeysSize+payloadSize*sizeof(char)]);
+      if(fromBytes_result->error == OK)
+      {
+        signaturesPtr = fromBytes_result->result;
+        free(fromBytes_result);
+      } else {
+        return fromBytes_result;
+      }
+    } else {
+      return lookup_result;
+    }
+
+  } else if(choice == 0x03){
+    // Signatures
+    XYResult* lookup_result = lookup((char*)&ShortStrongArray_id);
+    if(lookup_result->error == OK){
+      Object_Creator* SWA_Creator = lookup_result->result;
+      free(lookup_result);
+      XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[4*sizeof(char)]);
+      if(fromBytes_result->error == OK)
+      {
+        signaturesPtr = fromBytes_result->result;
+        free(fromBytes_result);
+      } else {
+        return fromBytes_result;
+      }
+    } else {
+      return lookup_result;
+    }
+  } else {
+    RETURN_ERROR(ERR_BADDATA);
+  }
+
+  return_BoundWitness->publicKeys = publicKeysPtr;
+  return_BoundWitness->payloads = payloadPtr;
+  return_BoundWitness->signatures = signaturesPtr;
+  XYResult* return_result = malloc(sizeof(XYResult));
+  if(return_result){
+    return_result->error = OK;
+    return_result->result = return_BoundWitness;
+    return return_result;
+  } else {
+    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+  }
+
+}
+
+/*----------------------------------------------------------------------------*
+*  NAME
+*      BoundWitnessTransfer_creator_create
+*
+*  DESCRIPTION
+*      Create an empty Bound Witness Object
+*
+*  PARAMETERS
+*     *id                    [in]       char*
+*     *user_data             [in]       void*
+*
+*  RETURNS
+*      XYResult*            [out]      bool   Returns XYObject* of the BoundWitness type.
+*----------------------------------------------------------------------------*/
+XYResult* BoundWitnessTransfer_creator_create(char id[2], void* user_data){
+  return newObject(id, user_data);
 }
 
 /*----------------------------------------------------------------------------*

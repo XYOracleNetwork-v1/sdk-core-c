@@ -8,8 +8,12 @@ char* cryptoGetId(CryptoCreator* object){
   return object->id;
 }
 
-char* getPublicKey(Signer* signer){
-  return signer->publicKey;
+struct XYResult* getPublicKey(Signer* signer){
+  XYResult* return_result = malloc(sizeof(XYResult));
+  if(return_result->error != OK) return return_result;
+  return_result->error = OK;
+  return_result->result = signer->publicKey;
+  return return_result;
 }
 
 keyPairStruct* generateKeypair(){
@@ -21,9 +25,8 @@ keyPairStruct* generateKeypair(){
 
 Signer* getSigner(){
   Signer* sig = malloc(sizeof(Signer));
-  keyPairStruct* keys = generateKeypair();
-  sig->publicKey = keys->publicKey;
-  sig->privateKey = keys->privateKey;
+  sig->publicKey = NULL;
+  sig->privateKey = NULL; // Generate keypair and set these.
   sig->getPublicKey = &getPublicKey;
   sig->sign = NULL;
   sig->verify = NULL;

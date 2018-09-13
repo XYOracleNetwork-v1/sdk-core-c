@@ -8,9 +8,9 @@
  * @Last modified time: 10-Aug-2018
  * @Copyright: XY - The Findables Company
  */
+#ifndef XYO_H
 #include <stddef.h>
 #include <stdint.h>
-#ifndef XYO_H
 #include "xyobject.h"
 
 #define RETURN_ERROR(ERR)                                   \
