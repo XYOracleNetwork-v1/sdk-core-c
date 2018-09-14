@@ -15,8 +15,50 @@
 *  RETURNS
 *      XYResult  [out]      bool       Returns XYResult<ByteArray*> the data to send to the other party.
 *----------------------------------------------------------------------------*/
-XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray* bwData){
-  RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray* boundWitnessData){
+  // Here we infer if the userSession bound witness is already completed or not.
+  if(userSession->BoundWitness->dynamicPublicKeys->size == userSession->BoundWitness->dynamicSignatures->size && userSession->BoundWitness->dynamicPublicKeys->size != 0){
+    RETURN_ERROR(ERR_INTERNAL_ERROR);
+  }
+
+  BoundWitnessTransfer* boundWitness = NULL;
+  if(boundWitnessData != NULL){
+      XYResult* lookup_result = lookup((char*)&BoundWitnessTransfer_id);
+      if(lookup_result->error != OK) return lookup_result;
+      Object_Creator* BoundWitnessTransfer_creator = lookup_result->result;
+      free(lookup_result);
+      XYResult* fromBytes_result = BoundWitnessTransfer_creator->fromBytes(boundWitnessData->payload);
+      if(fromBytes_result->error != OK) return fromBytes_result;
+      boundWitness = fromBytes_result->result;
+      free(fromBytes_result);
+  }
+  XYResult* incomingData_result = userSession->BoundWitness->incomingData(userSession->BoundWitness, boundWitness, userSession->cycles && boundWitnessData != NULL);
+  ByteArray* returnData = malloc(sizeof(ByteArray));
+  if(incomingData_result->error != OK) return incomingData_result;
+  if(returnData == NULL) { RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
+  returnData->size = to_uint32((char*)&incomingData_result->result);
+  if(littleEndian()){
+    returnData->size = to_uint32((char*)&returnData->size);
+  }
+
+  if(userSession->cycles && boundWitnessData == NULL){
+    /*
+     * CATALOG_SIZE + 5 because the first bytes of a packet should be fixed length 5.
+     * 4 bytes for size 1 byte for size of the catalog and then the actual catalog.
+     * CATALOG_SIZE is measured in bytes. Catalog size 1 means the catalog is 8 bits long.
+     * The first 4 bytes of a packet in our protocol should always be size of the whole
+     * message in bytes in big endian. choice->size should return the same as CATALOG_SIZE+5
+     * but this is explicit.
+     */
+    returnData->payload = malloc(sizeof(char)*(CATALOG_SIZE + 5) + returnData->size);
+    memcpy(returnData->payload, userSession->choice->payload, sizeof(char)*(CATALOG_SIZE + 5));
+    memcpy(returnData->payload, incomingData_result->result, returnData->size);
+    returnData->size += CATALOG_SIZE+5;
+    //userSession->NetworkPipe->send(userSession->NetworkPipe, returnData, receiverCallback);
+  } else {
+
+  }
+
 }
 
 #define ZIGZAGBOUNDWITNESSSESSION_H

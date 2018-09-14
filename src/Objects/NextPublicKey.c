@@ -3,7 +3,6 @@
 #include <string.h>
 #include "xyo.h"
 #include "XYOHeuristicsBuilder.h"
-#include <arpa/inet.h>
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -48,7 +47,6 @@ XYResult* NextPublicKey_creator_fromBytes(char* pubkey_data){
   if(lookup_result->error == OK && lookup_result2->error == OK && return_NPK){
     Object_Creator* NPK_creator = lookup_result2->result;
     uint32_t element_size = 0;
-    uint8_t offset = 0;
     if(NPK_creator->defaultSize != 0){
       element_size = NPK_creator->defaultSize;
       return_NPK->publicKey = malloc(element_size*sizeof(char));
@@ -142,6 +140,7 @@ XYResult* NextPublicKey_creator_toBytes(struct XYObject* user_XYObject){
             memcpy(byteBuffer+2, user_NPK->publicKey, 2*sizeof(char) + (element_size*sizeof(char)));
             break;
           case 2:
+          {
             element_size = to_uint16(&casted_NPK[0]);
             uint16_t encodedSize16 = element_size;
             byteBuffer = malloc(2*sizeof(char) + (element_size*sizeof(char)));
@@ -151,8 +150,8 @@ XYResult* NextPublicKey_creator_toBytes(struct XYObject* user_XYObject){
             memcpy(byteBuffer, &id, 2);
             memcpy(byteBuffer+(2*sizeof(char)), &encodedSize16, 2);
             memcpy(byteBuffer+(4*sizeof(char)), user_NPK->publicKey+2, (element_size-(sizeof(char)*2)));
-
             break;
+          }
           case 4:
             element_size = to_uint32(&casted_NPK[0]);
             uint32_t encodedSize32 = element_size;

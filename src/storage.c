@@ -2,7 +2,7 @@
 #include "storage.h"
 
 StorageProvider* newStorageProvider(){
-  StorageProvider* store = malloc(sizeof(storageProvider));
+  StorageProvider* store = malloc(sizeof(struct StorageProvider));
   store->write = NULL;
   store->read = NULL;
   store->GetAllKeys = NULL;

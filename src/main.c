@@ -16,11 +16,12 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <openssl/sha.h>
 
+XYResult* preallocated_result;
 
 int main(){
   preallocated_result = malloc(sizeof(struct XYResult));
+
   if(preallocated_result){
     initTable();
 
@@ -98,7 +99,7 @@ int main(){
           if(lookup_result->error != OK){
             return lookup_result->error;
           }
-          /**/
+
           Object_Creator* IWA_Creator = lookup_result->result;
           create_result = IWA_Creator->create(NULL, NULL);
           if(create_result->error != OK){

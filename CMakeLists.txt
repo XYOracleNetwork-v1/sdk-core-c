@@ -1,10 +1,10 @@
 cmake_minimum_required (VERSION 2.6)
 project (sdk-core)
-# The version number.
+# set the version number.
 set (Tutorial_VERSION_MAJOR 0)
 set (Tutorial_VERSION_MINOR 1)
  
-#Bring in the headers
+# bring in the headers
 include_directories(include)
 
 find_package(PkgConfig REQUIRED)
@@ -26,6 +26,10 @@ file(GLOB_RECURSE SOURCES "src/*.c")
 include_directories("${PROJECT_BINARY_DIR}")
  
 set(CMAKE_BUILD_TYPE Debug)
+
+# add options for warnings
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+
 # add the executable
 add_executable(simulation ${SOURCES})
 

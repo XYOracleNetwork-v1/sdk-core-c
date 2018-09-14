@@ -39,6 +39,7 @@ XYResult* newObject(char id[2], void* payload){
 
 }
 
+void* typeTable[16][16];
 XYResult* initTable(){
   int x,y;
   for(x = 0; x < 16; x ++) {

@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <arpa/inet.h>
 
 typedef struct XYObject XYObject;
 typedef struct XYResult XYResult;
@@ -161,12 +160,12 @@ struct XYObject{
   void* (*GetPayload)(struct XYObject*); // Fetch the above payload pointer object and return it.
 };
 
-struct XYResult* preallocated_result;
-void* typeTable[16][16];
+extern struct XYResult* preallocated_result;
+extern void* typeTable[16][16];
 
 struct XYResult* newObject(char id[2], void* payload);
 struct XYResult* lookup(char id[2]);
-XYResult* initTable();
+struct XYResult* initTable();
 uint16_t to_uint16(char* data);
 uint32_t to_uint32(char* data);
 

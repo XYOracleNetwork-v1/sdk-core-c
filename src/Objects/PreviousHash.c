@@ -3,8 +3,6 @@
 #include <string.h>
 #include "xyo.h"
 #include "XYOHeuristicsBuilder.h"
-#include <arpa/inet.h>
-
 /*----------------------------------------------------------------------------*
 *  NAME
 *      PreviousHash_creator_create
@@ -48,7 +46,6 @@ XYResult* PreviousHash_creator_fromBytes(char* hash_data){
   if(lookup_result->error == OK && lookup_result2->error == OK && return_PH){
     Object_Creator* PH_creator = lookup_result2->result;
     uint32_t element_size = 0;
-    uint8_t offset = 0;
     if(PH_creator->defaultSize != 0){
       element_size = PH_creator->defaultSize;
       return_PH->hash = malloc(element_size*sizeof(char));
@@ -143,6 +140,7 @@ XYResult* PreviousHash_creator_toBytes(struct XYObject* user_XYObject){
             memcpy(byteBuffer+2, user_PH->hash, 2*sizeof(char) + (element_size*sizeof(char)));
             break;
           case 2:
+          {
             element_size = to_uint16(&casted_PH[0]);
             uint16_t encodedSize16 = element_size;
             int mallocNumber = 2*sizeof(char) + (element_size*sizeof(char));
@@ -155,6 +153,7 @@ XYResult* PreviousHash_creator_toBytes(struct XYObject* user_XYObject){
             memcpy(byteBuffer+(4*sizeof(char)), user_PH->hash+2, (element_size-(sizeof(char)*2)));
 
             break;
+          }
           case 4:
             element_size = to_uint32(&casted_PH[0]);
             uint32_t encodedSize32 = element_size;

@@ -3,7 +3,6 @@
 #include <string.h>
 #include "xyo.h"
 #include "XYOHeuristicsBuilder.h"
-#include <arpa/inet.h>
 
 /*----------------------------------------------------------------------------*
 *  NAME

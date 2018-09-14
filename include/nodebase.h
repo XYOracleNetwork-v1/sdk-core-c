@@ -1,4 +1,4 @@
-#ifndef ORIGINCHAIN_H
+#ifndef NODEBASE_H
 #include <stdint.h>
 typedef struct BaseNode BaseNode;
 
@@ -19,5 +19,5 @@ struct BaseNode {
 
 };
 
-#define ORIGINCHAIN_H
+#define NODEBASE_H
 #endif

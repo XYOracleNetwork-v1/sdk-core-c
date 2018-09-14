@@ -9,7 +9,7 @@ struct NetworkPipe{
   NetworkPeer* peer;
   NetworkProvider* Provider;
   struct ByteArray* initializationData;
-  struct XYResult* (*send)(NetworkPipe* self, ByteArray* data, void (*callback)(ByteArray* data));
+  struct XYResult* (*send)(NetworkPipe* self, ByteArray* data, struct ZigZagBoundWitness* session, void (*callback)(struct ZigZagBoundWitnessSession* session, XYResult* data));
   struct XYResult* (*close)();
 };
 
@@ -19,8 +19,6 @@ struct NetworkPeer{
 
 struct NetworkProvider{
   struct XYResult* (*find)(int flags);
-  struct XYResult* (*send)(ByteArray* data, void (*callback)(ByteArray* data));
-  struct XYResult* (*close)();
 };
 
 #define NETWORK_H

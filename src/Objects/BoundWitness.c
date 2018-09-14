@@ -136,14 +136,14 @@ XYResult* BoundWitnessTransfer_toBytes(XYObject* user_XYObect){
   uint32_t signaturesSize = 0;
 
   XYResult* lookup_result = lookup((char*)&ShortStrongArray_id);
-  if((lookup_result->error =! OK)){
+  if(lookup_result->error != OK){
    RETURN_ERROR(ERR_CRITICAL);
   }
   Object_Creator* ShortStrongArray_creator = lookup_result->result;
   free(lookup_result);
 
   lookup_result = lookup((char*)&IntStrongArray_id);
-  if((lookup_result->error =! OK)){
+  if(lookup_result->error != OK){
    RETURN_ERROR(ERR_CRITICAL);
   }
   Object_Creator* IntStrongArray_creator = lookup_result->result;
@@ -190,6 +190,7 @@ XYResult* BoundWitnessTransfer_toBytes(XYObject* user_XYObect){
   }
 
   char* return_bytes = malloc(totalSize*sizeof(char));
+
   if(!return_bytes){
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
@@ -223,7 +224,7 @@ XYResult* BoundWitnessTransfer_toBytes(XYObject* user_XYObect){
 
 /*----------------------------------------------------------------------------*
 *  NAME
-*      BoundWitness_fromTransfer
+*      BoundWitnessTransfer_fromBytes
 *
 *  DESCRIPTION
 *      Method somewhat similar to BoundWitness_creator_toBytes that creates a
@@ -233,7 +234,7 @@ XYResult* BoundWitnessTransfer_toBytes(XYObject* user_XYObect){
 *     *user_BoundWitness                    [in]       BoundWitness*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYObject* with a char* as the result.
+*      XYResult*            [out]      bool   Returns XYResult* of the BoundWitnessTransfer type.
 *----------------------------------------------------------------------------*/
 XYResult* BoundWitnessTransfer_fromBytes(char* user_Transfer){
   BoundWitnessTransfer* return_BoundWitness = malloc(sizeof(BoundWitnessTransfer));
@@ -242,7 +243,6 @@ XYResult* BoundWitnessTransfer_fromBytes(char* user_Transfer){
     BoundWitnessSize = to_uint32((char*)&BoundWitnessSize);
   }
   uint8_t choice = user_Transfer[4];
-  uint32_t offset = 5;
 
   return_BoundWitness->size = BoundWitnessSize;
   return_BoundWitness->choice = choice;

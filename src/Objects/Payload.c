@@ -3,7 +3,6 @@
 #include <string.h>
 #include "xyo.h"
 #include "XYOHeuristicsBuilder.h"
-#include <arpa/inet.h>
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -110,9 +109,7 @@ XYResult* Payload_creator_toBytes(struct XYObject* user_XYObject){
   XYResult* toBytes_result1 = NULL;
   XYResult* toBytes_result2 = NULL;
   /* Take the array_raw in, endian the size around, then do toBytes() */
-  IntWeakArray* tempArrayPointer1 = user_Payload->signedHeuristics;
-  IntWeakArray* tempArrayPointer2 = user_Payload->unsignedHeuristics;
-
+  
   XYResult* newObject_result1 = newObject(IntWeakArrayID, user_Payload->signedHeuristics);
   if(newObject_result1->error == OK){
     toBytes_result1 = weakArrayCreator->toBytes( newObject_result1->result );

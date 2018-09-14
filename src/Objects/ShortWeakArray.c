@@ -1,10 +1,5 @@
-#include "xyobject.h"
-#include <stdlib.h>
-#include <string.h>
 #include "xyo.h"
 #include "XYOHeuristicsBuilder.h"
-#include <stdio.h>
-#include <arpa/inet.h>
 
 
 /*----------------------------------------------------------------------------*
@@ -56,18 +51,16 @@ XYResult* ShortWeakArray_add(ShortWeakArray* self_ShortWeakArray, XYObject* user
         case 2:
           /* First we read 2 bytes of the payload to get the size,
            * the to_uint16 function reads ints in big endian.
-           * ntohs converts this big endian number to a number
-           * that is garanteed to be compatible with the host.
            */
           object_size = to_uint16(user_object_payload); //TODO: Check compatibility on big endian devices.
           if(littleEndian()){
-            object_size = ntohs(object_size);
+            object_size = to_uint16((char*)&object_size);
           }
           break;
         case 4:
           object_size = to_uint32(user_object_payload);
           if(littleEndian()){
-            object_size = ntohl(object_size);
+            object_size = to_uint32((char*)&object_size);
           }
           break;
       }
@@ -245,7 +238,7 @@ XYResult* ShortWeakArray_creator_create(char id[2], void* user_data){
     ShortWeakArrayObject->payload = NULL;
     XYResult* return_result = malloc(sizeof(XYResult));
     if(return_result != NULL){
-      return_result->error = 0;
+      return_result->error = OK;
       XYObject* return_object = newObject_result->result;
       return_result->result = return_object;
       return return_result;
@@ -331,13 +324,13 @@ XYResult* ShortWeakArray_creator_toBytes(struct XYObject* user_XYObject){
        * are in the network byte order.
        */
       if(littleEndian()){
-        user_array->size = to_uint16((char*)user_array);
+        user_array->size = to_uint16((char*)(uintptr_t)user_array->size);
       }
 
       memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 2);
       memcpy(byteBuffer+2, user_array->payload, sizeof(char)*(totalSize-2));
       if(littleEndian()){
-        user_array->size = ntohs(user_array->size);
+        user_array->size = to_uint16((char*)(uintptr_t)user_array->size);
       }
       return_result->error = OK;
       return_result->result = byteBuffer;

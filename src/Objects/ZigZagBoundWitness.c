@@ -15,18 +15,9 @@
 *  RETURNS
 *      XYResult  [out]      bool       Returns XYResult<ByteArray*> the data to send to the other party.
 *----------------------------------------------------------------------------*/
-XYResult* incomingData(ZigZagBoundWitness* self, BoundWitness* boundWitness, int endpoint){
-
-  /*
-  * get size of signature array
-  * to send and appened in progress boundWitness to local
-  * BoundWitness object
-  */
-  int signatureRecievedSize = 0;
-
+XYResult* incomingData(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitness, int endpoint){
   if(boundWitness != NULL){
     int success = self->addTransfer(self, boundWitness);
-    signatureRecievedSize = boundWitness->signatures->size;
     if(!success){
       RETURN_ERROR(ERR_BADDATA);
     }
@@ -77,7 +68,7 @@ XYResult* incomingData(ZigZagBoundWitness* self, BoundWitness* boundWitness, int
 *  RETURNS
 *      XYResult  [out]      bool       Returns Bool True if it succeeded.
 *----------------------------------------------------------------------------*/
-int addTransfer(ZigZagBoundWitness* self, BoundWitness* boundWitness){
+int addTransfer(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitness){
  if(!boundWitness){
    return 1;
  }
