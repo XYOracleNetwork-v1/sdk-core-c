@@ -32,7 +32,7 @@ if(ERR == ERR_INSUFFICIENT_MEMORY){                         \
     }                                                       \
 }
 
-int littleEndian();
+int littleEndian(void);
 
 #define CATALOG_SIZE 1
 

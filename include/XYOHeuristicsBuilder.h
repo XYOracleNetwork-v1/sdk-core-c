@@ -15,7 +15,7 @@
 #include "hash.h"
 #include "BoundWitness.h"
 /* todo */
-void breakpoint();
+void breakpoint(void);
 
 XYResult* Heuristic_RSSI_Creator_create(char id[2], void* rssi);
 XYResult* Heuristic_RSSI_Creator_fromBytes(char* heuristic_data);

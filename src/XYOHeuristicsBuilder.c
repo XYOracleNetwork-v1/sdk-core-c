@@ -15,7 +15,7 @@
  #include "XYOHeuristicsBuilder.h"
  #include <stdio.h>
 
-void breakpoint(){};
+void breakpoint(void){};
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -53,7 +53,7 @@ void breakpoint(){};
  *      result  [out]      bool         returns TRUE if Little Endian endian, FALSE if Big Endian.
  *----------------------------------------------------------------------------*/
 
-int littleEndian(){
+int littleEndian(void){
   volatile uint32_t i=0x01234567;
   // return 0 for big endian, 1 for little endian.
   return (*((uint8_t*)(&i))) == 0x67;

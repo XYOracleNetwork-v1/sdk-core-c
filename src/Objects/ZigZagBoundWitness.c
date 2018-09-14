@@ -114,7 +114,6 @@ int addIncomingKeys(ZigZagBoundWitness* self, ShortStrongArray* incomingKeySets)
       return 2;
     }
   }
-  return 0;
 }
 
 /*----------------------------------------------------------------------------*
@@ -141,7 +140,6 @@ int addIncomingPayload(ZigZagBoundWitness* self, IntStrongArray* incomingPayload
       return 2;
     }
   }
-  return 0;
 }
 
 /*----------------------------------------------------------------------------*
@@ -168,7 +166,6 @@ int addIncomingSignatures(ZigZagBoundWitness* self, ShortStrongArray* incomingSi
       return 2;
     }
   }
-  return 0;
 }
 
 /*----------------------------------------------------------------------------*

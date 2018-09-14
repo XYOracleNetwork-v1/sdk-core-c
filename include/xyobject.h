@@ -165,7 +165,7 @@ extern void* typeTable[16][16];
 
 struct XYResult* newObject(char id[2], void* payload);
 struct XYResult* lookup(char id[2]);
-struct XYResult* initTable();
+struct XYResult* initTable(void);
 uint16_t to_uint16(char* data);
 uint32_t to_uint32(char* data);
 

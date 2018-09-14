@@ -40,7 +40,7 @@ XYResult* newObject(char id[2], void* payload){
 }
 
 void* typeTable[16][16];
-XYResult* initTable(){
+XYResult* initTable(void){
   int x,y;
   for(x = 0; x < 16; x ++) {
       for(y = 0; y < 16; y ++) typeTable[x][y] = 0;
