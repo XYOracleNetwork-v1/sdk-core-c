@@ -18,6 +18,7 @@
 #include <stdio.h>
 
 XYResult* preallocated_result;
+#ifdef BUILD_MAIN
 
 int main(){
   preallocated_result = malloc(sizeof(struct XYResult));
@@ -219,3 +220,4 @@ int main(){
 
   return 0;
 }
+#endif

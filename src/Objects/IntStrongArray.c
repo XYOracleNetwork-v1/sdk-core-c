@@ -233,9 +233,8 @@ XYResult* IntStrongArray_creator_create(char id[2], void* user_data){ // conside
     IntStrongArrayObject->payload = NULL;
     XYResult* return_result = malloc(sizeof(XYResult));
     if(return_result != NULL){
-      return_result->error = 0;
-      XYObject* return_object = newObject_result->result;
-      return_result->result = return_object;
+      return_result->error = OK;
+      return_result->result = newObject_result->result;
       return return_result;
     }
     else {

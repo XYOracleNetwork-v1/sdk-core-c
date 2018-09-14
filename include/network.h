@@ -1,5 +1,5 @@
 #ifndef NETWORK_H
-#include <stddef.h>
+#include <stdint.h>
 
 typedef struct NetworkPipe NetworkPipe;
 typedef struct NetworkPeer NetworkPeer;
@@ -9,7 +9,7 @@ struct NetworkPipe{
   NetworkPeer* peer;
   NetworkProvider* Provider;
   struct ByteArray* initializationData;
-  struct XYResult* (*send)(NetworkPipe* self, ByteArray* data, struct ZigZagBoundWitness* session, void (*callback)(struct ZigZagBoundWitnessSession* session, XYResult* data));
+  struct XYResult* (*send)(NetworkPipe* self, ByteArray* data, uint8_t cycles, struct XYResult* (*callback)(NetworkPipe* self, uint8_t cycles, XYResult* data));
   struct XYResult* (*close)();
 };
 

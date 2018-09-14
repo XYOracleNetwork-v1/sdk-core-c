@@ -7,20 +7,22 @@
 *
 *  DESCRIPTION
 *      Retrieves and orders the bound witness data so that it can be signed or hashed.
+*      void* is being used here to use multiple types of objects (Bound witness and Bound Witness Transfer)
+*      as parameters
 *
 *  PARAMETERS
-*     *user_BoundWitness                    [in]       BoundWitness*
+*     *user_BoundWitness                    [in]       void* (BoundWitness*)(BoundWitnessTransfer*)
 *
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* with a byteBuffer as the result.
 *----------------------------------------------------------------------------*/
-XYResult* BoundWitness_getSigningData(BoundWitness* user_BoundWitness){
-  uint32_t publicKeysSize = user_BoundWitness->publicKeys->size;
+XYResult* BoundWitness_getSigningData(void* user_BoundWitness){
+  uint32_t publicKeysSize = ((BoundWitness*)user_BoundWitness)->publicKeys->size;
   uint32_t firstHeuristicsSize;
   uint32_t secondHeuristicsSize;
 
   /* Get Size of keysets + payloads first */
-  IntStrongArray* user_payloadsArray = user_BoundWitness->payloads;
+  IntStrongArray* user_payloadsArray = ((BoundWitness*)user_BoundWitness)->payloads;
   XYResult* get_result = user_payloadsArray->get(user_payloadsArray, 0);
   XYObject* user_firstPayloadObject = get_result->result;
   char* user_firstPayload = user_firstPayloadObject->payload;
@@ -45,7 +47,7 @@ XYResult* BoundWitness_getSigningData(BoundWitness* user_BoundWitness){
   if(byteBuffer){
     // Copy Public Keys in.
 
-    XYResult* newObject_result = newObject((char*)&ShortStrongArray_id, user_BoundWitness->publicKeys);
+    XYResult* newObject_result = newObject((char*)&ShortStrongArray_id, ((BoundWitness*)user_BoundWitness)->publicKeys);
     if(newObject_result->error!=OK){
       return newObject_result;
     }

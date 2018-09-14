@@ -235,7 +235,7 @@ XYResult* IntWeakArray_creator_create(char id[2], void* user_data){ // consider 
     IntWeakArrayObject->payload = NULL;
     XYResult* return_result = malloc(sizeof(XYResult));
     if(return_result != NULL){
-      return_result->error = 0;
+      return_result->error = OK;
       XYObject* return_object = newObject_result->result;
       return_result->result = return_object;
       return return_result;
