@@ -45,7 +45,7 @@ XYResult* NextPublicKey_creator_fromBytes(char* pubkey_data){
   XYResult* lookup_result2 = lookup(pubkey_id);
   NextPublicKey* return_NPK = malloc(sizeof(NextPublicKey));
   if(lookup_result->error == OK && lookup_result2->error == OK && return_NPK){
-    Object_Creator* NPK_creator = lookup_result2->result;
+    ObjectProvider* NPK_creator = lookup_result2->result;
     uint32_t element_size = 0;
     if(NPK_creator->defaultSize != 0){
       element_size = NPK_creator->defaultSize;
@@ -90,11 +90,15 @@ XYResult* NextPublicKey_creator_fromBytes(char* pubkey_data){
     {
       RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
     }
-  }
-  if(lookup_result->error == OK && lookup_result2->error == OK){
+  } else if(lookup_result->error == OK && lookup_result2->error == OK){
+    if(lookup_result) free(lookup_result);
+    if(lookup_result2) free(lookup_result2);
+    if(return_NPK) free(return_NPK);
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-  }
-  else{
+  } else {
+    if(lookup_result) free(lookup_result);
+    if(lookup_result2) free(lookup_result2);
+    if(return_NPK) free(return_NPK);
     RETURN_ERROR(ERR_BADDATA);
   }
 }
@@ -120,7 +124,7 @@ XYResult* NextPublicKey_creator_toBytes(struct XYObject* user_XYObject){
     memcpy(&id, user_NPK->id, 2);
     XYResult* lookup_result = lookup(id);
     if(lookup_result->error == OK){
-      Object_Creator* NPK_creator = lookup_result->result;
+      ObjectProvider* NPK_creator = lookup_result->result;
       uint32_t element_size = 0;
       char* byteBuffer;
       if(NPK_creator->defaultSize != 0){

@@ -23,7 +23,7 @@ keyPairStruct* generateKeypair(){
     return keypair;
 }
 
-Signer* getSigner(){
+Signer* newInstance(ByteArray* user_PrivateKey){
   Signer* sig = malloc(sizeof(Signer));
   sig->publicKey = NULL;
   sig->privateKey = NULL; // Generate keypair and set these.
@@ -36,7 +36,7 @@ Signer* getSigner(){
 CryptoCreator* newCryptoCreator(){
   CryptoCreator* creator = malloc(sizeof(CryptoCreator));
   memset(creator->id, 0x00, 2);
-  creator->getSigner = &getSigner;
+  creator->newInstance = &newInstance;
   creator->getId = &cryptoGetId;
   return creator;
 }

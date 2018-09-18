@@ -161,7 +161,7 @@ struct XYObject{
 };
 
 extern struct XYResult* preallocated_result;
-extern void* typeTable[16][16];
+extern void* typeTable[17][16];
 
 struct XYResult* newObject(char id[2], void* payload);
 struct XYResult* lookup(char id[2]);
@@ -191,9 +191,9 @@ static const char ECDSASecp256k1_id[2]        = { 0x04, 0x01 };
 static const char ECDSASecp256k1Sig_id[2]     = { 0x05, 0x01 };
 static const char Rssi_id[2]                  = { 0x08, 0x01 };
 
-typedef struct Object_Creator Object_Creator;
+typedef struct ObjectProvider ObjectProvider;
 
- struct Object_Creator {
+ struct ObjectProvider {
    int        sizeIdentifierSize;
    int        defaultSize;
    struct XYResult*  (*create)(char[2], void*);

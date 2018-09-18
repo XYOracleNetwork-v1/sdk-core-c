@@ -39,15 +39,15 @@ XYResult* newObject(char id[2], void* payload){
 
 }
 
-void* typeTable[16][16];
+void* typeTable[17][16];
 XYResult* initTable(void){
   int x,y;
-  for(x = 0; x < 16; x ++) {
+  for(x = 0; x < 17; x ++) {
       for(y = 0; y < 16; y ++) typeTable[x][y] = 0;
   }
 
   // Initialize Byte Strong Array Creator
-  struct Object_Creator* ByteStrongArray_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* ByteStrongArray_creator = malloc(sizeof(ObjectProvider));
   if(ByteStrongArray_creator != NULL){
     ByteStrongArray_creator->sizeIdentifierSize = 1;
     ByteStrongArray_creator->defaultSize = 0;
@@ -63,7 +63,7 @@ XYResult* initTable(void){
   }
 
   // Initialize Short Strong Array Creator
-  struct Object_Creator* ShortStrongArray_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* ShortStrongArray_creator = malloc(sizeof(ObjectProvider));
   if(ShortStrongArray_creator != NULL){
     ShortStrongArray_creator->sizeIdentifierSize = 2;
     ShortStrongArray_creator->defaultSize = 0;
@@ -79,7 +79,7 @@ XYResult* initTable(void){
   }
 
   // Initialize Int Strong Array Creator
-  struct Object_Creator* IntStrongArray_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* IntStrongArray_creator = malloc(sizeof(ObjectProvider));
   if(IntStrongArray_creator != NULL){
     IntStrongArray_creator->sizeIdentifierSize = 4;
     IntStrongArray_creator->defaultSize = 0;
@@ -95,7 +95,7 @@ XYResult* initTable(void){
   }
 
   // Initialize Byte Weak Array Creator
-  struct Object_Creator* ByteWeakArray_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* ByteWeakArray_creator = malloc(sizeof(ObjectProvider));
   if(ByteWeakArray_creator != NULL){
     ByteWeakArray_creator->sizeIdentifierSize = 1;
     ByteWeakArray_creator->defaultSize = 0;
@@ -111,7 +111,7 @@ XYResult* initTable(void){
   }
 
   // Initialize Short Weak Array Creator
-  struct Object_Creator* ShortWeakArray_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* ShortWeakArray_creator = malloc(sizeof(ObjectProvider));
   if(ShortWeakArray_creator != NULL){
     ShortWeakArray_creator->sizeIdentifierSize = 2;
     ShortWeakArray_creator->defaultSize = 0;
@@ -127,7 +127,7 @@ XYResult* initTable(void){
   }
 
   // Initialize Int Weak Array Creator
-  struct Object_Creator* IntWeakArray_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* IntWeakArray_creator = malloc(sizeof(ObjectProvider));
   if(IntWeakArray_creator != NULL){
     IntWeakArray_creator->sizeIdentifierSize = 4;
     IntWeakArray_creator->defaultSize = 0;
@@ -143,7 +143,7 @@ XYResult* initTable(void){
   }
 
   // Initialize Bound Witness Creator
-  struct Object_Creator* BoundWitness_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* BoundWitness_creator = malloc(sizeof(ObjectProvider));
   if(BoundWitness_creator != NULL){
     BoundWitness_creator->sizeIdentifierSize = 4;
     BoundWitness_creator->defaultSize = 0;
@@ -159,7 +159,7 @@ XYResult* initTable(void){
   }
 
   // Initialize Keyset
-  struct Object_Creator* KeySet_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* KeySet_creator = malloc(sizeof(ObjectProvider));
   if(KeySet_creator != NULL){
     KeySet_creator->sizeIdentifierSize = 2;
     KeySet_creator->defaultSize = 0;
@@ -175,7 +175,7 @@ XYResult* initTable(void){
   }
 
   // Initialize Payload Creator
-  struct Object_Creator* Payload_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* Payload_creator = malloc(sizeof(ObjectProvider));
   if(Payload_creator != NULL){
     Payload_creator->sizeIdentifierSize = 4;
     Payload_creator->defaultSize = 0;
@@ -191,7 +191,7 @@ XYResult* initTable(void){
   }
 
   // Initialize Index Creator
-  struct Object_Creator* Index_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* Index_creator = malloc(sizeof(ObjectProvider));
   if(Index_creator != NULL){
     Index_creator->sizeIdentifierSize = 0;
     Index_creator->defaultSize = 4;
@@ -207,7 +207,7 @@ XYResult* initTable(void){
   }
 
   // Initialize Previous Hash Creator
-  struct Object_Creator* PreviousHash_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* PreviousHash_creator = malloc(sizeof(ObjectProvider));
   if(PreviousHash_creator != NULL){
     PreviousHash_creator->sizeIdentifierSize = 0;
     PreviousHash_creator->defaultSize = 34;
@@ -223,7 +223,7 @@ XYResult* initTable(void){
   }
 
   // Initialize Next Public Key Creator
-  struct Object_Creator* NPK_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* NPK_creator = malloc(sizeof(ObjectProvider));
   if(NPK_creator != NULL){
     NPK_creator->sizeIdentifierSize = 0;
     NPK_creator->defaultSize = 0;
@@ -239,7 +239,7 @@ XYResult* initTable(void){
   }
 
   // Initialize Bound Witness Transfer
-  struct Object_Creator* BWT_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* BWT_creator = malloc(sizeof(ObjectProvider));
   if(BWT_creator != NULL){
     BWT_creator->sizeIdentifierSize = 0;
     BWT_creator->defaultSize = 0;
@@ -255,7 +255,7 @@ XYResult* initTable(void){
   }
 
   // Initialize SHA256 Hash Creator
-  struct Object_Creator* SHA256_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* SHA256_creator = malloc(sizeof(ObjectProvider));
   if(SHA256_creator != NULL){
     SHA256_creator->sizeIdentifierSize = 0;
     SHA256_creator->defaultSize = 32;
@@ -271,7 +271,7 @@ XYResult* initTable(void){
   }
 
   // Initialize ECDSA Secp256k1 Uncompressed Key TODO
-  struct Object_Creator* secp256k1_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* secp256k1_creator = malloc(sizeof(ObjectProvider));
   if(secp256k1_creator != NULL){
     secp256k1_creator->sizeIdentifierSize = 0;
     secp256k1_creator->defaultSize = 64;
@@ -287,7 +287,7 @@ XYResult* initTable(void){
   }
 
   // Initialize Custom Next Public Key Creator
-  struct Object_Creator* NPKU_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* NPKU_creator = malloc(sizeof(ObjectProvider));
   if(NPKU_creator != NULL){
     NPKU_creator->sizeIdentifierSize = 0;
     NPKU_creator->defaultSize = 6;
@@ -303,7 +303,7 @@ XYResult* initTable(void){
   }
 
   // Initialize SECP256k1 Signature type
-  struct Object_Creator* secp256k1sig_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* secp256k1sig_creator = malloc(sizeof(ObjectProvider));
   if(secp256k1sig_creator != NULL){
     secp256k1sig_creator->sizeIdentifierSize = 1;
     secp256k1sig_creator->defaultSize = 0;
@@ -319,7 +319,7 @@ XYResult* initTable(void){
   }
 
   // Initialize RSSI Heuristic Creator
-  struct Object_Creator* rssi_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* rssi_creator = malloc(sizeof(ObjectProvider));
   if(rssi_creator != NULL){
     rssi_creator->sizeIdentifierSize = 0;
     rssi_creator->defaultSize = 1;
@@ -335,7 +335,7 @@ XYResult* initTable(void){
   }
 
   // Initialize Text Heuristic Creator
-  struct Object_Creator* text_creator = malloc(sizeof(Object_Creator));
+  struct ObjectProvider* text_creator = malloc(sizeof(ObjectProvider));
   if(text_creator != NULL){
     text_creator->sizeIdentifierSize = 2;
     text_creator->defaultSize = 0;

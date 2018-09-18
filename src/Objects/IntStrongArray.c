@@ -24,33 +24,33 @@
 *      XYResult  [out]      bool       Returns EXyoErrors::OK if adding succeeded.
 *----------------------------------------------------------------------------*/
 XYResult* IntStrongArray_add(IntStrongArray* self_IntStrongArray, XYObject* user_XYObject){ //TODO: consider changing self to XYObject
-  // Lookup the Object_Creator for the object so we can infer if the object has a default
+  // Lookup the ObjectProvider for the object so we can infer if the object has a default
   // size or a variable size per each element. We know every element in a single-type array
   // has the same type, but we don't know if they have uniform size. An array of Bound Witness
   // objects will be variable size, but all the same type.
   XYResult* lookup_result = lookup(user_XYObject->id);
   if(lookup_result->error == OK){
-    Object_Creator* user_object_creator = lookup_result->result;
+    ObjectProvider* user_ObjectProvider = lookup_result->result;
 
     // First we calculate how much space we need for the payload with
     // the addition of this new element.
     uint32_t newSize = 0;
     uint32_t object_size = 0;
 
-    if(user_object_creator->defaultSize != 0){
+    if(user_ObjectProvider->defaultSize != 0){
 
       // This object type is always going to have the same size so no additional
       // logic is needed to derrive the new total size of the array.
-      object_size = user_object_creator->defaultSize;
+      object_size = user_ObjectProvider->defaultSize;
       newSize = (self_IntStrongArray->size + object_size);
     }
-    else if(user_object_creator->sizeIdentifierSize != 0){
+    else if(user_ObjectProvider->sizeIdentifierSize != 0){
 
       // Get a pointer to beginning of the array to read the size.
       char* object_payload = user_XYObject->payload;
 
       // Size identifier Size tells you how many bytes to read for size
-      switch(user_object_creator->sizeIdentifierSize){
+      switch(user_ObjectProvider->sizeIdentifierSize){
         case 1:
           object_size = object_payload[0];
           break;
@@ -83,14 +83,14 @@ XYResult* IntStrongArray_add(IntStrongArray* self_IntStrongArray, XYObject* user
        memcpy(id, user_object_payload, 2);
        lookup_result = lookup(id);
        if(lookup_result->error == OK){
-         Object_Creator* deeper_object_creator = lookup_result->result;
-         if(deeper_object_creator->defaultSize != 0){
+         ObjectProvider* deeper_ObjectProvider = lookup_result->result;
+         if(deeper_ObjectProvider->defaultSize != 0){
 
-           object_size = deeper_object_creator->defaultSize;
+           object_size = deeper_ObjectProvider->defaultSize;
 
            newSize = (self_IntStrongArray->size + object_size);
          }
-         else if(deeper_object_creator->sizeIdentifierSize != 0){
+         else if(deeper_ObjectProvider->sizeIdentifierSize != 0){
            /* Unimplemented */
          }
        }
@@ -114,7 +114,7 @@ XYResult* IntStrongArray_add(IntStrongArray* self_IntStrongArray, XYObject* user
         object_payload = &(object_payload[self_IntStrongArray->size - (sizeof(char)*6)]);
 
         // Finally copy the element into the array
-        XYResult* toBytes_result = user_object_creator->toBytes(user_XYObject);
+        XYResult* toBytes_result = user_ObjectProvider->toBytes(user_XYObject);
         memcpy(object_payload, toBytes_result->result, object_size);
 
         self_IntStrongArray->size = newSize;
@@ -160,7 +160,7 @@ XYResult* IntStrongArray_add(IntStrongArray* self_IntStrongArray, XYObject* user
 XYResult* IntStrongArray_get(IntStrongArray* self_IntStrongArray, int index) {
   XYResult* general_result = lookup(self_IntStrongArray->id);
   if(general_result->error == OK){
-    Object_Creator* element_creator = general_result->result;
+    ObjectProvider* element_creator = general_result->result;
     if(element_creator->defaultSize != 0){
       uint8_t totalSize = self_IntStrongArray->size;
       totalSize = totalSize - 6*sizeof(char);
@@ -311,41 +311,34 @@ XYResult* IntStrongArray_creator_fromBytes(char* data){
 *----------------------------------------------------------------------------*/
 XYResult* IntStrongArray_creator_toBytes(struct XYObject* user_XYObject){
   if(user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x03){
-    IntStrongArray* IntStrongArrayObject = malloc(sizeof(IntStrongArray));
-    if(IntStrongArrayObject != NULL){
-      IntStrongArray* user_array = user_XYObject->GetPayload(user_XYObject);
-      uint8_t totalSize = user_array->size;
-      char* byteBuffer = malloc(sizeof(char)*totalSize);
-      XYResult* return_result = malloc(sizeof(XYResult));
-      if(return_result != NULL && byteBuffer != NULL){
+    IntStrongArray* user_array = user_XYObject->GetPayload(user_XYObject);
+    uint8_t totalSize = user_array->size;
+    char* byteBuffer = malloc(sizeof(char)*totalSize);
+    XYResult* return_result = malloc(sizeof(XYResult));
+    if(return_result != NULL && byteBuffer != NULL){
 
-        /*
-         * Use the to_uint32 function to converter endian to Big Endian
-         * if the host architecture isn't already Big Endian.
-         * This switch happens so that when it's copied into a buffer we
-         * are in the network byte order.
-         */
-        if(littleEndian()){
-          user_array->size = to_uint32((char*)user_array);
-        }
+      /*
+       * Use the to_uint32 function to converter endian to Big Endian
+       * if the host architecture isn't already Big Endian.
+       * This switch happens so that when it's copied into a buffer we
+       * are in the network byte order.
+       */
+      if(littleEndian()){
+        user_array->size = to_uint32((char*)user_array);
+      }
 
-        memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 6);
-        memcpy(byteBuffer+6, user_array->payload, sizeof(char)*(totalSize-6));
-        if(littleEndian()){
-          user_array->size = to_uint32((char*)(uintptr_t)user_array->size);
-        }
-        return_result->error = OK;
-        return_result->result = byteBuffer;
-        return return_result;
+      memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 6);
+      memcpy(byteBuffer+6, user_array->payload, sizeof(char)*(totalSize-6));
+      if(littleEndian()){
+        user_array->size = to_uint32((char*)(uintptr_t)user_array->size);
       }
-      else {
-        RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)
-      }
-    }
-    else {
-      preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-      preallocated_result->result = 0;
-      return preallocated_result;
+      return_result->error = OK;
+      return_result->result = byteBuffer;
+      return return_result;
+    } else {
+      if(byteBuffer) free(byteBuffer);
+      if(return_result) free(return_result);
+      RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)
     }
   }
   else {

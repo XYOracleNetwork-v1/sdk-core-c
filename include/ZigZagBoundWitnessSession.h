@@ -5,6 +5,8 @@
 #include "network.h"
 
 typedef struct ZigZagBoundWitnessSession ZigZagBoundWitnessSession;
+typedef struct NetworkPipe NetworkPipe;
+typedef struct NetworkPeer NetworkPeer;
 
 struct ZigZagBoundWitnessSession {
   struct XYResult* (*completeBoundWitness)(ZigZagBoundWitnessSession* userSession, ByteArray* bwData);
@@ -14,7 +16,19 @@ struct ZigZagBoundWitnessSession {
   ByteArray* choice;
 };
 
-struct XYResult* receiverCallback(NetworkPipe* self, uint8_t cycles, XYResult* data);
+struct NetworkPipe{
+  NetworkPeer* peer;
+  NetworkProvider* Provider;
+  struct ByteArray* initializationData;
+  struct XYResult* (*send)(ZigZagBoundWitnessSession* self, ByteArray* data, struct XYResult* (*callback)(ZigZagBoundWitnessSession* self, ByteArray* data));
+  struct XYResult* (*close)();
+};
+
+struct NetworkPeer{
+  struct XYResult* (*getRole)(NetworkPipe* pipe);
+};
+
+struct XYResult* receiverCallback(ZigZagBoundWitnessSession* self, ByteArray* data);
 
 #define ZIGZAGBOUNDWITNESSSESSION_H
 #endif

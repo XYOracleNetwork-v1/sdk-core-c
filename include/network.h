@@ -1,21 +1,6 @@
 #ifndef NETWORK_H
 #include <stdint.h>
-
-typedef struct NetworkPipe NetworkPipe;
-typedef struct NetworkPeer NetworkPeer;
 typedef struct NetworkProvider NetworkProvider;
-
-struct NetworkPipe{
-  NetworkPeer* peer;
-  NetworkProvider* Provider;
-  struct ByteArray* initializationData;
-  struct XYResult* (*send)(NetworkPipe* self, ByteArray* data, uint8_t cycles, struct XYResult* (*callback)(NetworkPipe* self, uint8_t cycles, XYResult* data));
-  struct XYResult* (*close)();
-};
-
-struct NetworkPeer{
-  struct XYResult* (*getRole)(NetworkPipe* pipe);
-};
 
 struct NetworkProvider{
   struct XYResult* (*find)(int flags);

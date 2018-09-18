@@ -109,7 +109,9 @@ XYResult* Heuristic_Text_Creator_toBytes(struct XYObject* user_XYObject){
     uint16_t encodedSize = to_uint16((char*)&encodedSize);
   }
   char* encoded_bytes = malloc(sizeof(char)*size);
-
+  if(encoded_bytes == NULL) {
+    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+  }
   memcpy(encoded_bytes, &encodedSize, sizeof(uint16_t));
   memcpy(encoded_bytes+(2*sizeof(char)), text+(2*sizeof(char)), size-(2*sizeof(char)));
 
@@ -120,6 +122,7 @@ XYResult* Heuristic_Text_Creator_toBytes(struct XYObject* user_XYObject){
     return return_result;
   }
   else {
+    if(encoded_bytes) free(encoded_bytes);
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_result->result = NULL;
     return preallocated_result;
@@ -157,6 +160,7 @@ XYResult* ECDSA_secp256k1Uncompressed_creator_toBytes(struct XYObject* user_XYOb
     return return_result;
   }
   else {
+    if(encoded_bytes) free(encoded_bytes);
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_result->result = NULL;
     return preallocated_result;
@@ -176,7 +180,7 @@ XYResult* ECDSA_secp256k1Sig_creator_fromBytes(char* heuristic_data){
   secp256k1Signature* return_signature = malloc(sizeof(secp256k1Signature));
   return_signature->size = size;
   return_signature->signature = payload_bytes;
-  return newObject(id, payload_bytes);
+  return newObject(id, return_signature);
 }
 
 XYResult* ECDSA_secp256k1Sig_creator_toBytes(struct XYObject* user_XYObject){

@@ -18,33 +18,33 @@
 *      XYResult  [out]      bool       Returns EXyoErrors::OK if adding succeeded.
 *----------------------------------------------------------------------------*/
 XYResult* ByteWeakArray_add(ByteWeakArray* self_ByteWeakArray, XYObject* user_XYObject){ //TODO: consider changing self to XYObject
-  // Lookup the Object_Creator for the object so we can infer if the object has a default
+  // Lookup the ObjectProvider for the object so we can infer if the object has a default
   // size or a variable size per each element. We know every element in a single-type array
   // has the same type, but we don't know if they have uniform size. An array of Bound Witness
   // objects will be variable size, but all the same type.
   XYResult* lookup_result = lookup(user_XYObject->id);
   if(lookup_result->error == OK){
-    Object_Creator* user_object_creator = lookup_result->result;
+    ObjectProvider* user_ObjectProvider = lookup_result->result;
 
     // First we calculate how much space we need for the payload with
     // the addition of this new element.
     uint32_t newSize = 0;
     uint32_t object_size = 0;
 
-    if(user_object_creator->defaultSize != 0){
+    if(user_ObjectProvider->defaultSize != 0){
 
       // This object type is always going to have the same size so no additional
       // logic is needed to derrive the new total size of the array.
-      object_size = user_object_creator->defaultSize;
+      object_size = user_ObjectProvider->defaultSize;
       newSize = (self_ByteWeakArray->size + object_size + (sizeof(char)*2));
     }
-    else if(user_object_creator->sizeIdentifierSize != 0){
+    else if(user_ObjectProvider->sizeIdentifierSize != 0){
 
       // Get a pointer to beginning of the user object payload to read size.
       char* user_object_payload = user_XYObject->payload;
 
       // Get the number of bytes to read to get size.
-      switch(user_object_creator->sizeIdentifierSize){
+      switch(user_ObjectProvider->sizeIdentifierSize){
         case 1:
           object_size = user_object_payload[0];
           break;
@@ -78,15 +78,15 @@ XYResult* ByteWeakArray_add(ByteWeakArray* self_ByteWeakArray, XYObject* user_XY
        memcpy(id, user_object_payload, 2);
        lookup_result = lookup(id);
        if(lookup_result->error == OK){
-         Object_Creator* deeper_object_creator = lookup_result->result;
-         if(deeper_object_creator->defaultSize != 0){
+         ObjectProvider* deeper_ObjectProvider = lookup_result->result;
+         if(deeper_ObjectProvider->defaultSize != 0){
 
            // defaultSize + 2 Bytes representing ID
-           object_size = deeper_object_creator->defaultSize + (sizeof(char)*2);
+           object_size = deeper_ObjectProvider->defaultSize + (sizeof(char)*2);
 
            newSize = (self_ByteWeakArray->size + object_size + (sizeof(char)*2));
          }
-         else if(deeper_object_creator->sizeIdentifierSize != 0){
+         else if(deeper_ObjectProvider->sizeIdentifierSize != 0){
            /* Unimplemented */
          }
        }
@@ -110,7 +110,7 @@ XYResult* ByteWeakArray_add(ByteWeakArray* self_ByteWeakArray, XYObject* user_XY
 
         // Finally copy the element into the array
         memcpy(object_payload, user_XYObject->id, 2);
-        XYResult* toBytes_result = user_object_creator->toBytes(user_XYObject);
+        XYResult* toBytes_result = user_ObjectProvider->toBytes(user_XYObject);
         memcpy(object_payload+2, toBytes_result->result, object_size);
 
         self_ByteWeakArray->size = newSize;
@@ -168,7 +168,7 @@ XYResult* ByteWeakArray_get(ByteWeakArray* self_ByteWeakArray, int index) {
   for(char* arrayPointer = self_ByteWeakArray->payload; (ByteWeakArray **)arrayPointer < (&self_ByteWeakArray+(sizeof(char)*self_ByteWeakArray->size));){
     XYResult* lookup_result = lookup(arrayPointer);
     if(lookup_result->error == OK){
-      Object_Creator* element_creator = lookup_result->result;
+      ObjectProvider* element_creator = lookup_result->result;
 
       uint32_t element_size = 0;
       if(element_creator->defaultSize != 0 ){
@@ -298,6 +298,8 @@ XYResult* ByteWeakArray_creator_fromBytes(char* data){
       }
   }
   else{
+    if(return_result) free(return_result);
+    if(return_array) free(return_array);
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
 }

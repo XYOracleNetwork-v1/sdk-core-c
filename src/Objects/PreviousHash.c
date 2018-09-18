@@ -44,7 +44,7 @@ XYResult* PreviousHash_creator_fromBytes(char* hash_data){
   XYResult* lookup_result2 = lookup(hash_id);
   PreviousHash* return_PH = malloc(sizeof(PreviousHash));
   if(lookup_result->error == OK && lookup_result2->error == OK && return_PH){
-    Object_Creator* PH_creator = lookup_result2->result;
+    ObjectProvider* PH_creator = lookup_result2->result;
     uint32_t element_size = 0;
     if(PH_creator->defaultSize != 0){
       element_size = PH_creator->defaultSize;
@@ -89,11 +89,15 @@ XYResult* PreviousHash_creator_fromBytes(char* hash_data){
     {
       RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
     }
-  }
-  if(lookup_result->error == OK && lookup_result2->error == OK){
+  } else if(lookup_result->error == OK && lookup_result2->error == OK){
+    if(lookup_result) free(lookup_result);
+    if(lookup_result2) free(lookup_result2);
+    if(return_PH) free(return_PH);
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-  }
-  else{
+  } else{
+    if(lookup_result) free(lookup_result);
+    if(lookup_result2) free(lookup_result2);
+    if(return_PH) free(return_PH);
     RETURN_ERROR(ERR_BADDATA);
   }
 }
@@ -119,7 +123,7 @@ XYResult* PreviousHash_creator_toBytes(struct XYObject* user_XYObject){
     memcpy(&id, user_PH->id, 2);
     XYResult* lookup_result = lookup(id);
     if(lookup_result->error == OK){
-      Object_Creator* PH_creator = lookup_result->result;
+      ObjectProvider* PH_creator = lookup_result->result;
       uint32_t element_size = 0;
       char* byteBuffer;
 

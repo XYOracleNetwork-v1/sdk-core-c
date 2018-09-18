@@ -18,6 +18,7 @@
 #include <stdio.h>
 
 XYResult* preallocated_result;
+#define BUILD_MAIN
 #ifdef BUILD_MAIN
 
 int main(){
@@ -28,7 +29,7 @@ int main(){
 
     XYResult* lookup_result = lookup((char*)&BoundWitness_id);
     if(lookup_result->error == OK){
-      Object_Creator* BoundWitness_creator = lookup_result->result;
+      ObjectProvider* BoundWitness_creator = lookup_result->result;
       //free(lookup_result);
       BoundWitness* BoundWitness_raw = malloc(sizeof(BoundWitness));
       XYObject* BoundWitness_object;
@@ -43,11 +44,11 @@ int main(){
       }
       lookup_result = lookup((char*)&ShortStrongArray_id);
       if(lookup_result->error == OK){
-        Object_Creator* SSA_Creator = lookup_result->result;
+        ObjectProvider* SSA_Creator = lookup_result->result;
         //free(lookup_result);
         lookup_result = lookup((char*)&IntStrongArray_id);
         if(lookup_result->error == OK){
-          Object_Creator* ISA_Creator = lookup_result->result;
+          ObjectProvider* ISA_Creator = lookup_result->result;
           //free(lookup_result);
           XYResult* create_result = SSA_Creator->create((char*)&KeySet_id, NULL);
           if(create_result->error != OK){
@@ -61,7 +62,7 @@ int main(){
           if(lookup_result->error != OK){
             return lookup_result->error;
           }
-          Object_Creator* SWA_Creator = lookup_result->result;
+          ObjectProvider* SWA_Creator = lookup_result->result;
           create_result = SWA_Creator->create((char*)&ShortWeakArray_id, NULL);
           if(create_result->error != OK){
             return create_result->error;
@@ -101,7 +102,7 @@ int main(){
             return lookup_result->error;
           }
 
-          Object_Creator* IWA_Creator = lookup_result->result;
+          ObjectProvider* IWA_Creator = lookup_result->result;
           create_result = IWA_Creator->create(NULL, NULL);
           if(create_result->error != OK){
             return create_result->error;
@@ -123,7 +124,7 @@ int main(){
           if(lookup_result->error != OK){
             return lookup_result->error;
           }
-          Object_Creator* Rssi_Creator = lookup_result->result;
+          ObjectProvider* Rssi_Creator = lookup_result->result;
           char rssi_val = 0xC4;
           create_result = Rssi_Creator->create((char*)&Rssi_id, &rssi_val);
           if(create_result->error != OK){
@@ -166,7 +167,7 @@ int main(){
           if(lookup_result->error != OK){
             return lookup_result->result;
           }
-          Object_Creator* SWA_Creator = lookup_result->result;
+          ObjectProvider* SWA_Creator = lookup_result->result;
           */
           create_result = SWA_Creator->create(NULL, NULL);
           if(create_result->error != OK){

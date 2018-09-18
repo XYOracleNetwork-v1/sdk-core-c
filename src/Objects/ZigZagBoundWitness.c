@@ -30,13 +30,16 @@ XYResult* incomingData(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitn
     self->hasSentKeysAndPayload = 0;
   }
 
-  BoundWitnessTransfer* BoundWitness_raw = malloc(sizeof(BoundWitness));
-
   if(endpoint){
     XYResult* signForSelf_result = self->signForSelf(self);
-    if(signForSelf_result->error != OK)
+    if(signForSelf_result->error != OK){
       return signForSelf_result;
+    }
     free(signForSelf_result);
+  }
+  BoundWitnessTransfer* BoundWitness_raw = malloc(sizeof(BoundWitness));
+  if(BoundWitness_raw == NULL){
+    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
 
   BoundWitness_raw->size = self->dynamicPublicKeys->size + self->dynamicPayloads->size + self->dynamicSignatures->size +(4*sizeof(char));
@@ -48,11 +51,12 @@ XYResult* incomingData(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitn
 
   XYResult* lookup_result = lookup((char*)&BoundWitnessTransfer_id);
   if(lookup_result->error != OK) return lookup_result;
-  Object_Creator* BountWitnessTransfer_creator = lookup_result->result;
+  ObjectProvider* BountWitnessTransfer_creator = lookup_result->result;
   XYResult* newObject_result = newObject((char*)&BoundWitnessTransfer_id, BoundWitness_raw);
-  free(newObject_result);
   if(newObject_result->result != OK) return newObject_result;
-  return BountWitnessTransfer_creator->toBytes(newObject_result->result);
+  XYResult* toBytes_result = BountWitnessTransfer_creator->toBytes(newObject_result->result);
+  free(newObject_result);
+  return toBytes_result;
 }
 
 /*----------------------------------------------------------------------------*
@@ -195,7 +199,7 @@ XYResult* makeSelfKeySet(ZigZagBoundWitness* self){
   if(lookup_result->error != OK){
     return lookup_result;
   }
-  Object_Creator* KeySet_creator = lookup_result->result;
+  ObjectProvider* KeySet_creator = lookup_result->result;
   XYResult* create_result = KeySet_creator->create((char*)&KeySet_id, NULL);
   XYObject* keysetObject = create_result->result;
   ShortWeakArray* keysetArray = keysetObject->payload;
@@ -243,7 +247,7 @@ XYResult* signForSelf(ZigZagBoundWitness* self){
   if(lookup_result->error != OK){
     return lookup_result;
   }
-  Object_Creator* SignatureSet_creator = lookup_result->result;
+  ObjectProvider* SignatureSet_creator = lookup_result->result;
   XYResult* create_result = SignatureSet_creator->create((char*)&KeySet_id, NULL);
   if(create_result->result != OK){
     return create_result;

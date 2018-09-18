@@ -42,7 +42,7 @@ XYResult* Payload_creator_fromBytes(char* payload_data){
 
   char IntWeakArrayID[2] = {0x01, 0x06};
   XYResult* lookup_result = lookup(IntWeakArrayID);
-  Object_Creator* weakArrayCreator = lookup_result->result;
+  ObjectProvider* weakArrayCreator = lookup_result->result;
 
   IntWeakArray* signedWeakArray;
   IntWeakArray* unsignedWeakArray;
@@ -61,11 +61,13 @@ XYResult* Payload_creator_fromBytes(char* payload_data){
     }
     else
     {
+      free(return_payload);
       return array_result;
     }
   }
   else
   {
+    free(return_payload);
     return array_result;
   }
   return_payload->size = to_uint32((char*)payload_data);
@@ -101,7 +103,7 @@ XYResult* Payload_creator_toBytes(struct XYObject* user_XYObject){
 
   char IntWeakArrayID[2] = {0x01, 0x06};
   XYResult* lookup_result = lookup(IntWeakArrayID);
-  Object_Creator* weakArrayCreator = lookup_result->result;
+  ObjectProvider* weakArrayCreator = lookup_result->result;
   IntWeakArray* signedArray = user_Payload->signedHeuristics;
   IntWeakArray* unsignedArray = user_Payload->unsignedHeuristics;
   uint32_t size1 = signedArray->size;
@@ -109,7 +111,7 @@ XYResult* Payload_creator_toBytes(struct XYObject* user_XYObject){
   XYResult* toBytes_result1 = NULL;
   XYResult* toBytes_result2 = NULL;
   /* Take the array_raw in, endian the size around, then do toBytes() */
-  
+
   XYResult* newObject_result1 = newObject(IntWeakArrayID, user_Payload->signedHeuristics);
   if(newObject_result1->error == OK){
     toBytes_result1 = weakArrayCreator->toBytes( newObject_result1->result );

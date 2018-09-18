@@ -22,7 +22,7 @@ XYResult* getOriginBlockByBlockHash(OriginChainNavigator* self_OriginChainNaviga
   if(lookup_result->error != OK){
     return lookup_result;
   }
-  Object_Creator* BoundWitness_creator = lookup_result->result;
+  ObjectProvider* BoundWitness_creator = lookup_result->result;
   free(lookup_result);
   return BoundWitness_creator->fromBytes(return_array->payload);
 }
@@ -99,7 +99,7 @@ XYResult* getOriginBlockByPreviousHash(OriginChainNavigator* self_OriginChainNav
 *----------------------------------------------------------------------------*/
 XYResult* addBoundWitness(OriginChainNavigator* self_OriginChainNavigator, BoundWitness* user_BoundWitness) {
   XYResult* lookup_result = lookup((char*)BoundWitness_id);
-  Object_Creator* BoundWitness_creator = lookup_result->result;
+  ObjectProvider* BoundWitness_creator = lookup_result->result;
   XYResult* toBytes_result = BoundWitness_creator->toBytes((XYObject*)user_BoundWitness);
   char* boundWitnessBytes = toBytes_result->result;
   free(lookup_result);
@@ -126,7 +126,6 @@ XYResult* addBoundWitness(OriginChainNavigator* self_OriginChainNavigator, Bound
     self_OriginChainNavigator->Storage->write(write_ByteArray, blockHashValue);
     free(write_ByteArray);
     free(payload);
-    free(write_ByteArray);
     XYResult* return_result = malloc(sizeof(XYResult));
     if(return_result){
       return_result->error = OK;
@@ -175,7 +174,7 @@ XYResult* findPreviousBlocks(OriginChainNavigator* self_OriginChainNavigator, Bo
               if(lookup_result->error != OK){
                 continue;
               }
-              Object_Creator* previousHash_creator = lookup_result->result;
+              ObjectProvider* previousHash_creator = lookup_result->result;
               free(lookup_result);
               ByteArray* blockHash = malloc(sizeof(ByteArray));
               blockHash->payload = previous_hash->hash;

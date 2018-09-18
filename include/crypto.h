@@ -27,5 +27,5 @@ struct Signer{
 struct CryptoCreator{
   char id[2];
   char* (*getId)(struct CryptoCreator*); // Fetch the above id object and return it.
-  Signer* (*getSigner)(); // Generate a new Signer object which includes generating a new keypair.
+  Signer* (*newInstance)(struct ByteArray* user_PrivateKey); // Generate a new Signer object which includes generating a new keypair.
 };
