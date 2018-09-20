@@ -100,7 +100,7 @@ struct XYResult* getPublicKey(Signer* signer){
  */
 keyPairStruct* generateKeypair(){
   
-    keyPairStruct* keypair = malloc(sizeof(keyPairStruct));
+  keyPairStruct* keypair = malloc(sizeof(keyPairStruct));
   
   if (keypair) {
     
