@@ -1,4 +1,4 @@
-#ifndef ORIGINCHAIN_H
+#ifndef STATE_H
 #include <stdint.h>
 #include "crypto.h"
 #include "xyobject.h"
@@ -13,5 +13,5 @@ struct OriginChainState {
   uint32_t index;
 };
 
-#define ORIGINCHAIN_H
+#define STATE_H
 #endif

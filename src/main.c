@@ -18,7 +18,7 @@
 #include <stdio.h>
 
 XYResult* preallocated_result;
-#define BUILD_MAIN
+
 #ifdef BUILD_MAIN
 
 int main(){

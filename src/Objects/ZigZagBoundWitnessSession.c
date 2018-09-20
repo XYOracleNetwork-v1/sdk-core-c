@@ -66,6 +66,20 @@ XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray
   }
 }
 
+/*----------------------------------------------------------------------------*
+*  NAME
+*      receiverCallback
+*
+*  DESCRIPTION
+*     Adds data to the bound witness and returns whats the party should send back.
+*
+*  PARAMETERS
+*     *self          [in]      ZigZagBoundWitnessSession*    The data from the other party.
+*     *data          [in]      ByteArray*       If not already turned around, decide if what to send sign and send back.
+*
+*  RETURNS
+*      XYResult  [out]      bool       Returns XYResult<ByteArray*> the data to send to the other party.
+*----------------------------------------------------------------------------*/
 XYResult* receiverCallback(ZigZagBoundWitnessSession* self, ByteArray* data){
   if(data->size == 0 ) return 0;
   if(self->cycles == 0){
