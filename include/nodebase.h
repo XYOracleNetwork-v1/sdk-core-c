@@ -1,3 +1,22 @@
+/**
+ ****************************************************************************************
+ *
+ * @file nodebase.h
+ *
+ * @XYO Core library source code.
+ *
+ * @brief primary crypto routines for the XYO Core.
+ *
+ * Copyright (C) 2018 XY - The Findables Company
+ *
+ ****************************************************************************************
+ */
+
+/*
+ * INCLUDES
+ ****************************************************************************************
+ */
+
 #ifndef NODEBASE_H
 
 #include "repository.h"
@@ -12,12 +31,20 @@ struct NodeBase {
   RepositoryProvider* blockRepository;
   HashProvider* hashingProvider;
   OriginChainNavigator* originChainNavigator;
-  OriginChainState* state;
+  OriginChainState* originChainState;
   ZigZagBoundWitnessSession* session;
+  uint8_t heuristicCount;
+  void* boundWitnessOptions;
+  void* listeners;
+
+  /*
+  * Initializes the Node.
+  */
+  XYResult* (*initNode)(NodeBase* self, RepositoryProvider* repository, HashProvider* hashingProvider);
   /*
   * Gets the choice of a catalog from another party.
   */
-  uint (*getChoice)(NodeBase* self, uint catalog, uint8_t strict);
+  uint8_t (*getChoice)(NodeBase* self, uint catalog, uint8_t strict);
   /*
   * Adds a heuristic to be used when creating bound witnesses.
   */
@@ -53,13 +80,26 @@ struct NodeBase {
   /*
   * Update the state of the origin chain.
   */
-  XYResult* (*updateOriginState)(NodeBase* self);
+  XYResult* (*updateOriginState)(NodeBase* self, ZigZagBoundWitness* boundWitness);
   /*
   * Make a Payload* which can be used in a bound witness.
   */
   XYResult* (*makePayload)(NodeBase* self, uint bitFlag);
-
+  XYObject* heuristics[0];
 };
+
+XYResult* initNode(NodeBase* self, RepositoryProvider* repository, HashProvider* hashingProvider, uint8_t heuristicCount);
+uint8_t addHeuristic(NodeBase* self, uint key, XYObject* heuristic);
+uint8_t removeHeuristic(NodeBase* self, uint key);
+uint8_t selfSignOriginChain(NodeBase* self, uint flag);
+uint8_t getUnSignedPayloads(NodeBase* self, uint bitFlag);
+uint8_t getSignedPayloads(NodeBase* self, uint bitFlag);
+uint8_t notifyListeners(NodeBase* self, ZigZagBoundWitness* boundWitness);
+XYResult* getBridgedBlocks(NodeBase* self);
+XYResult* doBoundWitness(ByteArray* startingData, NetworkPipe* pipe);
+XYResult* updateOriginState(NodeBase* self, BoundWitness* boundWitness);
+XYResult* onBoundWitnessEndSuccess(NodeBase* self, BoundWitness* boundWitness);
+XYResult* makePayload(NodeBase* self, uint bitFlag);
 
 #define NODEBASE_H
 #endif

@@ -1,4 +1,22 @@
-#ifndef ZIGZAGBOUNDWITNESSSESSION_H
+/**
+ ****************************************************************************************
+ *
+ * @file crypto.c
+ *
+ * @XYO Core library source code.
+ *
+ * @brief primary crypto routines for the XYO Core.
+ *
+ * Copyright (C) 2018 XY - The Findables Company
+ *
+ ****************************************************************************************
+ */
+ 
+/*
+ * INCLUDES
+ ****************************************************************************************
+ */
+
 #include "ZigZagBoundWitnessSession.h"
 
 /*----------------------------------------------------------------------------*
@@ -97,6 +115,3 @@ XYResult* receiverCallback(ZigZagBoundWitnessSession* self, ByteArray* data){
 
   }
 }
-
-#define ZIGZAGBOUNDWITNESSSESSION_H
-#endif

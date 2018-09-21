@@ -3,14 +3,11 @@
  *
  * @file crypto.c
  *
- * @XY4 project source code.
+ * @XYO Core library source code.
  *
- * @brief primary crypto routines for the XY4 firmware.
+ * @brief primary crypto routines for the XYO Core.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2018 XY - The Findables Company
  *
  ****************************************************************************************
  */
@@ -42,11 +39,11 @@
  *      id          [out]     char*
  *
  *  NOTES
- *       
+ *
  ****************************************************************************************
  */
 char* cryptoGetId(CryptoCreator* object){
-  
+
   return object->id;
 }
 
@@ -69,14 +66,14 @@ char* cryptoGetId(CryptoCreator* object){
  ****************************************************************************************
  */
 struct XYResult* getPublicKey(Signer* signer){
-  
+
   XYResult* return_result = malloc(sizeof(XYResult));
-  
+
   if(return_result->error != OK) return return_result;
-  
+
   return_result->error = OK;
   return_result->result = signer->publicKey;
-  
+
   return return_result;
 }
 
@@ -86,7 +83,7 @@ struct XYResult* getPublicKey(Signer* signer){
  *      generateKeypair
  *
  *  DESCRIPTION
- *      this routine returns a NEW pair of public and private keys 
+ *      this routine returns a NEW pair of public and private keys
  *
  *  PARAMETERS
  *      none
@@ -99,15 +96,15 @@ struct XYResult* getPublicKey(Signer* signer){
  ****************************************************************************************
  */
 keyPairStruct* generateKeypair(){
-  
+
   keyPairStruct* keypair = malloc(sizeof(keyPairStruct));
-  
+
   if (keypair) {
-    
+
     keypair->publicKey = NULL;
     keypair->privateKey = NULL;
   }
-  
+
   return keypair;
 }
 
@@ -117,7 +114,7 @@ keyPairStruct* generateKeypair(){
  *      newInstance
  *
  *  DESCRIPTION
- *      this routine returns a NEW Signer 
+ *      this routine returns a NEW Signer
  *
  *  PARAMETERS
  *      user_PrivateKey     [in]      ByteArray*
@@ -130,18 +127,18 @@ keyPairStruct* generateKeypair(){
  ****************************************************************************************
  */
 Signer* newInstance(ByteArray* user_PrivateKey){
-  
+
   Signer* signer = malloc(sizeof(Signer));
-  
+
   if (signer) {
-    
+
     signer->publicKey = NULL;
     signer->privateKey = NULL;            // Generate keypair and set these.
     signer->getPublicKey = &getPublicKey;
     signer->sign = NULL;
     signer->verify = NULL;
   }
-  
+
   return signer;
 }
 
@@ -151,7 +148,7 @@ Signer* newInstance(ByteArray* user_PrivateKey){
  *      newCryptoCreator
  *
  *  DESCRIPTION
- *      this routine returns a NEW CryptoCreator 
+ *      this routine returns a NEW CryptoCreator
  *
  *  PARAMETERS
  *      none
@@ -164,18 +161,17 @@ Signer* newInstance(ByteArray* user_PrivateKey){
  ****************************************************************************************
  */
 CryptoCreator* newCryptoCreator(){
-  
+
   CryptoCreator* creator = malloc(sizeof(CryptoCreator));
-  
+
   if (creator) {
-    
+
     memset(creator->id, 0x00, 2);
     creator->newInstance = &newInstance;
     creator->getId = &cryptoGetId;
   }
-  
+
   return creator;
 }
 
 // end of file crypto.c
-

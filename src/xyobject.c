@@ -1,6 +1,22 @@
+/**
+ ****************************************************************************************
+ *
+ * @file crypto.c
+ *
+ * @XYO Core library source code.
+ *
+ * @brief primary crypto routines for the XYO Core.
+ *
+ * Copyright (C) 2018 XY - The Findables Company
+ *
+ ****************************************************************************************
+ */
+
+/*
+ * INCLUDES
+ ****************************************************************************************
+ */
 #include "XYOHeuristicsBuilder.h"
-#include <stdlib.h>
-#include <string.h>
 
 char* GetId(struct XYObject* object){
   return object->id;
@@ -39,11 +55,11 @@ XYResult* newObject(char id[2], void* payload){
 
 }
 
-void* typeTable[17][16];
+void* typeTable[TYPE_TABLE_MAJOR_MAX][TYPE_TABLE_MINOR_MAX];
 XYResult* initTable(void){
   int x,y;
-  for(x = 0; x < 17; x ++) {
-      for(y = 0; y < 16; y ++) typeTable[x][y] = 0;
+  for(x = 0; x < TYPE_TABLE_MAJOR_MAX; x ++) {
+      for(y = 0; y < TYPE_TABLE_MINOR_MAX; y ++) typeTable[x][y] = 0;
   }
 
   // Initialize Byte Strong Array Creator
@@ -54,7 +70,7 @@ XYResult* initTable(void){
     ByteStrongArray_creator->create = &ByteStrongArray_creator_create;
     ByteStrongArray_creator->fromBytes = &ByteStrongArray_creator_fromBytes;
     ByteStrongArray_creator->toBytes = &ByteStrongArray_creator_toBytes;
-    typeTable[0x01][0x01] = ByteStrongArray_creator;
+    typeTable[MAJOR_ARRAY][MINOR_BYTE_SINGLE_TYPE] = ByteStrongArray_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -70,7 +86,7 @@ XYResult* initTable(void){
     ShortStrongArray_creator->create = &ShortStrongArray_creator_create;
     ShortStrongArray_creator->fromBytes = &ShortStrongArray_creator_fromBytes;
     ShortStrongArray_creator->toBytes = &ShortStrongArray_creator_toBytes;
-    typeTable[0x01][0x02] = ShortStrongArray_creator;
+    typeTable[MAJOR_ARRAY][MINOR_SHORT_SINGLE_TYPE] = ShortStrongArray_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -86,7 +102,7 @@ XYResult* initTable(void){
     IntStrongArray_creator->create = &IntStrongArray_creator_create;
     IntStrongArray_creator->fromBytes = &IntStrongArray_creator_fromBytes;
     IntStrongArray_creator->toBytes = &IntStrongArray_creator_toBytes;
-    typeTable[0x01][0x03] = IntStrongArray_creator;
+    typeTable[MAJOR_ARRAY][MINOR_INT_SINGLE_TYPE] = IntStrongArray_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -102,7 +118,7 @@ XYResult* initTable(void){
     ByteWeakArray_creator->create = &ByteWeakArray_creator_create;
     ByteWeakArray_creator->fromBytes = &ByteWeakArray_creator_fromBytes;
     ByteWeakArray_creator->toBytes = &ByteWeakArray_creator_toBytes;
-    typeTable[0x01][0x04] = ByteWeakArray_creator;
+    typeTable[MAJOR_ARRAY][MINOR_BYTE_MULTI_TYPE] = ByteWeakArray_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -118,7 +134,7 @@ XYResult* initTable(void){
     ShortWeakArray_creator->create = &ShortWeakArray_creator_create;
     ShortWeakArray_creator->fromBytes = &ShortWeakArray_creator_fromBytes;
     ShortWeakArray_creator->toBytes = &ShortWeakArray_creator_toBytes;
-    typeTable[0x01][0x05] = ShortWeakArray_creator;
+    typeTable[MAJOR_ARRAY][MINOR_SHORT_MULTI_TYPE] = ShortWeakArray_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -134,7 +150,7 @@ XYResult* initTable(void){
     IntWeakArray_creator->create = &IntWeakArray_creator_create;
     IntWeakArray_creator->fromBytes = &IntWeakArray_creator_fromBytes;
     IntWeakArray_creator->toBytes = &IntWeakArray_creator_toBytes;
-    typeTable[0x01][0x06] = IntWeakArray_creator;
+    typeTable[MAJOR_ARRAY][MINOR_INT_MULTI_TYPE] = IntWeakArray_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -150,7 +166,7 @@ XYResult* initTable(void){
     BoundWitness_creator->create = &BoundWitness_creator_create;
     BoundWitness_creator->fromBytes = &BoundWitness_creator_fromBytes;
     BoundWitness_creator->toBytes = &BoundWitness_creator_toBytes;
-    typeTable[0x02][0x01] = BoundWitness_creator;
+    typeTable[MAJOR_CORE][MINOR_BOUND_WITNESS] = BoundWitness_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -166,7 +182,7 @@ XYResult* initTable(void){
     KeySet_creator->create = &ShortWeakArray_creator_create;
     KeySet_creator->fromBytes = &ShortWeakArray_creator_fromBytes;
     KeySet_creator->toBytes = &ShortWeakArray_creator_toBytes;
-    typeTable[0x02][0x02] = KeySet_creator;
+    typeTable[MAJOR_CORE][MINOR_KEY_SET] = KeySet_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -182,7 +198,7 @@ XYResult* initTable(void){
     Payload_creator->create = &Payload_creator_create;
     Payload_creator->fromBytes = &Payload_creator_fromBytes;
     Payload_creator->toBytes = &Payload_creator_toBytes;
-    typeTable[0x02][0x04] = Payload_creator;
+    typeTable[MAJOR_CORE][MINOR_PAYLOAD] = Payload_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -198,7 +214,7 @@ XYResult* initTable(void){
     Index_creator->create = &Index_creator_create;
     Index_creator->fromBytes = &Index_creator_fromBytes;
     Index_creator->toBytes = &Index_creator_toBytes;
-    typeTable[0x02][0x05] = Index_creator;
+    typeTable[MAJOR_CORE][MINOR_INDEX] = Index_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -214,7 +230,7 @@ XYResult* initTable(void){
     PreviousHash_creator->create = PreviousHash_creator_create;
     PreviousHash_creator->fromBytes = PreviousHash_creator_fromBytes;
     PreviousHash_creator->toBytes = PreviousHash_creator_toBytes;
-    typeTable[0x02][0x06] = PreviousHash_creator;
+    typeTable[MAJOR_CORE][MINOR_PREVIOUS_HASH] = PreviousHash_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -230,7 +246,7 @@ XYResult* initTable(void){
     NPK_creator->create = &NextPublicKey_creator_create;
     NPK_creator->fromBytes = &NextPublicKey_creator_fromBytes;
     NPK_creator->toBytes = &NextPublicKey_creator_toBytes;
-    typeTable[0x02][0x07] = NPK_creator;
+    typeTable[MAJOR_CORE][MINOR_NEXT_PUBLIC_KEY] = NPK_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -246,7 +262,7 @@ XYResult* initTable(void){
     BWT_creator->create = &BoundWitness_creator_create;
     BWT_creator->fromBytes = &BoundWitnessTransfer_fromBytes;
     BWT_creator->toBytes = &BoundWitnessTransfer_toBytes;
-    typeTable[0x02][0x08] = BWT_creator;
+    typeTable[MAJOR_CORE][MINOR_BOUND_WITNESS_TRANSFER] = BWT_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -262,7 +278,7 @@ XYResult* initTable(void){
     SHA256_creator->create = NULL;
     SHA256_creator->fromBytes = NULL;
     SHA256_creator->toBytes = NULL;
-    typeTable[0x03][0x05] = SHA256_creator;
+    typeTable[MAJOR_HASH][MINOR_SHA256] = SHA256_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -278,23 +294,7 @@ XYResult* initTable(void){
     secp256k1_creator->create = &ECDSA_secp256k1Uncompressed_creator_create;
     secp256k1_creator->fromBytes = &ECDSA_secp256k1Uncompressed_creator_fromBytes;
     secp256k1_creator->toBytes = &ECDSA_secp256k1Uncompressed_creator_toBytes;
-    typeTable[0x04][0x01] = secp256k1_creator;
-  }
-  else {
-    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-    preallocated_result->result = 0;
-    return preallocated_result;
-  }
-
-  // Initialize Custom Next Public Key Creator
-  struct ObjectProvider* NPKU_creator = malloc(sizeof(ObjectProvider));
-  if(NPKU_creator != NULL){
-    NPKU_creator->sizeIdentifierSize = 0;
-    NPKU_creator->defaultSize = 6;
-    NPKU_creator->create = NULL;
-    NPKU_creator->fromBytes = NULL;
-    NPKU_creator->toBytes = NULL;
-    typeTable[0x04][0x03] = NPKU_creator;
+    typeTable[MAJOR_KEYS][MINOR_ECDSA_SECP256K1_COMPRESSED] = secp256k1_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -310,7 +310,7 @@ XYResult* initTable(void){
     secp256k1sig_creator->create = NULL;
     secp256k1sig_creator->fromBytes = NULL;
     secp256k1sig_creator->toBytes = NULL;
-    typeTable[0x04][0x03] = secp256k1sig_creator;
+    typeTable[MAJOR_KEYS][MINOR_ECDSA_SECP256K1_SHA256_SIGNATURE] = secp256k1sig_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -326,7 +326,7 @@ XYResult* initTable(void){
     rssi_creator->create = &Heuristic_RSSI_Creator_create;
     rssi_creator->fromBytes = &Heuristic_RSSI_Creator_fromBytes;
     rssi_creator->toBytes = &Heuristic_RSSI_Creator_toBytes;
-    typeTable[0x08][0x01] = rssi_creator; //TODO: Change major and minor for RSSI when it's standardized.
+    typeTable[MAJOR_HEURISTICS][MINOR_RSSI] = rssi_creator; //TODO: Change major and minor for RSSI when it's standardized.
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -342,7 +342,7 @@ XYResult* initTable(void){
     text_creator->create = &Heuristic_Text_Creator_create;
     text_creator->fromBytes = &Heuristic_Text_Creator_fromBytes;
     text_creator->toBytes = &Heuristic_Text_Creator_toBytes;
-    typeTable[0x10][0x01] = text_creator;
+    typeTable[MAJOR_CUSTOM][MINOR_TEXT] = text_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -363,16 +363,8 @@ XYResult* initTable(void){
   }
 }
 
-void registerType(char id[2], void* creator){
-  typeTable[id[0]][id[1]] = creator;
-}
-
-void ArrayIteratorNext(){
-
-}
-
 XYResult* lookup(char id[2]){
-  void* tableValue = typeTable[id[0]][id[1]];
+  void* tableValue = typeTable[(unsigned)id[0]][(unsigned)id[1]];
   XYResult* return_result = malloc(sizeof(XYResult));
   if(return_result != NULL){
     if(tableValue != 0){

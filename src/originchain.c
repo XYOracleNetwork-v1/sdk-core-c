@@ -1,3 +1,21 @@
+/**
+ ****************************************************************************************
+ *
+ * @file crypto.c
+ *
+ * @XYO Core library source code.
+ *
+ * @brief primary crypto routines for the XYO Core.
+ *
+ * Copyright (C) 2018 XY - The Findables Company
+ *
+ ****************************************************************************************
+ */
+
+/*
+ * INCLUDES
+ ****************************************************************************************
+ */
 #include "originchain.h"
 
 /*----------------------------------------------------------------------------*
@@ -15,7 +33,8 @@
 *      XYResult*                              [out]      XYObject*   Returns XYObject of Boound Witness type
 *----------------------------------------------------------------------------*/
 XYResult* getOriginBlockByBlockHash(OriginChainNavigator* self_OriginChainNavigator, ByteArray* originBlockHash) {
-  XYResult* read_return = self_OriginChainNavigator->Storage->read(originBlockHash);
+  //XYResult* read_return = self_OriginChainNavigator->Storage->read(originBlockHash);
+  /*
   ByteArray* return_array = read_return->result;
   free(read_return);
   XYResult* lookup_result = lookup((char*)BoundWitness_id);
@@ -25,6 +44,7 @@ XYResult* getOriginBlockByBlockHash(OriginChainNavigator* self_OriginChainNaviga
   ObjectProvider* BoundWitness_creator = lookup_result->result;
   free(lookup_result);
   return BoundWitness_creator->fromBytes(return_array->payload);
+  */
 }
 
 /*----------------------------------------------------------------------------*
@@ -42,7 +62,7 @@ XYResult* getOriginBlockByBlockHash(OriginChainNavigator* self_OriginChainNaviga
 *      XYResult*                               [out]      success   Returns boolean 0 if remove succeeded.
 *----------------------------------------------------------------------------*/
 XYResult* removeOriginBlock(OriginChainNavigator* self_OriginChainNavigator, ByteArray* originBlockHash) {
-  return self_OriginChainNavigator->Storage->delete(originBlockHash);
+  return preallocated_result;//self_OriginChainNavigator->Storage->delete(originBlockHash);
 }
 
 /*----------------------------------------------------------------------------*
@@ -69,7 +89,7 @@ XYResult* getOriginBlockByPreviousHash(OriginChainNavigator* self_OriginChainNav
     formattedHash->payload = payload;
     char nullBits[2] = { 0, 0 };
     memcpy(formattedHash->reserved, nullBits, sizeof(nullBits));
-    XYResult* read_return = self_OriginChainNavigator->Storage->read(formattedHash);
+    //XYResult* read_return = self_OriginChainNavigator->Storage->read(formattedHash);
     free(formattedHash);
     free(payload);
     if(read_return->error != OK){
@@ -120,10 +140,10 @@ XYResult* addBoundWitness(OriginChainNavigator* self_OriginChainNavigator, Bound
     memcpy(payload+sizeof(char), prevBlockHashValue->payload, blockHashValue->size+(1*sizeof(char)));
     write_ByteArray->size = user_BoundWitness->size;
     write_ByteArray->payload = boundWitnessBytes;
-    self_OriginChainNavigator->Storage->write(blockHashValue, write_ByteArray);
+    //self_OriginChainNavigator->Storage->write(blockHashValue, write_ByteArray);
     write_ByteArray->size = prevBlockHashValue->size + 1*sizeof(char);
     write_ByteArray->payload = payload;
-    self_OriginChainNavigator->Storage->write(write_ByteArray, blockHashValue);
+    //self_OriginChainNavigator->Storage->write(write_ByteArray, blockHashValue);
     free(write_ByteArray);
     free(payload);
     XYResult* return_result = malloc(sizeof(XYResult));

@@ -1,4 +1,22 @@
-#ifndef ZIGZAGBOUNDWITNESS_H
+/**
+ ****************************************************************************************
+ *
+ * @file crypto.c
+ *
+ * @XYO Core library source code.
+ *
+ * @brief primary crypto routines for the XYO Core.
+ *
+ * Copyright (C) 2018 XY - The Findables Company
+ *
+ ****************************************************************************************
+ */
+
+/*
+ * INCLUDES
+ ****************************************************************************************
+ */
+
 #include "ZigZagBoundWitness.h"
 
 /*----------------------------------------------------------------------------*
@@ -26,7 +44,9 @@ XYResult* incomingData(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitn
   if(!self->hasSentKeysAndPayload){
     XYResult* keyset_results = makeSelfKeySet(self);
     self->dynamicPublicKeys->add(self->dynamicPublicKeys, keyset_results->result);
-    self->dynamicPayloads->add(self->dynamicPayloads, self->payload);
+    for(int i = 0; i< self->heuristicCount; i++){
+      self->dynamicPayloads->add(self->dynamicPayloads, self->payload[i]->GetPayload(self->payload));
+    }
     self->hasSentKeysAndPayload = 0;
   }
 
@@ -262,6 +282,3 @@ XYResult* signForSelf(ZigZagBoundWitness* self){
 
 
 }
-
-#define ZIGZAGBOUNDWITNESS_H
-#endif

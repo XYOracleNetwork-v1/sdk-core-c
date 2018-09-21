@@ -1,13 +1,22 @@
 /**
- * @Author: Nate Brune
- * @Date:   09-Aug-2018
- * @Email:  nate.brune@xyo.network
- * @Project: XYO-C-SDK
- * @Filename: xyo.h
- * @Last modified by:   Nate Brune
- * @Last modified time: 10-Aug-2018
- * @Copyright: XY - The Findables Company
+ ****************************************************************************************
+ *
+ * @file crypto.c
+ *
+ * @XYO Core library source code.
+ *
+ * @brief primary crypto routines for the XYO Core.
+ *
+ * Copyright (C) 2018 XY - The Findables Company
+ *
+ ****************************************************************************************
  */
+
+/*
+ * INCLUDES
+ ****************************************************************************************
+ */
+
 #ifndef XYO_H
 #include <stddef.h>
 #include <stdint.h>
