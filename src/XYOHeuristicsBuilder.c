@@ -51,8 +51,8 @@ void breakpoint(void){};
  *
  *  RETURNS
  *      result  [out]      bool         returns TRUE if Little Endian endian, FALSE if Big Endian.
- *----------------------------------------------------------------------------*/
-
+ *----------------------------------------------------------------------------
+ */
 int littleEndian(void){
   volatile uint32_t i=0x01234567;
   // return 0 for big endian, 1 for little endian.
