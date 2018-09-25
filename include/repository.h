@@ -1,7 +1,7 @@
 /**
  ****************************************************************************************
  *
- * @file crypto.c
+ * @file repository.h
  *
  * @XYO Core library source code.
  *
@@ -18,23 +18,28 @@
  */
 
 #include "xyobject.h"
+#include "xyo.h"
+#include "defines.h"
 #ifndef REPOSITORY_H
 typedef struct RepositoryProvider RepositoryProvider;
-typedef struct OriginChainRepository OriginChainRepository;
+typedef struct OriginChainProvider OriginChainProvider;
 
 struct RepositoryProvider{
-  uint repository;
+  void* repository;
   uint logicalEnd;
-  XYResult* (*write)(ByteArray* value, uint offset, uint timeout);
-  XYResult* (*read)(uint offset, uint timeout);
-  XYResult* (*readRows)(uint beginning, uint end, uint timeout);
-  XYResult* (*delete)(uint offset, uint timeout);
-  XYResult* (*deleteRows)(uint beginning, uint end, uint timeout);
+  XYResult* (*write)(RepositoryProvider* self, ByteArray* value, uint offset, uint timeout);
+  XYResult* (*read)(RepositoryProvider* self, uint offset, uint timeout);
+  XYResult* (*readRows)(RepositoryProvider* self, uint beginning, uint end, uint timeout);
+  XYResult* (*delete)(RepositoryProvider* self, uint offset, uint timeout);
+  XYResult* (*deleteRows)(RepositoryProvider* self, uint beginning, uint end, uint timeout);
 };
 
-struct OriginChainRepository {
-  XYResult* (*append)(ByteArray* value, uint timeout);
-  RepositoryProvider* repo;
+struct OriginChainProvider{
+  RepositoryProvider* repository;
+  XYResult* (*append)(OriginChainProvider* self, ByteArray* value, uint timeout);
+  XYResult* (*getChain)(OriginChainProvider* self);
+  XYResult* (*deleteChain)(OriginChainProvider* self);
+
 };
 
 #define REPOSITORY_H

@@ -1,7 +1,7 @@
 /**
  ****************************************************************************************
  *
- * @file crypto.c
+ * @file ZigZagBoundWitness.c
  *
  * @XYO Core library source code.
  *
@@ -45,7 +45,7 @@ XYResult* incomingData(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitn
     XYResult* keyset_results = makeSelfKeySet(self);
     self->dynamicPublicKeys->add(self->dynamicPublicKeys, keyset_results->result);
     for(int i = 0; i< self->heuristicCount; i++){
-      self->dynamicPayloads->add(self->dynamicPayloads, self->payload[i]->GetPayload(self->payload));
+      self->dynamicPayloads->add(self->dynamicPayloads, self->payload[i]->GetPayload((XYObject*)self->payload[i]));
     }
     self->hasSentKeysAndPayload = 0;
   }

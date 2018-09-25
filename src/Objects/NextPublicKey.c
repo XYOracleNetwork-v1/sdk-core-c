@@ -1,7 +1,7 @@
 /**
  ****************************************************************************************
  *
- * @file crypto.c
+ * @file NextPublicKey.c
  *
  * @XYO Core library source code.
  *

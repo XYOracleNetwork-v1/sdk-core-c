@@ -1,7 +1,7 @@
 /**
  ****************************************************************************************
  *
- * @file crypto.c
+ * @file state.c
  *
  * @XYO Core library source code.
  *
@@ -60,7 +60,7 @@ XYResult* ByteWeakArray_add(ByteWeakArray* self_ByteWeakArray, XYObject* user_XY
     else if(user_ObjectProvider->sizeIdentifierSize != 0){
 
       // Get a pointer to beginning of the user object payload to read size.
-      char* user_object_payload = user_XYObject->payload;
+      char* user_object_payload = user_XYObject->GetPayload(user_XYObject);
 
       // Get the number of bytes to read to get size.
       switch(user_ObjectProvider->sizeIdentifierSize){
@@ -92,7 +92,7 @@ XYResult* ByteWeakArray_add(ByteWeakArray* self_ByteWeakArray, XYObject* user_XY
        * If both the SizeOfSize identifier and defaultSize are 0,
        * we have to read one layer deeper to retrieve the defaultSize
        */
-       char* user_object_payload = user_XYObject->payload;
+       char* user_object_payload = user_XYObject->GetPayload(user_XYObject);
        char id[2];
        memcpy(id, user_object_payload, 2);
        lookup_result = lookup(id);

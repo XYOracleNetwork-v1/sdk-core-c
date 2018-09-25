@@ -1,7 +1,7 @@
 /**
  ****************************************************************************************
  *
- * @file crypto.c
+ * @file network.h
  *
  * @XYO Core library source code.
  *
@@ -18,12 +18,20 @@
  */
 
 #ifndef NETWORK_H
-#include <stdint.h>
-typedef struct NetworkProvider NetworkProvider;
+#define NETWORK_H
 
-struct NetworkProvider{
+#include <stdint.h>
+#include "xyobject.h"
+
+typedef struct NetworkProvider NetworkProvider;
+typedef struct ProcedureCatalogue ProcedureCatalogue;
+
+struct NetworkProvider {
   struct XYResult* (*find)(int flags);
 };
 
-#define NETWORK_H
+struct ProcedureCatalogue {
+
+};
+
 #endif

@@ -1,7 +1,7 @@
 /**
  ****************************************************************************************
  *
- * @file crypto.c
+ * @file ZigZagBoundWitnessSession.c
  *
  * @XYO Core library source code.
  *
@@ -11,7 +11,7 @@
  *
  ****************************************************************************************
  */
- 
+
 /*
  * INCLUDES
  ****************************************************************************************
@@ -35,7 +35,7 @@
 *----------------------------------------------------------------------------*/
 XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray* boundWitnessData){
   // Here we infer if the userSession bound witness is already completed or not.
-  if(userSession->BoundWitness->dynamicPublicKeys->size == userSession->BoundWitness->dynamicSignatures->size && userSession->BoundWitness->dynamicPublicKeys->size != 0){
+  if(userSession->boundWitness->dynamicPublicKeys->size == userSession->boundWitness->dynamicSignatures->size && userSession->boundWitness->dynamicPublicKeys->size != 0){
     RETURN_ERROR(ERR_INTERNAL_ERROR);
   }
 
@@ -50,7 +50,7 @@ XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray
       boundWitness = fromBytes_result->result;
       free(fromBytes_result);
   }
-  XYResult* incomingData_result = userSession->BoundWitness->incomingData(userSession->BoundWitness, boundWitness, userSession->cycles && boundWitnessData != NULL);
+  XYResult* incomingData_result = userSession->boundWitness->incomingData(userSession->boundWitness, boundWitness, userSession->cycles && boundWitnessData != NULL);
   if(incomingData_result->error != OK){
     return incomingData_result;
   }
@@ -74,7 +74,7 @@ XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray
      */
     returnData->payload = malloc(sizeof(char)*(CATALOG_SIZE + 5) + returnData->size);
     if(returnData->payload){
-      memcpy(returnData->payload, userSession->choice->payload, sizeof(char)*(CATALOG_SIZE + 5));
+      memcpy(returnData->payload, &userSession->choice, sizeof(char)*(CATALOG_SIZE + 5));
       memcpy(returnData->payload, incomingData_result->result, returnData->size);
       returnData->size += CATALOG_SIZE+5;
       return userSession->NetworkPipe->send(userSession, returnData, receiverCallback);
@@ -107,8 +107,8 @@ XYResult* receiverCallback(ZigZagBoundWitnessSession* self, ByteArray* data){
     XYResult* transfer_result = BWT_creator->fromBytes(data->payload);
     if(transfer_result->error != OK) return transfer_result;
     BoundWitnessTransfer* transfer = transfer_result->result;
-    self->BoundWitness->incomingData(self->BoundWitness, transfer, 1);
-    return 0;
+    self->boundWitness->incomingData(self->boundWitness, transfer, 1);
+    RETURN_ERROR(OK);
   } else {
     self->cycles++;
     return self->completeBoundWitness(self, data);

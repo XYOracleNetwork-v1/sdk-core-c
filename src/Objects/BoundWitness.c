@@ -153,8 +153,8 @@ XYResult* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider* us
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* with a char* as the result.
 *----------------------------------------------------------------------------*/
-XYResult* BoundWitnessTransfer_toBytes(XYObject* user_XYObect){
-  BoundWitnessTransfer* user_BoundWitness = user_XYObect->payload;
+XYResult* BoundWitnessTransfer_toBytes(XYObject* user_XYObject){
+  BoundWitnessTransfer* user_BoundWitness = user_XYObject->payload;
   uint32_t totalSize = 4;
   uint32_t publicKeysSize = 0;
   uint32_t payloadsSize = 0;

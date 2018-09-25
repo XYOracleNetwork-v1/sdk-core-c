@@ -1,7 +1,7 @@
 /**
  ****************************************************************************************
  *
- * @file crypto.c
+ * @file BoundWitness.h
  *
  * @XYO Core library source code.
  *
@@ -45,11 +45,11 @@ struct BoundWitnessTransfer {
 
 XYResult* BoundWitnessTransfer_create(char id[2], void* user_data);
 XYResult* BoundWitnessTransfer_fromBytes(char* user_Transfer);
-XYResult* BoundWitnessTransfer_toBytes(XYObject* user_XYObect);
+XYResult* BoundWitnessTransfer_toBytes(XYObject* user_XYObject);
 
 XYResult* BoundWitness_creator_create(char id[2], void* user_data);
 XYResult* BoundWitness_creator_fromBytes(char* BoundWitness_data);
-XYResult* BoundWitness_creator_toBytes(struct XYObject* user_XYObect);
+XYResult* BoundWitness_creator_toBytes(struct XYObject* user_XYObject);
 XYResult* BoundWitness_getSigningData(void* user_BoundWitness);
 XYResult* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider*);
 

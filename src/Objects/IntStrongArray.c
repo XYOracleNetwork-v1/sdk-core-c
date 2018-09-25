@@ -1,7 +1,7 @@
 /**
  ****************************************************************************************
  *
- * @file crypto.c
+ * @file IntStrongArray.c
  *
  * @XYO Core library source code.
  *

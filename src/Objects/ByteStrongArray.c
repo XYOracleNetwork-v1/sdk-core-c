@@ -61,7 +61,7 @@ XYResult* ByteStrongArray_add(ByteStrongArray* self_ByteStrongArray, XYObject* u
     else if(user_ObjectProvider->sizeIdentifierSize != 0){
 
       // Get a pointer to beginning of the array to read the size.
-      char* object_payload = user_XYObject->payload;
+      char* object_payload = user_XYObject->GetPayload(user_XYObject);
 
       // Size identifier Size tells you how many bytes to read for size
       switch(user_ObjectProvider->sizeIdentifierSize){

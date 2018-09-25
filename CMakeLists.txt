@@ -1,21 +1,21 @@
 cmake_minimum_required (VERSION 2.6)
 project (sdk-core)
 # set the version number.
-set (Tutorial_VERSION_MAJOR 0)
-set (Tutorial_VERSION_MINOR 1)
+set (SDK_VERSION_MAJOR 0)
+set (SDK_VERSION_MINOR 1)
  
 # bring in the headers
 include_directories(include)
 
-find_package(PkgConfig REQUIRED)
-pkg_search_module(OPENSSL REQUIRED openssl)
+#find_package(PkgConfig REQUIRED)
+#pkg_search_module(OPENSSL REQUIRED openssl)
 
-if( OPENSSL_FOUND )
-    include_directories(${OPENSSL_INCLUDE_DIRS})
-    message(STATUS "Using OpenSSL ${OPENSSL_VERSION}")
-else()
+#if( OPENSSL_FOUND )
+#    include_directories(${OPENSSL_INCLUDE_DIRS})
+#    message(STATUS "Using OpenSSL ${OPENSSL_VERSION}")
+#else()
     # Error; with REQUIRED, pkg_search_module() will throw an error by it's own
-endif()
+#endif()
 
 file(GLOB_RECURSE SOURCES "src/*.c")
 
@@ -28,9 +28,11 @@ include_directories("${PROJECT_BINARY_DIR}")
 set(CMAKE_BUILD_TYPE Debug)
 
 # add options for warnings
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything")
 
 # add the executable
-add_executable(simulation ${SOURCES})
+#add_executable(sdk ${SOURCES})
+ADD_LIBRARY(sdk-xyo STATIC ${SOURCES})
 
-target_link_libraries(simulation ${OPENSSL_LIBRARIES})
+
+#target_link_libraries(simulation ${OPENSSL_LIBRARIES})

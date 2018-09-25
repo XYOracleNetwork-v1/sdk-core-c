@@ -1,3 +1,22 @@
+/**
+ ****************************************************************************************
+ *
+ * @file defines.h
+ *
+ * @XYO Core library source code.
+ *
+ * @brief All standard definitions in XYO Library
+ *
+ * Copyright (C) 2018 XY - The Findables Company
+ *
+ ****************************************************************************************
+ */
+
+/*
+ * Defines
+ ****************************************************************************************
+ */
+
 #define MAJOR_ARRAY                             0x01
 #define MAJOR_CORE                              0x02
 #define MAJOR_HASH                              0x03
@@ -72,11 +91,25 @@
 #define TYPE_TABLE_MINOR_MAX                    0x10
 
 /*
+ * originchain.c defines
+ */
+#define MIN_QUEUE                               0x05
+#define MAX_QUEUE                               0x20
+#define DEFAULT_TIMEOUT                         0xFFFF
+
+/*
  * nodebase.c defines
  */
 #define MAX_ALLOCATED_OPTIONS                   0x03
 #define MAX_ALLOCATED_HEURISTICS                0x03
 #define MAX_ALLOCATED_LISTENERS                 0x03
+#define BOUNDWITNESS_OPTIONS                    0x03
+
+/*
+ * repository.c defines
+ */
+#define RAM_DISK_BYTES                          7500
+#define MAX_BOUNDWITNESS_IN_CHAIN               1000
 
 #define TRUE                                    0x01
 #define FALSE                                   0x00

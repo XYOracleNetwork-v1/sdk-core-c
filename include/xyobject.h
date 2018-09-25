@@ -1,7 +1,7 @@
 /**
  ****************************************************************************************
  *
- * @file crypto.c
+ * @file xyobject.h
  *
  * @XYO Core library source code.
  *
@@ -22,6 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include <defines.h>
 
 typedef struct XYObject XYObject;
 typedef struct XYResult XYResult;
@@ -180,7 +181,7 @@ struct XYObject{
 };
 
 extern struct XYResult* preallocated_result;
-extern void* typeTable[17][16];
+extern void* typeTable[TYPE_TABLE_MAJOR_MAX][TYPE_TABLE_MINOR_MAX];
 
 struct XYResult* newObject(char id[2], void* payload);
 struct XYResult* lookup(char id[2]);

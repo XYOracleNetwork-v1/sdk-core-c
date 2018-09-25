@@ -1,7 +1,7 @@
 /**
  ****************************************************************************************
  *
- * @file crypto.c
+ * @file crypto.h
  *
  * @XYO Core library source code.
  *
@@ -30,6 +30,7 @@
 #include <stddef.h>
 #include <string.h>
 #include "xyobject.h"
+#include "hash.h"
 
 /*
  * TYPE DEFINITIONS
@@ -67,6 +68,8 @@ struct Signer{
   int (*verify)(Signer*, struct ByteArray* data, struct ByteArray* sig, struct ByteArray* pubkey);
   ByteArray* (*encrypt)(struct Signer*, struct ByteArray*); // Encrypt the data to the key of this Signer object
   ByteArray* (*decrypt)(struct Signer*, struct ByteArray*); // Decrypt the data with the key of this Signer object.
+
+  HashProvider* hashingProvider;
 };
 
 struct CryptoCreator{

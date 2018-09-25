@@ -1,7 +1,7 @@
 /**
  ****************************************************************************************
  *
- * @file crypto.c
+ * @file originchain.h
  *
  * @XYO Core library source code.
  *
@@ -32,12 +32,17 @@ typedef struct OriginChainNavigator OriginChainNavigator;
 #endif
 
 struct OriginChainNavigator {
-  XYResult* (*getOriginBlockByPreviousHash)(OriginChainNavigator*, ByteArray* originBlockHash);
-  XYResult* (*getOriginBlockByBlockHash)(OriginChainNavigator*, ByteArray* originBlockHash);
-  XYResult* (*removeOriginBlock)(OriginChainNavigator*, ByteArray* originBlockHash);
-  XYResult* (*addBoundWitness)(BoundWitness*);
-  XYResult* (*getHash)(BoundWitness* user_BoundWitness, HashProvider* user_HashProvider);
-  XYResult* (*findPreviousBlocks)(OriginChainNavigator* self_OriginChainNavigator, BoundWitness* user_BoundWitness);
-  RepositoryProvider* Storage;
+  //XYResult* (*getOriginBlockByPreviousHash)(OriginChainNavigator*, ByteArray* originBlockHash);
+  //XYResult* (*getOriginBlockByBlockHash)(OriginChainNavigator*, ByteArray* originBlockHash);
+  //XYResult* (*removeOriginBlock)(OriginChainNavigator*, ByteArray* originBlockHash);
+  XYResult* (*addBoundWitness)(OriginChainNavigator* self, BoundWitness*);
+  //XYResult* (*getHash)(BoundWitness* user_BoundWitness, HashProvider* user_HashProvider);
+  //XYResult* (*findPreviousBlocks)(OriginChainNavigator* self_OriginChainNavigator, BoundWitness* user_BoundWitness);
+  XYResult* (*containsOriginBlock)(OriginChainNavigator* self_OriginChainNavigator, BoundWitness* user_BoundWitness);
+  OriginChainProvider* originChainRepository;
   HashProvider* Hash;
+  ByteArray bridgeQueue[MIN_QUEUE];
+
 };
+
+XYResult* getMostRecentOriginBlock(OriginChainNavigator* self_OriginChainNavigator);

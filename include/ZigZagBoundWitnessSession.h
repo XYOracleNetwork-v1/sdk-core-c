@@ -1,7 +1,7 @@
 /**
  ****************************************************************************************
  *
- * @file crypto.c
+ * @file ZigZagBoundWitnessSession.h
  *
  * @XYO Core library source code.
  *
@@ -30,9 +30,9 @@ typedef struct NetworkPeer NetworkPeer;
 struct ZigZagBoundWitnessSession {
   struct XYResult* (*completeBoundWitness)(ZigZagBoundWitnessSession* userSession, ByteArray* bwData);
   struct NetworkPipe* NetworkPipe;
-  struct ZigZagBoundWitness* BoundWitness;
+  struct ZigZagBoundWitness* boundWitness;
   uint8_t cycles;
-  ByteArray* choice;
+  uint8_t choice;
 };
 
 struct NetworkPipe{
@@ -48,6 +48,7 @@ struct NetworkPeer{
 };
 
 struct XYResult* receiverCallback(ZigZagBoundWitnessSession* self, ByteArray* data);
+struct XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray* boundWitnessData);
 
 #define ZIGZAGBOUNDWITNESSSESSION_H
 #endif
