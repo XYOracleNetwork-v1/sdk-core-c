@@ -30,6 +30,73 @@
 /**
  ****************************************************************************************
  *  NAME
+ *      newInstance
+ *
+ *  DESCRIPTION
+ *      this routine returns a NEW Signer 
+ *
+ *  PARAMETERS
+ *      user_PrivateKey     [in]      ByteArray*
+ *      hashingProvider     [in]      HashProvider* 
+ *
+ *  RETURNS
+ *      signer              [out]     Signer*
+ *
+ *  NOTES
+ *      will return NULL if there is insufficient memory to create a signer
+ ****************************************************************************************
+ */
+Signer* newInstance(ByteArray_t* user_PrivateKey, HashProvider* hashingProvider){
+  
+  Signer* signer = malloc(sizeof(Signer));    //TODO: wal, where is this freed?
+  
+  if (signer) {
+    
+    signer->publicKey = NULL;
+    signer->privateKey = NULL;                // Generate keypair and set these.
+    signer->getPublicKey = &getPublicKey;
+    signer->sign = NULL;
+    signer->verify = NULL;
+  }
+  
+  return signer;
+}
+
+/**
+ ****************************************************************************************
+ *  NAME
+ *      newCryptoCreator
+ *
+ *  DESCRIPTION
+ *      this routine returns a NEW CryptoCreator 
+ *
+ *  PARAMETERS
+ *      none
+ *
+ *  RETURNS
+ *      creator     [out]     CryptoCreator*
+ *
+ *  NOTES
+ *      will return NULL if there is insufficient memory to create a creator
+ ****************************************************************************************
+ */
+CryptoCreator* newCryptoCreator(){
+  
+  CryptoCreator* creator = malloc(sizeof(CryptoCreator));   //TODO: wal, where is this freed?
+  
+  if (creator) {
+    
+    memset(creator->id, 0x00, 2);
+    creator->newInstance = &newInstance;
+    creator->getId = &cryptoGetId;
+  }
+  
+  return creator;
+}
+
+/**
+ ****************************************************************************************
+ *  NAME
  *      cryptoGetId
  *
  *  DESCRIPTION
@@ -62,15 +129,15 @@ char* cryptoGetId(CryptoCreator* object){
  *      signer            [in]      Signer*
  *
  *  RETURNS
- *      return_result     [out]     XYResult*
+ *      return_result     [out]     XYResult_t*
  *
  *  NOTES
  *      will return NULL if there is insufficient memory to create an XYResult
  ****************************************************************************************
  */
-struct XYResult* getPublicKey(Signer* signer){
+XYResult_t* getPublicKey(Signer* signer){
   
-  XYResult* return_result = malloc(sizeof(XYResult));
+  XYResult_t* return_result = malloc(sizeof(XYResult_t));   //TODO: wal, where is this freed?
   
   if(return_result->error != OK) return return_result;
   
@@ -100,7 +167,7 @@ struct XYResult* getPublicKey(Signer* signer){
  */
 keyPairStruct* generateKeypair(){
   
-  keyPairStruct* keypair = malloc(sizeof(keyPairStruct));
+  keyPairStruct* keypair = malloc(sizeof(keyPairStruct));   //TODO: wal, where is this freed?
   
   if (keypair) {
     
@@ -109,72 +176,6 @@ keyPairStruct* generateKeypair(){
   }
   
   return keypair;
-}
-
-/**
- ****************************************************************************************
- *  NAME
- *      newInstance
- *
- *  DESCRIPTION
- *      this routine returns a NEW Signer 
- *
- *  PARAMETERS
- *      user_PrivateKey     [in]      ByteArray*
- *
- *  RETURNS
- *      signer              [out]     Signer*
- *
- *  NOTES
- *      will return NULL if there is insufficient memory to create a signer
- ****************************************************************************************
- */
-Signer* newInstance(ByteArray* user_PrivateKey){
-  
-  Signer* signer = malloc(sizeof(Signer));
-  
-  if (signer) {
-    
-    signer->publicKey = NULL;
-    signer->privateKey = NULL;            // Generate keypair and set these.
-    signer->getPublicKey = &getPublicKey;
-    signer->sign = NULL;
-    signer->verify = NULL;
-  }
-  
-  return signer;
-}
-
-/**
- ****************************************************************************************
- *  NAME
- *      newCryptoCreator
- *
- *  DESCRIPTION
- *      this routine returns a NEW CryptoCreator 
- *
- *  PARAMETERS
- *      none
- *
- *  RETURNS
- *      creator     [out]     CryptoCreator*
- *
- *  NOTES
- *      will return NULL if there is insufficient memory to create a creator
- ****************************************************************************************
- */
-CryptoCreator* newCryptoCreator(){
-  
-  CryptoCreator* creator = malloc(sizeof(CryptoCreator));
-  
-  if (creator) {
-    
-    memset(creator->id, 0x00, 2);
-    creator->newInstance = &newInstance;
-    creator->getId = &cryptoGetId;
-  }
-  
-  return creator;
 }
 
 // end of file crypto.c

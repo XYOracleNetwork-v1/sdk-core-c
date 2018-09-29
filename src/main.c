@@ -9,6 +9,11 @@
  * @Copyright: XY - The Findables Company
  */
 
+/*
+ * INCLUDES
+ ****************************************************************************************
+ */
+
 #include "xyo.h"
 #include "XYOHeuristicsBuilder.h"
 #include "BoundWitness.h"
@@ -17,12 +22,12 @@
 #include <string.h>
 #include <stdio.h>
 
-XYResult* preallocated_result;
+//XYResult_t* preallocated_result;
 
 #ifdef BUILD_MAIN
 
 int main(){
-  preallocated_result = malloc(sizeof(struct XYResult));
+  preallocated_result = malloc(sizeof(XYResult));    //TODO: wal, where is this freed?
 
   if(preallocated_result){
     initTable();
@@ -31,7 +36,7 @@ int main(){
     if(lookup_result->error == OK){
       ObjectProvider* BoundWitness_creator = lookup_result->result;
       //free(lookup_result);
-      BoundWitness* BoundWitness_raw = malloc(sizeof(BoundWitness));
+      BoundWitness* BoundWitness_raw = malloc(sizeof(BoundWitness));    //TODO: wal, where is this freed?
       XYObject* BoundWitness_object;
       if(BoundWitness_raw){
         XYResult* create_result = BoundWitness_creator->create((char*)&BoundWitness_id, BoundWitness_raw);
@@ -40,7 +45,7 @@ int main(){
         }
         BoundWitness_object = create_result->result;
       } else {
-        return 1;
+        return 1;   //TODO: wal, should be a constant
       }
       lookup_result = lookup((char*)&ShortStrongArray_id);
       if(lookup_result->error == OK){
@@ -71,7 +76,8 @@ int main(){
           XYObject*  keyset_object = create_result->result;
           ShortStrongArray* keySet_raw = keyset_object->payload;
 
-          ECDSA_secp256k1_uncompressed* publicKey = malloc(sizeof(ECDSA_secp256k1_uncompressed));
+          ECDSA_secp256k1_uncompressed* publicKey = malloc(sizeof(ECDSA_secp256k1_uncompressed));   //TODO: wal, where is this freed?
+          //TODO: wal, where's the error check for the malloc?
           //free(create_result);
           strcpy(publicKey->point_x, "Hello");
           strcpy(publicKey->point_y, "World!");
@@ -139,13 +145,15 @@ int main(){
           if(add_result->error != OK){
             return add_result->error;
           }
-          Payload* user_payload = malloc(sizeof(Payload));
+          Payload* user_payload = malloc(sizeof(Payload));    //TODO: wal, where is this freed?
+          //TODO: wal, where's the error check for the malloc?
           user_payload->size = user_signedHeuristics->size + user_unsignedHeuristics->size + 4;
           user_payload->signedHeuristics = user_signedHeuristics;
           user_payload->unsignedHeuristics = user_unsignedHeuristics;
           newObject_result = newObject((char*)&Payload_id, user_payload);
           add_result = payload_raw->add(payload_raw, newObject_result->result);
-          Payload* user_payload2 = malloc(sizeof(Payload));
+          Payload* user_payload2 = malloc(sizeof(Payload));   //TODO: wal, where is this freed?
+          //TODO: wal, where's the error check for the malloc?
           user_payload2->size = user_signedHeuristics->size + user_unsignedHeuristics->size + 4;
           user_payload2->signedHeuristics = user_signedHeuristics;
           user_payload2->unsignedHeuristics = user_unsignedHeuristics;

@@ -1,3 +1,20 @@
+/**
+ ****************************************************************************************
+ *
+ * @file shortstrongarray.c
+ *
+ * @XY4 project source code.
+ *
+ * @brief primary short strong array routines for the XY4 firmware.
+ *
+ * Copyright (C) 2017 XY - The Findables Company
+ *
+ * This computer program includes Confidential, Proprietary Information of XY. 
+ * All Rights Reserved.
+ *
+ ****************************************************************************************
+ */
+
 #include "xyo.h"
 #include "XYOHeuristicsBuilder.h"
 

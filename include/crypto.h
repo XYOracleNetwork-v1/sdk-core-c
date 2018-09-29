@@ -15,24 +15,25 @@
  ****************************************************************************************
  */
 
-#ifndef XYCrypto
-
-/*
- * DEFINES
- ****************************************************************************************
- */
-
-#define XYCrypto
+#ifndef XYCRYPTO
+#define XYCRYPTO
 
 /*
  * INCLUDES
  ****************************************************************************************
  */
 
-#include <stdlib.h>
-#include <stddef.h>
-#include <string.h>
-#include "xyobject.h"
+//#include <stdlib.h>
+//#include <stddef.h>
+//#include <string.h>
+//#include "xyobject.h"
+#include "hash.h"
+
+/*
+ * DEFINES
+ ****************************************************************************************
+ */
+
 
 /*
  * TYPE DEFINITIONS
@@ -43,11 +44,9 @@ typedef struct Signer Signer;
 typedef struct CryptoCreator CryptoCreator;
 
 typedef struct{
-  
   char* publicKey;
   char* privateKey;
 } keyPairStruct;
-
 
 /*
  * STRUCTURES
@@ -56,10 +55,10 @@ typedef struct{
 
 struct Signer{
   
-  struct ByteArray* publicKey; // Cryptographic Public Key
-  struct ByteArray* privateKey; // Cryptographic Private Key
-  XYResult* (*getPublicKey)(Signer*);  // Returns public key
-  XYResult* (*sign)(Signer*, struct ByteArray*); // Returns signed byte array
+  struct ByteArray* publicKey;                    // Cryptographic Public Key
+  struct ByteArray* privateKey;                   // Cryptographic Private Key
+  XYResult_t* (*getPublicKey)(Signer*);             // Returns public key
+  XYResult_t* (*sign)(Signer*, struct ByteArray*);  // Returns signed byte array
   
   /*
    * The method will take data and a cryptographic signature and a cryptographic public key
@@ -68,15 +67,22 @@ struct Signer{
    */
   
   int (*verify)(Signer*, struct ByteArray* data, struct ByteArray* sig, struct ByteArray* pubkey);
-  ByteArray* (*encrypt)(struct Signer*, struct ByteArray*); // Encrypt the data to the key of this Signer object
-  ByteArray* (*decrypt)(struct Signer*, struct ByteArray*); // Decrypt the data with the key of this Signer object.
+  
+  ByteArray_t* (*encrypt)(struct Signer*, ByteArray_t*); // Encrypt the data to the key of this Signer object
+  ByteArray_t* (*decrypt)(struct Signer*, ByteArray_t*); // Decrypt the data with the key of this Signer object.
+  
+  HashProvider* hashingProvider;
 };
 
 struct CryptoCreator{
   
   char id[2];
-  char* (*getId)(struct CryptoCreator*); // Fetch the above id object and return it.
-  Signer* (*newInstance)(struct ByteArray* user_PrivateKey); // Generate a new Signer object which includes generating a new keypair.
+  char* (*getId)(struct CryptoCreator*);  // Fetch the above id object and return it.
+  
+  Signer* (*newInstance)(struct ByteArray* user_PrivateKey, HashProvider* hashingProvider); // Generate a 
+                                                                                            // new Signer object which 
+                                                                                            // includes generating a new 
+                                                                                            // keypair.
 };
 
 /*
@@ -85,8 +91,8 @@ struct CryptoCreator{
  */
 
 char* cryptoGetId(CryptoCreator* object);
-struct XYResult* getPublicKey(Signer* signer);
-Signer* newInstance(ByteArray* user_PrivateKey);
+XYResult_t* getPublicKey(Signer* signer);
+Signer* newInstance(ByteArray_t* user_PrivateKey, HashProvider* hashingProvider);
 CryptoCreator* newCryptoCreator(void);
 
 #endif

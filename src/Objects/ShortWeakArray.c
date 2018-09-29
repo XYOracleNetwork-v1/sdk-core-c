@@ -1,6 +1,28 @@
-#include "xyo.h"
-#include "XYOHeuristicsBuilder.h"
+/**
+ ****************************************************************************************
+ *
+ * @file shortweakarray.c
+ *
+ * @XY4 project source code.
+ *
+ * @brief primary short weak array routines for the XY4 firmware.
+ *
+ * Copyright (C) 2017 XY - The Findables Company
+ *
+ * This computer program includes Confidential, Proprietary Information of XY. 
+ * All Rights Reserved.
+ *
+ ****************************************************************************************
+ */
 
+/*
+ * INCLUDES
+ ****************************************************************************************
+ */
+
+//#include "xyo.h"
+//#include "XYOHeuristicsBuilder.h"
+#include "xyobject.h"
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -16,12 +38,15 @@
 *  RETURNS
 *      XYResult  [out]      bool       Returns EXyoErrors::OK if adding succeeded.
 *----------------------------------------------------------------------------*/
-XYResult* ShortWeakArray_add(ShortWeakArray* self_ShortWeakArray, XYObject* user_XYObject){ //TODO: consider changing self to XYObject
+XYResult* ShortWeakArray_add(ShortWeakArray* self_ShortWeakArray, 
+                             XYObject* user_XYObject){ //TODO: consider changing self to XYObject
+                               
   // Lookup the ObjectProvider for the object so we can infer if the object has a default
   // size or a variable size per each element. We know every element in a single-type array
   // has the same type, but we don't know if they have uniform size. An array of Bound Witness
   // objects will be variable size, but all the same type.
-  XYResult* lookup_result = lookup(user_XYObject->id);
+                               
+  XYResult* lookup_result = tableLookup(user_XYObject->id);
   if(lookup_result->error == OK){
     ObjectProvider* user_ObjectProvider = lookup_result->result;
 

@@ -1,3 +1,20 @@
+/**
+ ****************************************************************************************
+ *
+ * @file payload.c
+ *
+ * @XY4 project source code.
+ *
+ * @brief primary payload routines for the XY4 firmware.
+ *
+ * Copyright (C) 2017 XY - The Findables Company
+ *
+ * This computer program includes Confidential, Proprietary Information of XY. 
+ * All Rights Reserved.
+ *
+ ****************************************************************************************
+ */
+
 #include "xyobject.h"
 #include <stdlib.h>
 #include <string.h>

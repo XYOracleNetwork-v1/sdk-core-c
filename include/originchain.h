@@ -1,3 +1,25 @@
+/**
+ ****************************************************************************************
+ *
+ * @file originchain.h
+ *
+ * @XY4 project source code.
+ *
+ * @brief primary node base routines for the XY4 firmware.
+ *
+ * Copyright (C) 2017 XY - The Findables Company
+ *
+ * This computer program includes Confidential, Proprietary Information of XY. 
+ * All Rights Reserved.
+ *
+ ****************************************************************************************
+ */
+
+/*
+ * INCLUDES
+ ****************************************************************************************
+ */
+
 #include "xyo.h"
 #include "XYOHeuristicsBuilder.h"
 #include "BoundWitness.h"
@@ -7,18 +29,32 @@
 #include <string.h>
 
 #ifndef ORIGINCHAIN_H
+#define ORIGINCHAIN_H
+
+/*
+ * TYPE DEFINITIONS
+ ****************************************************************************************
+ */
+
 typedef struct OriginChainNavigator OriginChainNavigator;
 
-#define ORIGINCHAIN_H
 #endif
 
+/*
+ * STRUCTURES
+ ****************************************************************************************
+ */
+
 struct OriginChainNavigator {
-  XYResult* (*getOriginBlockByPreviousHash)(OriginChainNavigator*, ByteArray* originBlockHash);
-  XYResult* (*getOriginBlockByBlockHash)(OriginChainNavigator*, ByteArray* originBlockHash);
-  XYResult* (*removeOriginBlock)(OriginChainNavigator*, ByteArray* originBlockHash);
-  XYResult* (*addBoundWitness)(BoundWitness*);
-  XYResult* (*getHash)(BoundWitness* user_BoundWitness, HashProvider* user_HashProvider);
-  XYResult* (*findPreviousBlocks)(OriginChainNavigator* self_OriginChainNavigator, BoundWitness* user_BoundWitness);
+  XYResult_t* (*getOriginBlockByPreviousHash)(OriginChainNavigator*, ByteArray_t* originBlockHash);
+  XYResult_t* (*getOriginBlockByBlockHash)(OriginChainNavigator*, ByteArray_t* originBlockHash);
+  XYResult_t* (*removeOriginBlock)(OriginChainNavigator*, ByteArray_t* originBlockHash);
+  XYResult_t* (*addBoundWitness)(BoundWitness*);
+  XYResult_t* (*getHash)(BoundWitness* user_BoundWitness, HashProvider* user_HashProvider);
+  XYResult_t* (*findPreviousBlocks)(OriginChainNavigator* self_OriginChainNavigator, BoundWitness* user_BoundWitness);
   StorageProvider* Storage;
   HashProvider* Hash;
 };
+
+// end of file originchain.h
+

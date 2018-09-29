@@ -1,4 +1,27 @@
+/**
+ ****************************************************************************************
+ *
+ * @file nodebase.h
+ *
+ * @XY4 project source code.
+ *
+ * @brief primary node base routines for the XY4 firmware.
+ *
+ * Copyright (C) 2017 XY - The Findables Company
+ *
+ * This computer program includes Confidential, Proprietary Information of XY. 
+ * All Rights Reserved.
+ *
+ ****************************************************************************************
+ */
+
 #ifndef NODEBASE_H
+#define NODEBASE_H
+
+/*
+ * INCLUDES
+ ****************************************************************************************
+ */
 
 #include "repository.h"
 #include "hash.h"
@@ -6,7 +29,17 @@
 #include "ZigZagBoundWitnessSession.h"
 #include "state.h"
 
+/*
+ * TYPE DEFINITIONS
+ ****************************************************************************************
+ */
+
 typedef struct NodeBase NodeBase;
+
+/*
+ * STRUCTURES
+ ****************************************************************************************
+ */
 
 struct NodeBase {
   RepositoryProvider* blockRepository;
@@ -21,7 +54,7 @@ struct NodeBase {
   /*
   * Adds a heuristic to be used when creating bound witnesses.
   */
-  uint8_t (*addHeuristic)(NodeBase* self, uint key, XYObject* heuristic);
+  uint8_t (*addHeuristic)(NodeBase* self, uint key, XYObject_T* heuristic);
   /*
   * Removes a heuristic from the current heuristic pool.
   */
@@ -45,21 +78,24 @@ struct NodeBase {
   /*
   * Get blocks to bridge
   */
-  XYResult* (*getBridgedBlocks)(NodeBase* self);
+  XYResult_t* (*getBridgedBlocks)(NodeBase* self);
   /*
   * Create bound witness, handle outcome, and store if needed
   */
-  XYResult* (*doBoundWitness)(ByteArray* startingData, NetworkPipe* pipe);
+  XYResult_t* (*doBoundWitness)(ByteArray_T* startingData, NetworkPipe* pipe);
   /*
   * Update the state of the origin chain.
   */
-  XYResult* (*updateOriginState)(NodeBase* self);
+  XYResult_t* (*updateOriginState)(NodeBase* self);
   /*
   * Make a Payload* which can be used in a bound witness.
   */
-  XYResult* (*makePayload)(NodeBase* self, uint bitFlag);
+  XYResult_t* (*makePayload)(NodeBase* self, uint bitFlag);
 
 };
 
-#define NODEBASE_H
 #endif
+
+// end of file nodebase.h
+
+
