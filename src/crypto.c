@@ -65,7 +65,7 @@ char* cryptoGetId(CryptoCreator* object){
  *      will return NULL if there is insufficient memory to create an XYResult
  ****************************************************************************************
  */
-struct XYResult* getPublicKey(Signer* signer){
+XYResult* getPublicKey(Signer* signer){
 
   XYResult* return_result = malloc(sizeof(XYResult));
 
@@ -80,32 +80,76 @@ struct XYResult* getPublicKey(Signer* signer){
 /**
  ****************************************************************************************
  *  NAME
- *      generateKeypair
+ *      verify
  *
  *  DESCRIPTION
- *      this routine returns a NEW pair of public and private keys
+ *      this routine returns EExyoError::OK if the signature is valid to sign the
+ *      signedData field. Optionally, the publicKey field can be used to verify the
+ *      signature matches the public key.
  *
  *  PARAMETERS
- *      none
+ *      signer            [in]      Signer*
  *
  *  RETURNS
- *      keypair     [out]     keyPairStruct*
+ *      return_result     [out]     XYResult*
  *
  *  NOTES
- *      will return NULL if there is insufficient memory to create a keypair
+ *      will return NULL if there is insufficient memory to create an XYResult
  ****************************************************************************************
  */
-keyPairStruct* generateKeypair(){
+uint8_t verify_sig(Signer* signer, ByteArray* signedData, ByteArray* signature, ByteArray* publicKey){
+  return 0;
+}
 
-  keyPairStruct* keypair = malloc(sizeof(keyPairStruct));
+/**
+ ****************************************************************************************
+ *  NAME
+ *      sign
+ *
+ *  DESCRIPTION
+ *      this routine returns the public key for the supplied signer
+ *
+ *  PARAMETERS
+ *      signer            [in]      Signer*
+ *
+ *  RETURNS
+ *      return_result     [out]     XYResult*
+ *
+ *  NOTES
+ *      will return NULL if there is insufficient memory to create an XYResult
+ ****************************************************************************************
+ */
+XYResult* sign(Signer* signer, ByteArray* givenArray){
 
-  if (keypair) {
-
-    keypair->publicKey = NULL;
-    keypair->privateKey = NULL;
+  secp256k1Signature* return_signature = malloc(sizeof(secp256k1Signature));
+  if(return_signature == NULL){
+    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
 
-  return keypair;
+  XYObject* return_object = malloc(sizeof(XYObject));
+  if(return_object == NULL){
+    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+  }
+
+  return_object->id[0] = SignatureSet_id[0];
+  return_object->id[1] = SignatureSet_id[1];
+  return_object->payload = return_signature;
+  return_signature->size = 66;
+  return_signature->signature = malloc(sizeof(char)*66);
+  return_signature->signature[0] = 0x13;
+  return_signature->signature[1] = 0x37;
+
+  XYResult* return_result = malloc(sizeof(XYResult));
+  if(return_result){
+    return_result->error = OK;
+    return_result->result = return_object;
+    return return_result;
+  } else {
+    free(return_signature->signature);
+    free(return_signature);
+    free(return_object);
+    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+  }
 }
 
 /**
@@ -129,15 +173,30 @@ keyPairStruct* generateKeypair(){
 Signer* newInstance(ByteArray* user_PrivateKey){
 
   Signer* signer = malloc(sizeof(Signer));
-
-  if (signer) {
-
-    signer->publicKey = NULL;
-    signer->privateKey = NULL;            // Generate keypair and set these.
-    signer->getPublicKey = &getPublicKey;
-    signer->sign = NULL;
-    signer->verify = NULL;
+  if(signer){
+    return NULL;
   }
+  ByteArray* placeholder = malloc(sizeof(ByteArray));
+  if(placeholder == NULL ){
+    free(signer);
+    return NULL;
+  }
+  placeholder->payload = malloc(sizeof(char)*64);
+  if(placeholder->payload == NULL){
+    free(signer);
+    free(placeholder);
+    return NULL;
+  }
+
+  placeholder->size = 64;
+  placeholder->payload[0] = 0x13;
+  placeholder->payload[1] = 0x37;
+
+  signer->publicKey = placeholder;
+  signer->privateKey = placeholder;            // Generate keypair and set these.
+  signer->getPublicKey = &getPublicKey;
+  signer->sign = sign;
+  signer->verify = verify_sig;
 
   return signer;
 }

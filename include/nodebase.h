@@ -41,14 +41,14 @@ struct NodeBase {
   BoundWitnessOption* boundWitnessOptions[BOUNDWITNESS_OPTIONS];
   NodeListener* listeners[MAX_ALLOCATED_LISTENERS];
 
-  /*
-  * Initializes the Node.
-  */
-  XYResult* (*initNode)(NodeBase* self, OriginChainProvider* repository, HashProvider* hashingProvider);
-  /*
-  * Gets the choice of a catalog from another party.
-  */
-  uint8_t (*getChoice)(NodeBase* self, uint catalog, uint8_t strict);
+  /**
+   * Gets the choice of a catalog from another party.
+   *
+   * @param catalog The catalog of the other party.
+   * @return The choice to preform in the bound witness.
+   */
+  uint8_t (*getChoice)(uint8_t* catalog);
+
   /*
   * Adds a heuristic to be used when creating bound witnesses.
   */
@@ -64,15 +64,15 @@ struct NodeBase {
   /*
   * Gets all of the unsigned payloads for a given flag.
   */
-  uint8_t (*getUnSignedPayloads)(NodeBase* self, uint bitFlag);
+  XYObject* (*getUnSignedPayloads)(NodeBase* self, uint bitFlag);
   /*
   * Gets all of the signed payloads for a given flag.
   */
-  uint8_t (*getSignedPayloads)(NodeBase* self, uint bitFlag);
+  XYObject* (*getSignedPayloads)(NodeBase* self, uint bitFlag);
   /*
   * Call the listener for each block in a bound witness.
   */
-  uint8_t (*notifyListeners)(NodeBase* self, ZigZagBoundWitness* boundWitness);
+  void (*notifyListeners)(NodeBase* self, BoundWitness* boundWitness);
   /*
   * Get blocks to bridge
   */
@@ -80,11 +80,11 @@ struct NodeBase {
   /*
   * Create bound witness, handle outcome, and store if needed
   */
-  XYResult* (*doBoundWitness)(NodeBase* self, ByteArray* startingData, NetworkPipe* pipe);
+  void (*doBoundWitness)(NodeBase* self, ByteArray* startingData, NetworkPipe* pipe);
   /*
   * Update the state of the origin chain.
   */
-  XYResult* (*updateOriginState)(NodeBase* self, ZigZagBoundWitness* boundWitness);
+  uint8_t (*updateOriginState)(NodeBase* self, BoundWitness* boundWitness);
   /*
   * Make a Payload* which can be used in a bound witness.
   */
@@ -92,14 +92,18 @@ struct NodeBase {
   /*
   * Make a Payload* which can be used in a bound witness.
   */
-  XYResult* (*onBoundWitnessStart)(void);
+  void (*onBoundWitnessStart)(void);
+
+  void (*onBoundWitnessEndSuccess)(NodeBase* self, BoundWitness* boundWitness);
+  void (*onBoundWitnessEndFailure)(enum EXyoErrors error);
+
   /*
    * Struct hack heuristics in
    */
   XYObject* heuristics[0];
 };
 
-XYResult* initNode(NodeBase* self, OriginChainProvider* repository, HashProvider* hashingProvider, uint8_t heuristicCount);
+XYResult* initNode(NodeBase** self, OriginChainProvider* repository, HashProvider* hashingProvider, uint8_t heuristicCount);
 uint8_t addHeuristic(NodeBase* self, uint key, XYObject* heuristic);
 uint8_t removeHeuristic(NodeBase* self, uint key);
 uint8_t selfSignOriginChain(NodeBase* self, uint flag);
@@ -109,16 +113,13 @@ void notifyListeners(NodeBase* self, BoundWitness* boundWitness);
 XYResult* getBridgedBlocks(NodeBase* self);
 void doBoundWitness(NodeBase* self, ByteArray* startingData, NetworkPipe* pipe);
 uint8_t updateOriginState(NodeBase* self, BoundWitness* boundWitness);
-XYResult* onBoundWitnessEndSuccess(NodeBase* self, BoundWitness* boundWitness);
+void onBoundWitnessEndSuccess(NodeBase* self, BoundWitness* boundWitness);
 void onBoundWitnessEndFailure(enum EXyoErrors error);
+void onBoundWitnessStart( void );
 XYResult* makePayload(NodeBase* self, uint bitFlag);
-/**
-    * Gets the choice of a catalog from another party.
-    *
-    * @param catalog The catalog of the other party.
-    * @return The choice to preform in the bound witness.
-    */
-uint8_t (*getChoice)(uint8_t* catalog, uint8_t boolean);
+
+extern uint8_t (*getChoice)(uint8_t catalog);
+ProcedureCatalogue* procedureCatalogue;
 
 #define NODEBASE_H
 #endif

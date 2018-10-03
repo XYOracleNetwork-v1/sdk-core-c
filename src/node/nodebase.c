@@ -38,23 +38,39 @@
  ****************************************************************************************
  */
 
-XYResult* initNode(NodeBase* self, OriginChainProvider* repository, HashProvider* hashingProvider, uint8_t heuristicCount){
-  self = malloc(sizeof(NodeBase));
+XYResult* initNode(NodeBase** self, OriginChainProvider* repository, HashProvider* hashingProvider, uint8_t heuristicCount){
+  *self = malloc(sizeof(NodeBase));
   if(self == NULL){
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
 
-  self->blockRepository = repository;
-  self->hashingProvider = hashingProvider;
+  (*self)->blockRepository = repository;
+  (*self)->hashingProvider = hashingProvider;
 
-  self->originChainNavigator = malloc(sizeof(OriginChainNavigator));
-  if(self->originChainNavigator == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY) }
+  (*self)->originChainNavigator = malloc(sizeof(OriginChainNavigator));
+  if((*self)->originChainNavigator == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY) }
 
-  self->originChainState = malloc(sizeof(OriginChainState));
-  if(self->originChainState == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY) }
+  (*self)->originChainState = malloc(sizeof(OriginChainState));
+  if((*self)->originChainState == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY) }
 
-  self->session = NULL;
-  self->heuristicCount = heuristicCount;
+  (*self)->session = NULL;
+  (*self)->heuristicCount = heuristicCount;
+
+  (*self)->addHeuristic = addHeuristic;
+  (*self)->removeHeuristic = removeHeuristic;
+  (*self)->selfSignOriginChain = selfSignOriginChain;
+  (*self)->getUnSignedPayloads = getUnSignedPayloads;
+  (*self)->getSignedPayloads = getSignedPayloads;
+  (*self)->notifyListeners = notifyListeners;
+  (*self)->getBridgedBlocks = getBridgedBlocks;
+  (*self)->doBoundWitness = doBoundWitness;
+  (*self)->updateOriginState = updateOriginState;
+  (*self)->makePayload = makePayload;
+  (*self)->onBoundWitnessStart = onBoundWitnessStart;
+  (*self)->onBoundWitnessEndSuccess = onBoundWitnessEndSuccess;
+  (*self)->onBoundWitnessEndFailure = onBoundWitnessEndFailure;
+
+
 
   XYResult* return_result = malloc(sizeof(XYResult));
   if(return_result){
@@ -120,33 +136,26 @@ uint8_t removeHeuristic(NodeBase* self, uint key){
 /*
  * Called When a bound witness is added successfully.
  */
-XYResult* onBoundWitnessEndSuccess(NodeBase* self, BoundWitness* boundWitness){
+void onBoundWitnessEndSuccess(NodeBase* self, BoundWitness* boundWitness){
   if(boundWitness != NULL){
     XYResult* hash_result = boundWitness->getHash(boundWitness, self->hashingProvider);
     if(hash_result->error != OK){
-      RETURN_ERROR(ERR_CRITICAL);
+      return;
     } else {
       XYResult* contains_result = self->originChainNavigator->containsOriginBlock(self->originChainNavigator, boundWitness);
       if(contains_result->error != OK){
         //TODO: De-onion and sort bridge blocks
         self->originChainNavigator->addBoundWitness(self->originChainNavigator, boundWitness);
         notifyListeners(self, boundWitness);
-        XYResult* return_result = malloc(sizeof(XYResult));
-        if(return_result){
-          return_result->error = OK;
-          return_result->result = 0;
-          return return_result;
-        } else {
-          RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-        }
+        return;
       }
       else{
-        RETURN_ERROR(ERR_CRITICAL);
+        return;
       }
     }
 
   } else {
-    RETURN_ERROR(ERR_CRITICAL);
+    return;
   }
 }
 
@@ -157,6 +166,12 @@ void onBoundWitnessEndFailure(enum EXyoErrors error){
   return;
 }
 
+/*
+ * Called when a bound witness is about to start.
+ */
+void onBoundWitnessStart(){
+  return;
+}
 
 /*
 * Self signs an origin block to the devices origin chain.
@@ -225,14 +240,8 @@ uint8_t selfSignOriginChain(NodeBase* self, uint flag){
     BoundWitness* finalBoundWitness = fromBytes_result->result;
     free(fromBytes_result);
     if(updateOriginState(self, finalBoundWitness)){
-      XYResult* success_return = onBoundWitnessEndSuccess(self, finalBoundWitness);
-      if(success_return->error == OK){
-        free(success_return);
-        return TRUE;
-      } else {
-        free(success_return);
-        return FALSE;
-      }
+      self->onBoundWitnessEndSuccess(self, finalBoundWitness);
+      return TRUE;
     } else {
       return FALSE;
     }
@@ -297,11 +306,11 @@ void notifyListeners(NodeBase* self, BoundWitness* boundWitness){
 }
 
 /*
-* Get blocks to bridge
+ * Get blocks to bridge
+ */
 XYResult* getBridgedBlocks(NodeBase* self){
-  return preallocated_result;
+  return NULL;
 }
-*/
 
 /*
 * Create bound witness, handle outcome, and store if needed
@@ -316,7 +325,7 @@ void doBoundWitness(NodeBase* self, ByteArray* startingData, NetworkPipe* pipe){
       free(return_result);
       return;
     }
-    uint8_t choice = getChoice((uint8_t*)role_result->result, startingData == NULL);
+    uint8_t choice = self->getChoice((uint8_t*)&role_result->result);
     self->session = malloc(sizeof(ZigZagBoundWitnessSession));
     if(self->session == NULL){ return; }
     self->session->NetworkPipe = pipe;
@@ -332,12 +341,12 @@ void doBoundWitness(NodeBase* self, ByteArray* startingData, NetworkPipe* pipe){
     XYResult* completeBoundWitness_result = self->session->completeBoundWitness(self->session, startingData);
     pipe->close();
     if(completeBoundWitness_result->error != OK){
-      onBoundWitnessEndFailure(completeBoundWitness_result->error);
+      self->onBoundWitnessEndFailure(completeBoundWitness_result->error);
       self->session = NULL;
       return;
     } else {
-      updateOriginState(self, completeBoundWitness_result->result);
-      onBoundWitnessEndSuccess(self, completeBoundWitness_result->result);
+      self->updateOriginState(self, completeBoundWitness_result->result);
+      self->onBoundWitnessEndSuccess(self, completeBoundWitness_result->result);
       self->session = NULL;
       return;
 

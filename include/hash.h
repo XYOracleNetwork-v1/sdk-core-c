@@ -18,7 +18,7 @@
  */
 
 #ifndef HASH_H
-#include "xyobject.h"
+#include "xyo.h"
 
 typedef struct HashProvider HashProvider;
 
@@ -31,6 +31,8 @@ struct HashProvider{
   int (*VerifyHash)(ByteArray* hash, ByteArray* data);
   char* (*GetId)(); // Fetch the above id object and return it.
 };
+
+HashProvider* newHashProvider();
 
 #define HASH_H
 #endif

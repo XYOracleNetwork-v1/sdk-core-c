@@ -29,7 +29,7 @@
 #include <stdlib.h>
 #include <stddef.h>
 #include <string.h>
-#include "xyobject.h"
+#include "xyo.h"
 #include "hash.h"
 
 /*
@@ -40,13 +40,6 @@
 typedef struct Signer Signer;
 typedef struct CryptoCreator CryptoCreator;
 
-typedef struct{
-
-  char* publicKey;
-  char* privateKey;
-} keyPairStruct;
-
-
 /*
  * STRUCTURES
  ****************************************************************************************
@@ -54,8 +47,8 @@ typedef struct{
 
 struct Signer{
 
-  struct ByteArray* publicKey; // Cryptographic Public Key
-  struct ByteArray* privateKey; // Cryptographic Private Key
+  ByteArray* publicKey; // Cryptographic Public Key
+  ByteArray* privateKey; // Cryptographic Private Key
   XYResult* (*getPublicKey)(Signer*);  // Returns public key
   XYResult* (*sign)(Signer*, struct ByteArray*); // Returns signed byte array
 
@@ -65,7 +58,7 @@ struct Signer{
    * is malformed / invalid. Boolean return value.
    */
 
-  int (*verify)(Signer*, struct ByteArray* data, struct ByteArray* sig, struct ByteArray* pubkey);
+  uint8_t (*verify)(Signer*, ByteArray* data, ByteArray* sig, ByteArray* pubkey);
   ByteArray* (*encrypt)(struct Signer*, struct ByteArray*); // Encrypt the data to the key of this Signer object
   ByteArray* (*decrypt)(struct Signer*, struct ByteArray*); // Decrypt the data with the key of this Signer object.
 

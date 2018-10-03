@@ -148,7 +148,7 @@ int addIncomingKeys(ZigZagBoundWitness* self, ShortStrongArray* incomingKeySets)
 *  Adds KeySet from an incoming payload
 *
 *  PARAMETERS
-*     *incomingKeySets     [in]    XYObject*   The payload which will be added.
+*     *incomingPayloads     [in]    XYObject*   The payload which will be added.
 *
 *  RETURNS
 *      XYResult  [out]      bool       Returns Bool True if it succeeded.

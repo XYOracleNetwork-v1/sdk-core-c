@@ -118,9 +118,15 @@ XYResult* ByteStrongArray_add(ByteStrongArray* self_ByteStrongArray, XYObject* u
       // Here we are increasing the size of the payload to be able to hold our new element.
       if(self_ByteStrongArray->payload != NULL){
         self_ByteStrongArray->payload = realloc(self_ByteStrongArray->payload, newSize);
+        if(self_ByteStrongArray->payload == NULL){
+          RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+        }
       }
       else {
         self_ByteStrongArray->payload = malloc(newSize*sizeof(char));
+        if(self_ByteStrongArray->payload == NULL){
+          RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+        }
       }
 
       if(self_ByteStrongArray->payload != NULL){

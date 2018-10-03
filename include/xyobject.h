@@ -22,7 +22,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <defines.h>
+#include "defines.h"
 
 typedef struct XYObject XYObject;
 typedef struct XYResult XYResult;

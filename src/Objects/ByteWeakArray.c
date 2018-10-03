@@ -116,9 +116,15 @@ XYResult* ByteWeakArray_add(ByteWeakArray* self_ByteWeakArray, XYObject* user_XY
       // Here we are increasing the size of the payload to be able to hold our new element.
       if(self_ByteWeakArray->payload != NULL){
         self_ByteWeakArray->payload = realloc(self_ByteWeakArray->payload, newSize-(sizeof(char)*1));
+        if(self_ByteWeakArray->payload == NULL){
+          RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+        }
       }
       else {
         self_ByteWeakArray->payload = malloc(newSize-(sizeof(char)*1));
+        if(self_ByteWeakArray->payload == NULL){
+          RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+        }
       }
 
       if(self_ByteWeakArray->payload != NULL){

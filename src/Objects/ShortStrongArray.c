@@ -43,6 +43,7 @@ XYResult* ShortStrongArray_add(ShortStrongArray* self_ShortStrongArray, XYObject
   XYResult* lookup_result = lookup(user_XYObject->id);
   if(lookup_result->error == OK){
     ObjectProvider* user_ObjectProvider = lookup_result->result;
+    free(lookup_result);
 
     // First we calculate how much space we need for the payload with
     // the addition of this new element.
@@ -127,6 +128,8 @@ XYResult* ShortStrongArray_add(ShortStrongArray* self_ShortStrongArray, XYObject
         // Finally copy the element into the array
         XYResult* toBytes_result = user_ObjectProvider->toBytes(user_XYObject);
         memcpy(object_payload, toBytes_result->result, object_size);
+        free(toBytes_result->result);
+        free(toBytes_result);
 
         self_ShortStrongArray->size = newSize;
         XYResult* return_result = malloc(sizeof(XYResult));
@@ -233,6 +236,9 @@ XYResult* ShortStrongArray_get(ShortStrongArray* self_ShortStrongArray, int inde
 *----------------------------------------------------------------------------*/
 XYResult* ShortStrongArray_creator_create(char id[2], void* user_data){ // consider allowing someone to create array with one object
   ShortStrongArray* ShortStrongArrayObject = malloc(sizeof(ShortStrongArray));
+  if(ShortStrongArrayObject == NULL){
+    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+  }
   char ShortStrongArrayID[2] = {0x01, 0x02};
   XYResult* newObject_result = newObject(ShortStrongArrayID, ShortStrongArrayObject);
   if(newObject_result->error == OK && ShortStrongArrayObject != NULL){
@@ -246,6 +252,7 @@ XYResult* ShortStrongArray_creator_create(char id[2], void* user_data){ // consi
     if(return_result != NULL){
       return_result->error = OK;
       XYObject* return_object = newObject_result->result;
+      free(newObject_result);
       return_result->result = return_object;
       return return_result;
     }
@@ -340,13 +347,13 @@ XYResult* ShortStrongArray_creator_toBytes(struct XYObject* user_XYObject){
        * are in the network byte order.
        */
       if(littleEndian()){
-        user_array->size = to_uint16((char*)(uintptr_t)user_array->size);
+        user_array->size = to_uint16((char*)(uintptr_t)&user_array->size);
       }
 
       memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 4);
       memcpy(byteBuffer+4, user_array->payload, sizeof(char)*(totalSize-4));
       if(littleEndian()){
-        user_array->size = to_uint16((char*)(uintptr_t)user_array->size);
+        user_array->size = to_uint16((char*)(uintptr_t)&user_array->size);
       }
       return_result->error = OK;
       return_result->result = byteBuffer;

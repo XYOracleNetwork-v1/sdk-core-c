@@ -153,7 +153,7 @@ XYResult* addBoundWitness(OriginChainNavigator* self_OriginChainNavigator, Bound
     write_ByteArray->size = user_BoundWitness->size;
     write_ByteArray->payload = boundWitnessBytes;
     self_OriginChainNavigator->originChainRepository->append(self_OriginChainNavigator->originChainRepository, write_ByteArray, DEFAULT_TIMEOUT);
-    self_OriginChainNavigator->originChainRepository->repository->logicalEnd = self_OriginChainNavigator->originChainRepository->repository->logicalEnd+1;
+    self_OriginChainNavigator->originChainRepository->logicalEnd = self_OriginChainNavigator->originChainRepository->logicalEnd+1;
     free(write_ByteArray);
     free(payload);
 
@@ -206,7 +206,7 @@ XYResult* addBoundWitness(OriginChainNavigator* self_OriginChainNavigator, Bound
 *      XYResult*                              [out]      XYObject*   Returns XYObject of Boound Witness type
 *----------------------------------------------------------------------------*/
 XYResult* getMostRecentOriginBlock(OriginChainNavigator* self_OriginChainNavigator) {
-  return self_OriginChainNavigator->originChainRepository->repository->read(self_OriginChainNavigator->originChainRepository->repository, self_OriginChainNavigator->originChainRepository->repository->logicalEnd-1, DEFAULT_TIMEOUT);
+  return ((IntStrongArray*)self_OriginChainNavigator->originChainRepository->repository)->get(self_OriginChainNavigator->originChainRepository->repository, self_OriginChainNavigator->originChainRepository->logicalEnd-1);
 }
 
 /*----------------------------------------------------------------------------*
@@ -274,6 +274,20 @@ XYResult* findPreviousBlocks(OriginChainNavigator* self_OriginChainNavigator, Bo
 }
 */
 
+/*----------------------------------------------------------------------------*
+*  NAME
+*      containsOriginBlock
+*
+*  DESCRIPTION
+*     Will return OK if a boundwitness exists on disk or in ram and ERR otherwise
+*
+*  PARAMETERS
+*     *OriginChainNavigator                    [in]       self_OriginChainNavigator*
+*     *BoundWitness                            [in]       user_BoundWitness*
+*
+*  RETURNS
+*      XYResult*                              [out]      XYObject*   Returns XYObject of Boound Witness type
+*----------------------------------------------------------------------------*/
 XYResult* containsOriginBlock(OriginChainNavigator* self_OriginChainNavigator, BoundWitness* user_BoundWitness){
   XYResult* hash_result = user_BoundWitness->getHash(user_BoundWitness, self_OriginChainNavigator->Hash);
   if(hash_result->error != OK){
@@ -302,3 +316,34 @@ XYResult* containsOriginBlock(OriginChainNavigator* self_OriginChainNavigator, B
   }
   RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);
 }
+
+/*----------------------------------------------------------------------------*
+*  NAME
+*      initOriginChainProvider
+*
+*  DESCRIPTION
+*     Will return OK if a boundwitness exists on disk or in ram and ERR otherwise
+*
+*  PARAMETERS
+*     *OriginChainNavigator                    [in]       self_OriginChainNavigator*
+*     *BoundWitness                            [in]       user_BoundWitness*
+*
+*  RETURNS
+*      XYResult*                              [out]      XYObject*   Returns XYObject of Boound Witness type
+*----------------------------------------------------------------------------*/
+/*
+OriginChainNavigator* initOriginChainProvider( OriginChainNavigator** self, char* bits){
+  (*self) = malloc(sizeof(OriginChainNavigator));
+  if(*self){
+    (*self)->originChainRepository = malloc(sizeof(OriginChainProvider));
+
+    if((*self)->originChainRepository == NULL) {
+      free(*self);
+      return NULL;
+    }
+  } else {
+    return NULL;
+  }
+  return (*self);
+}
+*/

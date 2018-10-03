@@ -26,23 +26,21 @@
 #include <string.h>
 
 #ifndef ORIGINCHAIN_H
-typedef struct OriginChainNavigator OriginChainNavigator;
-
 #define ORIGINCHAIN_H
-#endif
+//typedef struct OriginChainNavigator OriginChainNavigator;
+//typedef struct OriginChainProvider  OriginChainProvider;
 
-struct OriginChainNavigator {
-  //XYResult* (*getOriginBlockByPreviousHash)(OriginChainNavigator*, ByteArray* originBlockHash);
-  //XYResult* (*getOriginBlockByBlockHash)(OriginChainNavigator*, ByteArray* originBlockHash);
-  //XYResult* (*removeOriginBlock)(OriginChainNavigator*, ByteArray* originBlockHash);
-  XYResult* (*addBoundWitness)(OriginChainNavigator* self, BoundWitness*);
-  //XYResult* (*getHash)(BoundWitness* user_BoundWitness, HashProvider* user_HashProvider);
-  //XYResult* (*findPreviousBlocks)(OriginChainNavigator* self_OriginChainNavigator, BoundWitness* user_BoundWitness);
-  XYResult* (*containsOriginBlock)(OriginChainNavigator* self_OriginChainNavigator, BoundWitness* user_BoundWitness);
+
+typedef struct OriginChainNavigatorT {
+  XYResult* (*addBoundWitness)(struct OriginChainNavigatorT* self, BoundWitness*);
+  XYResult* (*containsOriginBlock)(struct OriginChainNavigatorT* self_OriginChainNavigator, BoundWitness* user_BoundWitness);
   OriginChainProvider* originChainRepository;
   HashProvider* Hash;
   ByteArray bridgeQueue[MIN_QUEUE];
 
-};
+} OriginChainNavigator;
+#endif
 
+
+//OriginChainNavigator* initOriginChainProvider( OriginChainNavigator** self, char* bits);
 XYResult* getMostRecentOriginBlock(OriginChainNavigator* self_OriginChainNavigator);

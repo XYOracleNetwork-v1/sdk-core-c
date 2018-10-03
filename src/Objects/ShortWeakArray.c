@@ -43,6 +43,7 @@ XYResult* ShortWeakArray_add(ShortWeakArray* self_ShortWeakArray, XYObject* user
   XYResult* lookup_result = lookup(user_XYObject->id);
   if(lookup_result->error == OK){
     ObjectProvider* user_ObjectProvider = lookup_result->result;
+    free(lookup_result);
 
     // First we calculate how much space we need for the payload with
     // the addition of this new element.
@@ -130,6 +131,9 @@ XYResult* ShortWeakArray_add(ShortWeakArray* self_ShortWeakArray, XYObject* user
         memcpy(object_payload, user_XYObject->id, 2);
         XYResult* toBytes_result = user_ObjectProvider->toBytes(user_XYObject);
         memcpy(object_payload+2, toBytes_result->result, object_size);
+
+        free(toBytes_result->result);
+        free(toBytes_result);
 
         self_ShortWeakArray->size = newSize;
         XYResult* return_result = malloc(sizeof(XYResult));
@@ -248,7 +252,10 @@ XYResult* ShortWeakArray_get(ShortWeakArray* self_ShortWeakArray, int index) {
 *----------------------------------------------------------------------------*/
 XYResult* ShortWeakArray_creator_create(char id[2], void* user_data){
   ShortWeakArray* ShortWeakArrayObject = malloc(sizeof(ShortWeakArray));
-  char ShortWeakArrayID[2] = {0x01, 0x05};
+  if(ShortWeakArrayObject == NULL){
+    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+  }
+  char ShortWeakArrayID[2] = {MAJOR_ARRAY, MINOR_SHORT_MULTI_TYPE};
   XYResult* newObject_result = newObject(ShortWeakArrayID, ShortWeakArrayObject);
   if(newObject_result->error == OK && ShortWeakArrayObject != NULL){
     ShortWeakArrayObject->size = 2;
@@ -259,6 +266,7 @@ XYResult* ShortWeakArray_creator_create(char id[2], void* user_data){
     if(return_result != NULL){
       return_result->error = OK;
       XYObject* return_object = newObject_result->result;
+      free(newObject_result);
       return_result->result = return_object;
       return return_result;
     }
@@ -306,10 +314,13 @@ XYResult* ShortWeakArray_creator_fromBytes(char* data){
       }
       else
       {
+        if(return_result){ free(return_result); }
+        if(return_array){ free(return_array); }
         RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
       }
   }
   else{
+    if(return_result){ free(return_result); }
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
 }
@@ -343,13 +354,13 @@ XYResult* ShortWeakArray_creator_toBytes(struct XYObject* user_XYObject){
        * are in the network byte order.
        */
       if(littleEndian()){
-        user_array->size = to_uint16((char*)(uintptr_t)user_array->size);
+        user_array->size = to_uint16((char*)(uintptr_t)&user_array->size);
       }
 
       memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 2);
       memcpy(byteBuffer+2, user_array->payload, sizeof(char)*(totalSize-2));
       if(littleEndian()){
-        user_array->size = to_uint16((char*)(uintptr_t)user_array->size);
+        user_array->size = to_uint16((char*)(uintptr_t)&user_array->size);
       }
       return_result->error = OK;
       return_result->result = byteBuffer;

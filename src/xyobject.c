@@ -294,7 +294,7 @@ XYResult* initTable(void){
     secp256k1_creator->create = &ECDSA_secp256k1Uncompressed_creator_create;
     secp256k1_creator->fromBytes = &ECDSA_secp256k1Uncompressed_creator_fromBytes;
     secp256k1_creator->toBytes = &ECDSA_secp256k1Uncompressed_creator_toBytes;
-    typeTable[MAJOR_KEYS][MINOR_ECDSA_SECP256K1_COMPRESSED] = secp256k1_creator;
+    typeTable[MAJOR_KEYS][MINOR_ECDSA_SECP256K1_UNCOMPRESSED ] = secp256k1_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
@@ -310,7 +310,7 @@ XYResult* initTable(void){
     secp256k1sig_creator->create = NULL;
     secp256k1sig_creator->fromBytes = NULL;
     secp256k1sig_creator->toBytes = NULL;
-    typeTable[MAJOR_KEYS][MINOR_ECDSA_SECP256K1_SHA256_SIGNATURE] = secp256k1sig_creator;
+    typeTable[MAJOR_SIGNATURES][MINOR_ECDSA_SECP256K1_SHA256_SIGNATURE] = secp256k1sig_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;

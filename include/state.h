@@ -18,20 +18,21 @@
  */
 
 #ifndef STATE_H
+#define STATE_H
 #include <stdint.h>
 #include "crypto.h"
 #include "xyobject.h"
+#include "repository.h"
 typedef struct OriginChainState OriginChainState;
 
 struct OriginChainState {
-  struct XYResult* (*newOriginBlock)(OriginChainState* self_OriginChainState, ByteArray* newHash);
-  struct XYResult* (*addSigner)(OriginChainState* self_OriginChainState, Signer* newSigner);
-  struct XYResult* (*getSigners)(OriginChainState* self_OriginChainState);
-  struct Signer* currentSigner;
-  struct Signer* nextSigner;
-  struct ByteArray* latestHash;
+  XYResult* (*newOriginBlock)(OriginChainState* self_OriginChainState, ByteArray* newHash);
+  XYResult* (*addSigner)(OriginChainState* self_OriginChainState, Signer* newSigner);
+  XYResult* (*getSigners)(OriginChainState* self_OriginChainState);
+  Signer* currentSigner;
+  Signer* nextSigner;
+  ByteArray* latestHash;
   uint32_t index;
 };
 
-#define STATE_H
 #endif

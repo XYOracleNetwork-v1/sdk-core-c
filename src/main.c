@@ -1,7 +1,7 @@
 /**
  ****************************************************************************************
  *
- * @file crypto.c
+ * @file main.c
  *
  * @XYO Core library source code.
  *
@@ -26,6 +26,7 @@
 
 XYResult* preallocated_result;
 
+//#define BUILD_MAIN
 #ifdef BUILD_MAIN
 
 int main(){
@@ -208,7 +209,6 @@ int main(){
             BoundWitness_raw->getSigningData = &BoundWitness_getSigningData;
             XYResult* toBytes_result = BoundWitness_creator->toBytes(BoundWitness_object);
             char* theBytes = toBytes_result->result;
-            breakpoint();
             XYResult* GetSigningData_result = BoundWitness_raw->getSigningData(BoundWitness_raw);
             char* signingBytes = GetSigningData_result->result;
             breakpoint();

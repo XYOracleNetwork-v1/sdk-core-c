@@ -43,7 +43,5 @@ if(ERR == ERR_INSUFFICIENT_MEMORY){                         \
 
 int littleEndian(void);
 
-#define CATALOG_SIZE 1
-
 #define XYO_H
 #endif

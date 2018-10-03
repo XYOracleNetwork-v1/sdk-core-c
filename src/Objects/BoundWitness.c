@@ -568,7 +568,7 @@ XYResult* BoundWitness_creator_toBytes(struct XYObject* user_XYObject){
   BoundWitness* user_BoundWitness = user_XYObject->payload;
   XYResult* lookup_result = lookup((char*)&ShortStrongArray_id);
   ObjectProvider* SSA_Creator = lookup_result->result;
- //free(lookup_result);
+  free(lookup_result);
   lookup_result = lookup((char*)&IntStrongArray_id);
   ObjectProvider* ISA_Creator = lookup_result->result;
   char* byteBuffer = malloc(user_BoundWitness->size*sizeof(char));
@@ -584,10 +584,10 @@ XYResult* BoundWitness_creator_toBytes(struct XYObject* user_XYObject){
   XYResult* newObject_result = newObject((char*)&ShortStrongArray_id, user_publicKeys);
   if(newObject_result->error == OK){
     XYResult* toBytes_result = SSA_Creator->toBytes(newObject_result->result);
-   //free(newObject_result);
+   free(newObject_result);
     if(toBytes_result->error == OK){
       memcpy(byteBuffer+sizeof(uint32_t), toBytes_result->result, user_publicKeysSize);
-     //free(toBytes_result);
+      free(toBytes_result);
     }
   }
 
@@ -598,7 +598,7 @@ XYResult* BoundWitness_creator_toBytes(struct XYObject* user_XYObject){
     XYResult* toBytes_result = ISA_Creator->toBytes(newObject_result->result);
     if(toBytes_result->error == OK){
       memcpy(byteBuffer+sizeof(uint32_t)+user_publicKeysSize, toBytes_result->result, user_payloadSize);
-     //free(toBytes_result);
+      free(toBytes_result);
     }
   }
 
@@ -607,11 +607,10 @@ XYResult* BoundWitness_creator_toBytes(struct XYObject* user_XYObject){
   newObject_result = newObject((char*)&ShortStrongArray_id, user_signatures);
   if(newObject_result->error == OK){
     XYResult* toBytes_result = SSA_Creator->toBytes(newObject_result->result);
-    //free(newObject_result);
+    free(newObject_result);
     if(toBytes_result->error == OK){
       memcpy(byteBuffer+sizeof(uint32_t)+user_publicKeysSize+user_payloadSize, toBytes_result->result, user_signaturesSize);
-
-     //free(toBytes_result);
+      free(toBytes_result);
     }
   }
   XYResult* return_result = malloc(sizeof(XYResult));

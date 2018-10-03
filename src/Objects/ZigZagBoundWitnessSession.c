@@ -77,7 +77,7 @@ XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray
       memcpy(returnData->payload, &userSession->choice, sizeof(char)*(CATALOG_SIZE + 5));
       memcpy(returnData->payload, incomingData_result->result, returnData->size);
       returnData->size += CATALOG_SIZE+5;
-      return userSession->NetworkPipe->send(userSession, returnData, receiverCallback);
+      return userSession->NetworkPipe->send((void*)userSession, returnData, receiverCallback);
     } else { RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
   } else {
     return userSession->NetworkPipe->send(userSession, returnData, receiverCallback);
@@ -98,20 +98,20 @@ XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray
 *  RETURNS
 *      XYResult  [out]      bool       Returns XYResult<ByteArray*> the data to send to the other party.
 *----------------------------------------------------------------------------*/
-XYResult* receiverCallback(ZigZagBoundWitnessSession* self, ByteArray* data){
+XYResult* receiverCallback(void* self, ByteArray* data){
   if(data->size == 0 ) return 0;
-  if(self->cycles == 0){
+  if(((ZigZagBoundWitnessSession*)self)->cycles == 0){
     XYResult* lookup_result = lookup((char*)&BoundWitnessTransfer_id);
     if(lookup_result->error != OK) return lookup_result;
     ObjectProvider* BWT_creator = lookup_result->result;
     XYResult* transfer_result = BWT_creator->fromBytes(data->payload);
     if(transfer_result->error != OK) return transfer_result;
     BoundWitnessTransfer* transfer = transfer_result->result;
-    self->boundWitness->incomingData(self->boundWitness, transfer, 1);
+    ((ZigZagBoundWitnessSession*)self)->boundWitness->incomingData(((ZigZagBoundWitnessSession*)self)->boundWitness, transfer, 1);
     RETURN_ERROR(OK);
   } else {
-    self->cycles++;
-    return self->completeBoundWitness(self, data);
+    ((ZigZagBoundWitnessSession*)self)->cycles++;
+    return ((ZigZagBoundWitnessSession*)self)->completeBoundWitness(self, data);
 
   }
 }

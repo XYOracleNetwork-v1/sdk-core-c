@@ -96,6 +96,7 @@
 #define MIN_QUEUE                               0x05
 #define MAX_QUEUE                               0x20
 #define DEFAULT_TIMEOUT                         0xFFFF
+#define ORIGINCHAIN_EXTRA_BITS                  256
 
 /*
  * nodebase.c defines
@@ -111,5 +112,30 @@
 #define RAM_DISK_BYTES                          7500
 #define MAX_BOUNDWITNESS_IN_CHAIN               1000
 
+/*
+ * relaynode.c defines
+ */
+#define BOUND_WITNESS_OPTION                    1
+#define TAKE_ORIGIN_CHAIN_OPTION                2
+#define GIVE_ORIGIN_CHAIN_OPTION                4
+
 #define TRUE                                    0x01
 #define FALSE                                   0x00
+
+/*
+ * Network.c
+ */
+#define PARENT_RECV_BUFF_SIZE                  2048
+#define CHILD_RECV_BUFF_SIZE                    512
+#define XYO_NETWORK_PORT                       3779
+#define ERROR_SOCKET_FAILED                     -20
+#define ERROR_SETSOCKOPT_FAILED                 -21
+#define ERROR_BIND_FAILED                       -22
+#define ERROR_LISTEN_FAILED                     -23
+#define ERROR_ACCEPT_FAILED                     -24
+#define ERROR_READ_FAILED                       -25
+#define ERROR_ALLOC_FAILED                      -26
+#define ERROR_SEND_FAILED                       -27
+#define MAX_PEERS                                10
+#define CATALOG_BUFFER_SIZE                       9
+#define CATALOG_SIZE                              4
