@@ -17,7 +17,7 @@ jobs:
           command: 'apt-get update && sudo apt-get install -y cmake'
       - run:
           name: Traverse to build folder
-          command: 'cd ~/repo/ && make build && cd build'
+          command: 'cd ~/repo/ && mkdir build && cd build'
       - run:
           name: make cmake files
           command: 'cmake ..'
