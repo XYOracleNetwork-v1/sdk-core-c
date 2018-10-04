@@ -28,10 +28,10 @@ include_directories("${PROJECT_BINARY_DIR}")
 
 set(CMAKE_BUILD_TYPE Debug)
 
-find_program(iwyu_path NAMES iwyu-tool iwyu-fix-includes)
-if(NOT iwyu_path)
-  message(FATAL_ERROR "Could not find the program include-what-you-use")
-endif()
+#find_program(iwyu_path NAMES iwyu-tool iwyu-fix-includes)
+#if(NOT iwyu_path)
+#  message(FATAL_ERROR "Could not find the program include-what-you-use")
+#endif()
 
 # add options for warnings
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything -O3")
