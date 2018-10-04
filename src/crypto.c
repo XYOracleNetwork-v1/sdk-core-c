@@ -173,7 +173,7 @@ XYResult* sign(Signer* signer, ByteArray* givenArray){
 Signer* newInstance(ByteArray* user_PrivateKey){
 
   Signer* signer = malloc(sizeof(Signer));
-  if(signer){
+  if(signer == NULL){
     return NULL;
   }
   ByteArray* placeholder = malloc(sizeof(ByteArray));

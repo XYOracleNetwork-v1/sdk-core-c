@@ -39,7 +39,8 @@ typedef struct NetworkPipe NetworkPipe;
 typedef struct NetworkPeer NetworkPeer;
 
 struct NetworkProvider {
-  XYResult* (*findPeer)(NetworkProvider* self, uint8_t flags);
+  NetworkPipe* (*findPeer)(NetworkProvider* self, uint8_t flags);
+  void (*addPeer)(NetworkProvider* self, char* ip, int port);
 
   /*
    * Sentinel-known implementation specific private variables
@@ -87,7 +88,7 @@ struct NetworkPeer{
 };
 
 struct TcpClient {
-  XYResult* (*findPeer)(struct TcpClient* self, uint8_t flags);
+  NetworkPipe* (*findPeer)(struct TcpClient* self, uint8_t flags);
   NetworkProvider* networkProvider;
   struct sockaddr_in* peers[MAX_PEERS];
   ProcedureCatalogue* procedureCatalogue;
@@ -96,8 +97,8 @@ struct TcpClient {
 
 struct client_arguments{
   uint8_t flags;
-  struct sockaddr_in* peers[MAX_PEERS];
   pthread_t* server;
+  struct sockaddr_in* peers[MAX_PEERS];
 };
 
 struct server_arguments{
@@ -108,6 +109,6 @@ struct server_arguments{
 
 void* serverThread(void* flag);
 void* clientThread(void* args);
-extern XYResult* findPeer(NetworkProvider* self, uint8_t flags);
+extern NetworkPipe* findPeer(NetworkProvider* self, uint8_t flags);
 extern uint8_t canDo(ByteArray* catalog);
 #endif

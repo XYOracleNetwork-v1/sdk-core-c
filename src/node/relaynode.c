@@ -39,9 +39,11 @@
  */
 
 XYResult* initRelayNode(RelayNode* self, OriginChainProvider* repository, HashProvider* hashingProvider, uint8_t heuristicCount){
-  NodeBase* relayNode;
-  initNode(&relayNode, repository, hashingProvider, heuristicCount);
-  self->node = relayNode;
+  NodeBase* baseNode;
+  initNode(&baseNode, repository, hashingProvider, heuristicCount);
+  self->node = baseNode;
+  self->getChoice = Relay_getChoice;
+  self->doConnection = doConnection;
   XYResult* return_result = malloc(sizeof(XYResult));
   if(return_result){
     return_result->error = OK;
@@ -110,7 +112,7 @@ XYResult* initRelayNode(RelayNode* self, OriginChainProvider* repository, HashPr
  ****************************************************************************************
  */
  void doConnection(RelayNode* self){
-  NetworkPipe* connectionToOtherPartyFrom = self->findSomeoneToTalkTo(self);
+  NetworkPipe* connectionToOtherPartyFrom = self->findSomeoneToTalkTo();
   if(connectionToOtherPartyFrom->initializationData == NULL){
     XYResult* whatTheOtherPartyWantsToDo_result = connectionToOtherPartyFrom->peer->getRole(connectionToOtherPartyFrom);
     if(whatTheOtherPartyWantsToDo_result->error != OK){

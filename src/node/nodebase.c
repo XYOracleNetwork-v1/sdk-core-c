@@ -51,6 +51,9 @@ XYResult* initNode(NodeBase** self, OriginChainProvider* repository, HashProvide
   if((*self)->originChainNavigator == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY) }
 
   (*self)->originChainState = malloc(sizeof(OriginChainState));
+  (*self)->originChainState->addSigner = addSigner;
+  (*self)->originChainState->newOriginBlock = newOriginBlock;
+  (*self)->originChainState->getSigners = getSigners;
   if((*self)->originChainState == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY) }
 
   (*self)->session = NULL;
@@ -180,7 +183,7 @@ uint8_t selfSignOriginChain(NodeBase* self, uint flag){
   ZigZagBoundWitness* boundWitness = malloc(sizeof(ZigZagBoundWitness) + (2*sizeof(XYObject*)));
   if(boundWitness){
     boundWitness->boundWitness = malloc(sizeof(BoundWitnessTransfer));
-    if(boundWitness == NULL) { return FALSE;; }
+    if(boundWitness == NULL) { return FALSE; }
     XYResult* signer_result = self->originChainState->getSigners(self->originChainState);
     if(signer_result->error!=OK) { return FALSE; }
     boundWitness->signer = signer_result->result;

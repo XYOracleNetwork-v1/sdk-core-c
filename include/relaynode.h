@@ -27,11 +27,12 @@ struct RelayNode {
   NodeBase* node;
   NodeListener* listener;
   ProcedureCatalogue* procedureCatalogue;
+  NetworkProvider* networkProvider;
   /*
   * Gets the choice of a catalog from another party.
   */
   uint8_t (*getChoice)(ProcedureCatalogue* ourCatalog, uint8_t theirCatalog);
-  NetworkPipe* (*findSomeoneToTalkTo)( RelayNode* self );
+  NetworkPipe* (*findSomeoneToTalkTo)( void );
   void (*doConnection)( RelayNode* self );
 
 };
@@ -46,7 +47,8 @@ XYResult* initRelayNode(RelayNode* self, OriginChainProvider* repository, HashPr
 
 
 uint8_t Relay_getChoice(ProcedureCatalogue* ourCatalog, uint8_t theirCatalog);
-
+void doConnection(RelayNode* self);
+//extern NetworkPipe* findSomeoneToTalkTo( void );
 
 
 #define NODEBASE_H

@@ -139,9 +139,11 @@ XYResult* write(OriginChainProvider* self, ByteArray* value, uint offset, uint t
 *  RETURNS
 *      XYResult*                              [out]      bool   Returns OK if success
 *----------------------------------------------------------------------------*/
+/*
 XYResult* read(RepositoryProvider* self, uint offset, uint timeout){
   return ((IntStrongArray*)self->repository)->get(self->repository, offset);
 }
+*/
 
 /*----------------------------------------------------------------------------*
 *  NAME

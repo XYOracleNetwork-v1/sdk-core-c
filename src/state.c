@@ -61,7 +61,7 @@ XYResult* newOriginBlock(OriginChainState* self_OriginChainState, ByteArray* ori
 *  RETURNS
 *      XYResult*                              [out]      bool   Returns OK if success
 *----------------------------------------------------------------------------*/
-XYResult* addSigner(OriginChainState* self_OriginChainState, struct Signer* user_Signer) {
+XYResult* addSigner(OriginChainState* self_OriginChainState, Signer* user_Signer) {
   self_OriginChainState->nextSigner = user_Signer;
   XYResult* return_result = malloc(sizeof(XYResult));
   if(return_result){

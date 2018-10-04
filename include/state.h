@@ -35,4 +35,8 @@ struct OriginChainState {
   uint32_t index;
 };
 
+XYResult* addSigner(OriginChainState* self_OriginChainState, Signer* user_Signer);
+XYResult* newOriginBlock(OriginChainState* self_OriginChainState, ByteArray* originBlockHash);
+XYResult* getSigners(OriginChainState* self_OriginChainState);
+
 #endif

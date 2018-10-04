@@ -28,6 +28,11 @@ include_directories("${PROJECT_BINARY_DIR}")
 
 set(CMAKE_BUILD_TYPE Debug)
 
+find_program(iwyu_path NAMES iwyu-tool iwyu-fix-includes)
+if(NOT iwyu_path)
+  message(FATAL_ERROR "Could not find the program include-what-you-use")
+endif()
+
 # add options for warnings
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything -O3")
 
@@ -37,6 +42,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything -O3")
 ADD_LIBRARY(sdk-xyo STATIC ${SOURCES})
 target_link_libraries(sdk-xyo ${OPENSSL_LIBRARIES})
 target_link_libraries (sdk-xyo ${CMAKE_THREAD_LIBS_INIT})
+
+set_property(TARGET sdk-xyo PROPERTY C_INCLUDE_WHAT_YOU_USE ${iwyu_path})
+
 
 INSTALL(TARGETS sdk-xyo
         DESTINATION "lib"
