@@ -1,11 +1,11 @@
 /**
  ****************************************************************************************
  *
- * @file network.h
+ * @file shortstrongarray.h
  *
  * @XY4 project source code.
  *
- * @brief primary network routines for the XY4 firmware.
+ * @brief primary shortstrongarray routines for the XY4 firmware.
  *
  * Copyright (C) 2017 XY - The Findables Company
  *
@@ -15,50 +15,42 @@
  ****************************************************************************************
  */
 
-#ifndef NETWORK_H
-#define NETWORK_H
+#ifndef SHORTSTRONGARRAY_H
+#define SHORTSTRONGARRAY_H
+
+/*
+ * INCLUDES
+ ****************************************************************************************
+ */
+
 
 /*
  * DEFINES
  ****************************************************************************************
  */
 
-#include <stdint.h>
 
 /*
  * TYPE DEFINITIONS
  ****************************************************************************************
  */
 
-typedef struct proactiveNetworkProvider proactiveNetworkProvider_t;
-typedef struct reactiveNetworkProvider reactiveNetworkProvider_t;
 
 /*
  * STRUCTURES
  ****************************************************************************************
  */
 
-struct proactiveNetworkProvider{
-  //XYResult_t* (*find)(int flags);
-  
-  // temporary placeholders
-  uint32_t requestConnection;
-  uint32_t sendData;
-  uint32_t disconnect;
-};
 
-struct reactiveNetworkProvider{
-  //XYResult_t* (*find)(int flags);
-  
-  // temporary placeholders
-  uint32_t listen;
-  uint32_t disconnect;
-};
+/*
+ * FUNCTION DECLARATIONS
+ ****************************************************************************************
+ */
 
-proactiveNetworkProvider_t* newProactiveNetworkProvider(void);
-reactiveNetworkProvider_t* newReactiveNetworkProvider(void);
 
 #endif
 
-// end of file network.h
+// end of file shortstrongarray.h
+                                
+                                
 

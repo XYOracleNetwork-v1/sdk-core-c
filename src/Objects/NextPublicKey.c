@@ -29,13 +29,13 @@
 *      Create an empty Bound Witness Object
 *
 *  PARAMETERS
-*     *id                    [in]       char*
-*     *user_data             [in]       void*
+*     *id                   [in]       char*
+*     *user_data            [in]       void*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYObject* of the NextPublicKey type.
+*      XYResult_t*          [out]      bool   Returns XYObject_t* of the NextPublicKey type.
 *----------------------------------------------------------------------------*/
-XYResult* NextPublicKey_creator_create(char id[2], void* user_data){
+XYResult_t* NextPublicKey_creator_create(char id[2], void* user_data){
   return newObject(id, user_data);
 }
 
@@ -48,22 +48,28 @@ XYResult* NextPublicKey_creator_create(char id[2], void* user_data){
 *      payload of Next Public Key object.
 *
 *  PARAMETERS
-*     *pubkey_data                  [in]       char*
+*     *pubkey_data      [in]       char*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYResult* of the NextPublicKey type.
+*      XYResult_t*      [out]      bool   Returns XYResult* of the NextPublicKey type.
 *----------------------------------------------------------------------------*/
-XYResult* NextPublicKey_creator_fromBytes(char* pubkey_data){
+XYResult_t* NextPublicKey_creator_fromBytes(char* pubkey_data){
+  
   char id[2];
   memcpy(id, pubkey_data, 2);
   char pubkey_id[2];
   memcpy(pubkey_id, pubkey_data+(sizeof(char)*2), 2);
-  XYResult* lookup_result = lookup(id);
-  XYResult* lookup_result2 = lookup(pubkey_id);
-  NextPublicKey* return_NPK = malloc(sizeof(NextPublicKey));
+  
+  XYResult_t* lookup_result = tableLookup(id);
+  XYResult_t* lookup_result2 = tableLookup(pubkey_id);
+  
+  NextPublicKey_t* return_NPK = malloc(sizeof(NextPublicKey_t));
+  
   if(lookup_result->error == OK && lookup_result2->error == OK && return_NPK){
-    ObjectProvider* NPK_creator = lookup_result2->result;
+    
+    ObjectProvider_t* NPK_creator = lookup_result2->result;
     uint32_t element_size = 0;
+    
     if(NPK_creator->defaultSize != 0){
       element_size = NPK_creator->defaultSize;
       return_NPK->publicKey = malloc(element_size*sizeof(char));
@@ -89,6 +95,7 @@ XYResult* NextPublicKey_creator_fromBytes(char* pubkey_data){
     {
       RETURN_ERROR(ERR_CRITICAL);
     }
+    
     if(return_NPK->publicKey){
       memcpy(return_NPK->id, &pubkey_id, 2);
       memcpy(return_NPK->publicKey, pubkey_data+(sizeof(char)*4), (2 * sizeof(char))+(element_size*sizeof(char)));
@@ -97,10 +104,11 @@ XYResult* NextPublicKey_creator_fromBytes(char* pubkey_data){
     {
       RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
     }
-    XYResult* return_result = malloc(sizeof(XYResult));
+    XYResult_t* return_result = malloc(sizeof(XYResult_t));
     if(return_result){
       return_result->error = OK;
       return_result->result = return_NPK;
+      
       return return_result;
     }
     else
@@ -111,11 +119,13 @@ XYResult* NextPublicKey_creator_fromBytes(char* pubkey_data){
     if(lookup_result) free(lookup_result);
     if(lookup_result2) free(lookup_result2);
     if(return_NPK) free(return_NPK);
+    
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   } else {
     if(lookup_result) free(lookup_result);
     if(lookup_result2) free(lookup_result2);
     if(return_NPK) free(return_NPK);
+    
     RETURN_ERROR(ERR_BADDATA);
   }
 }
@@ -132,18 +142,24 @@ XYResult* NextPublicKey_creator_fromBytes(char* pubkey_data){
 *    *user_XYObject         [in]       XYObject*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns char* to serialized bytes.
+*      XYResult_t*            [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
-XYResult* NextPublicKey_creator_toBytes(struct XYObject* user_XYObject){
+XYResult_t* NextPublicKey_creator_toBytes(XYObject_t* user_XYObject){
+  
   if(user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x07){
-    NextPublicKey* user_NPK = user_XYObject->GetPayload(user_XYObject);
+    
+    NextPublicKey_t* user_NPK = user_XYObject->GetPayload(user_XYObject);
+    
     char id[2];
     memcpy(&id, user_NPK->id, 2);
-    XYResult* lookup_result = lookup(id);
+    XYResult_t* lookup_result = tableLookup(id);
+    
     if(lookup_result->error == OK){
-      ObjectProvider* NPK_creator = lookup_result->result;
+      
+      ObjectProvider_t* NPK_creator = lookup_result->result;
       uint32_t element_size = 0;
       char* byteBuffer;
+      
       if(NPK_creator->defaultSize != 0){
         element_size = NPK_creator->defaultSize;
         byteBuffer = malloc(2*sizeof(char) + (element_size*sizeof(char)));
@@ -190,7 +206,7 @@ XYResult* NextPublicKey_creator_toBytes(struct XYObject* user_XYObject){
       {
         RETURN_ERROR(ERR_CRITICAL);
       }
-      XYResult* return_result = malloc(sizeof(XYResult));
+      XYResult_t* return_result = malloc(sizeof(XYResult_t));
       if(return_result){
         return_result->error = OK;
         return_result->result = byteBuffer;
@@ -212,3 +228,6 @@ XYResult* NextPublicKey_creator_toBytes(struct XYObject* user_XYObject){
     RETURN_ERROR(ERR_BADDATA);
   }
 }
+
+// end of file nextpublickey.c
+

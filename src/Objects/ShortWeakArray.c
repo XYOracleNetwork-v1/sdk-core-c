@@ -20,9 +20,9 @@
  ****************************************************************************************
  */
 
-//#include "xyo.h"
-//#include "XYOHeuristicsBuilder.h"
-#include "xyobject.h"
+#include <stdlib.h>
+#include "xyo.h"
+#include "XYOHeuristicsBuilder.h" // includes "xyobject.h"
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -32,23 +32,25 @@
 *      Adds a supplied XYObject to a supplied ShortWeakArray
 *
 *  PARAMETERS
-*     *self_ShortWeakArray  [in]       XYObject*
-*     *user_XYObject          [in]      ShortWeakArray*
+*     *self_ShortWeakArray  [in]      XYObject*
+*     *user_XYObject        [in]      ShortWeakArray*
 *
 *  RETURNS
-*      XYResult  [out]      bool       Returns EXyoErrors::OK if adding succeeded.
+*      XYResult_t           [out]     bool       Returns EXyoErrors::OK if adding succeeded.
 *----------------------------------------------------------------------------*/
-XYResult* ShortWeakArray_add(ShortWeakArray* self_ShortWeakArray, 
-                             XYObject* user_XYObject){ //TODO: consider changing self to XYObject
+XYResult_t* ShortWeakArray_add(ShortWeakArray_t* self_ShortWeakArray, 
+                               XYObject_t* user_XYObject){ //TODO: consider changing self to XYObject
                                
   // Lookup the ObjectProvider for the object so we can infer if the object has a default
   // size or a variable size per each element. We know every element in a single-type array
   // has the same type, but we don't know if they have uniform size. An array of Bound Witness
   // objects will be variable size, but all the same type.
                                
-  XYResult* lookup_result = tableLookup(user_XYObject->id);
+  XYResult_t* lookup_result = tableLookup(user_XYObject->id);
+                               
   if(lookup_result->error == OK){
-    ObjectProvider* user_ObjectProvider = lookup_result->result;
+    
+    ObjectProvider_t* user_ObjectProvider = lookup_result->result;
 
     // First we calculate how much space we need for the payload with
     // the addition of this new element.
@@ -100,9 +102,9 @@ XYResult* ShortWeakArray_add(ShortWeakArray* self_ShortWeakArray,
        char* user_object_payload = user_XYObject->payload;
        char id[2];
        memcpy(id, user_object_payload, 2);
-       lookup_result = lookup(id);
+       lookup_result = tableLookup(id);
        if(lookup_result->error == OK){
-         ObjectProvider* deeper_ObjectProvider = lookup_result->result;
+         ObjectProvider_t* deeper_ObjectProvider = lookup_result->result;
          if(deeper_ObjectProvider->defaultSize != 0){
 
            // defaultSize + 2 Bytes representing ID
@@ -134,11 +136,11 @@ XYResult* ShortWeakArray_add(ShortWeakArray* self_ShortWeakArray,
 
         // Finally copy the element into the array
         memcpy(object_payload, user_XYObject->id, 2);
-        XYResult* toBytes_result = user_ObjectProvider->toBytes(user_XYObject);
+        XYResult_t* toBytes_result = user_ObjectProvider->toBytes(user_XYObject);
         memcpy(object_payload+2, toBytes_result->result, object_size);
 
         self_ShortWeakArray->size = newSize;
-        XYResult* return_result = malloc(sizeof(XYResult));
+        XYResult_t* return_result = malloc(sizeof(XYResult_t));
         if(return_result != NULL){
           return_result->error = OK;
           return_result->result = 0;
@@ -177,17 +179,21 @@ XYResult* ShortWeakArray_add(ShortWeakArray* self_ShortWeakArray,
 *  RETURNS
 *      XYResult  [out]      bool       Returns pointer to element in array.
 *----------------------------------------------------------------------------*/
-XYResult* ShortWeakArray_get(ShortWeakArray* self_ShortWeakArray, int index) {
+XYResult_t* ShortWeakArray_get(ShortWeakArray_t* self_ShortWeakArray, int index) {
+  
   /* Here the program will iterate through each element. Getting each
    * element's size and iterating to the next element unless we are
    * at the user's specified index. Get pointer to start of array
    * and bounds check each loop.
    */
   int internal_index = 0;
-  for(char* arrayPointer = self_ShortWeakArray->payload; (ShortWeakArray **)arrayPointer < (&self_ShortWeakArray+(sizeof(char)*self_ShortWeakArray->size));){
-    XYResult* lookup_result = lookup(arrayPointer);
+  
+  for(char* arrayPointer = self_ShortWeakArray->payload; (ShortWeakArray_t **)arrayPointer < (&self_ShortWeakArray+(sizeof(char)*self_ShortWeakArray->size));){
+    
+    XYResult_t* lookup_result = tableLookup(arrayPointer);
+    
     if(lookup_result->error == OK){
-      ObjectProvider* element_creator = lookup_result->result;
+      ObjectProvider_t* element_creator = lookup_result->result;
 
       uint32_t element_size = 0;
       if(element_creator->defaultSize != 0 ){
@@ -209,8 +215,9 @@ XYResult* ShortWeakArray_get(ShortWeakArray* self_ShortWeakArray, int index) {
 
       }
       if(internal_index == index) {
-        XYResult* return_result = malloc(sizeof(XYResult));
-        XYResult* new_result = newObject(arrayPointer, arrayPointer+2);
+        
+        XYResult_t* return_result = malloc(sizeof(XYResult_t));
+        XYResult_t* new_result = newObject(arrayPointer, arrayPointer+2);
 
         if(return_result && new_result->error == OK){
           return_result->error = OK;
@@ -224,7 +231,8 @@ XYResult* ShortWeakArray_get(ShortWeakArray* self_ShortWeakArray, int index) {
       // Skip to next element
       else {
         arrayPointer = arrayPointer+(sizeof(char)*(element_size+2));
-        if((ShortWeakArray **)arrayPointer > (&self_ShortWeakArray+(sizeof(char)*self_ShortWeakArray->size))){
+        
+        if((ShortWeakArray_t **)arrayPointer > (&self_ShortWeakArray+(sizeof(char)*self_ShortWeakArray->size))){
           RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);
         }
       }
@@ -252,19 +260,22 @@ XYResult* ShortWeakArray_get(ShortWeakArray* self_ShortWeakArray, int index) {
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* of the ShortWeakArray type.
 *----------------------------------------------------------------------------*/
-XYResult* ShortWeakArray_creator_create(char id[2], void* user_data){
-  ShortWeakArray* ShortWeakArrayObject = malloc(sizeof(ShortWeakArray));
+XYResult_t* ShortWeakArray_creator_create(char id[2], void* user_data){
+  
+  ShortWeakArray_t* ShortWeakArrayObject = malloc(sizeof(ShortWeakArray_t));
   char ShortWeakArrayID[2] = {0x01, 0x05};
-  XYResult* newObject_result = newObject(ShortWeakArrayID, ShortWeakArrayObject);
+  XYResult_t* newObject_result = newObject(ShortWeakArrayID, ShortWeakArrayObject);
+  
   if(newObject_result->error == OK && ShortWeakArrayObject != NULL){
+    
     ShortWeakArrayObject->size = 2;
     ShortWeakArrayObject->add = &ShortWeakArray_add;
     ShortWeakArrayObject->get = &ShortWeakArray_get;
     ShortWeakArrayObject->payload = NULL;
-    XYResult* return_result = malloc(sizeof(XYResult));
+    XYResult_t* return_result = malloc(sizeof(XYResult_t));
     if(return_result != NULL){
       return_result->error = OK;
-      XYObject* return_object = newObject_result->result;
+      XYObject_t* return_object = newObject_result->result;
       return_result->result = return_object;
       return return_result;
     }
@@ -289,15 +300,15 @@ XYResult* ShortWeakArray_creator_create(char id[2], void* user_data){
 *      Create an Strong Byte Array given a set of Bytes. Bytes must not include major and minor of array.
 *
 *  PARAMETERS
-*     *data                  [in]       char*
+*     *data               [in]       char*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYResult* of the ShortWeakArray type.
+*      XYResult_t*        [out]      bool   Returns XYResult* of the ShortWeakArray type.
 *----------------------------------------------------------------------------*/
-XYResult* ShortWeakArray_creator_fromBytes(char* data){
+XYResult_t* ShortWeakArray_creator_fromBytes(char* data){
 
-  XYResult* return_result = malloc(sizeof(XYResult));
-  ShortWeakArray* return_array = malloc(sizeof(ShortWeakArray));
+  XYResult_t* return_result = malloc(sizeof(XYResult_t));
+  ShortWeakArray_t* return_array = malloc(sizeof(ShortWeakArray_t));
   if(return_result && return_array){
       return_array->add = &ShortWeakArray_add;
       return_array->remove = NULL;
@@ -332,14 +343,16 @@ XYResult* ShortWeakArray_creator_fromBytes(char* data){
 *    *user_XYObject         [in]       XYObject*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns char* to serialized bytes.
+*      XYResult_t*          [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
-XYResult* ShortWeakArray_creator_toBytes(struct XYObject* user_XYObject){
+XYResult_t* ShortWeakArray_creator_toBytes(struct XYObject* user_XYObject){
+  
   if(user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x05){
-    ShortWeakArray* user_array = user_XYObject->GetPayload(user_XYObject);
+    
+    ShortWeakArray_t* user_array = user_XYObject->GetPayload(user_XYObject);
     uint16_t totalSize = user_array->size;
     char* byteBuffer = malloc(sizeof(char)*totalSize);
-    XYResult* return_result = malloc(sizeof(XYResult));
+    XYResult_t* return_result = malloc(sizeof(XYResult_t));
     if(return_result != NULL && byteBuffer != NULL){
 
       /*
@@ -362,11 +375,11 @@ XYResult* ShortWeakArray_creator_toBytes(struct XYObject* user_XYObject){
       return return_result;
     }
     else {
-      RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)
+      RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
     }
   }
   else {
-    RETURN_ERROR(ERR_BADDATA)
+    RETURN_ERROR(ERR_BADDATA);
   }
 
 }

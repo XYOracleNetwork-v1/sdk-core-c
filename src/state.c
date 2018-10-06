@@ -20,6 +20,7 @@
  ****************************************************************************************
  */
 
+#include <stdlib.h>
 #include "state.h"
 
 /*----------------------------------------------------------------------------*
@@ -52,8 +53,6 @@ XYResult_t* newOriginBlock(OriginChainState* self_OriginChainState, ByteArray_t*
   } else {
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
-  
-  return NULL;  //TODO: is this what should be returned here?
 }
 
 /*----------------------------------------------------------------------------*
@@ -83,8 +82,6 @@ XYResult_t* addSigner(OriginChainState* self_OriginChainState, struct Signer* us
   } else {
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
-  
-  return NULL;  //TODO: wal, is this what should be returned here?
 }
 
 // end of file state.c

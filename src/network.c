@@ -15,22 +15,65 @@
  ****************************************************************************************
  */
 
-/*
 #include <stdlib.h>
 #include "network.h"
 
-proactiveNetworkProvider* newProactiveNetworkProvider(){
-  proactiveNetworkProvider* provider = malloc(sizeof(proactiveNetworkProvider));
-  provider->requestConnection = NULL;
-  provider->sendData = NULL;
-  provider->disconnect = NULL;
-  return provider;
+/**
+ ****************************************************************************************
+ *  NAME
+ *      newProactiveNetworkProvider
+ *
+ *  DESCRIPTION
+ *      this routine returns a new proactiveNetworkProvider object  
+ *
+ *  PARAMETERS
+ *      none
+ *
+ *  RETURNS
+ *      proactiveNetworkProvider      [out]     proactiveNetworkProvider_t*
+ *
+ *  NOTES
+ *      
+ ****************************************************************************************
+ */
+proactiveNetworkProvider_t* newProactiveNetworkProvider(){
+  
+  proactiveNetworkProvider_t* proactiveNetworkProvider = malloc(sizeof(proactiveNetworkProvider_t));
+  
+  proactiveNetworkProvider->requestConnection = NULL;
+  proactiveNetworkProvider->sendData = NULL;
+  proactiveNetworkProvider->disconnect = NULL;
+  
+  return proactiveNetworkProvider;
 }
 
-reactiveNetworkProvider* newReactiveNetworkProvider(){
-  reactiveNetworkProvider* provider = malloc(sizeof(reactiveNetworkProvider));
-  provider->listen = NULL;
-  provider->disconnect = NULL;
-  return provider;
+/**
+ ****************************************************************************************
+ *  NAME
+ *      newReactiveNetworkProvider
+ *
+ *  DESCRIPTION
+ *      this routine returns a new reactiveNetworkProvider object  
+ *
+ *  PARAMETERS
+ *      none
+ *
+ *  RETURNS
+ *      reactiveNetworkProvider      [out]     reactiveNetworkProvider_t*
+ *
+ *  NOTES
+ *      
+ ****************************************************************************************
+ */
+reactiveNetworkProvider_t* newReactiveNetworkProvider(){
+  
+  reactiveNetworkProvider_t* reactiveNetworkProvider = malloc(sizeof(proactiveNetworkProvider_t));
+  
+  reactiveNetworkProvider->listen = NULL;
+  reactiveNetworkProvider->disconnect = NULL;
+  
+  return reactiveNetworkProvider;
 }
-*/
+
+// end of file network.c
+

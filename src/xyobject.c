@@ -20,8 +20,17 @@
  ****************************************************************************************
  */
 
-#include "xyobject.h"
+#include <stdlib.h>
 #include "xyo.h"
+#include "xyobject.h"
+#include "boundwitness.h"
+#include "xyoheuristicsbuilder.h"
+
+/*
+ * STRUCTURES
+ ****************************************************************************************
+ */
+
 
 /**
  ****************************************************************************************
@@ -345,9 +354,9 @@ XYResult_t* initTable(){
   if(PreviousHash_creator != NULL){
     PreviousHash_creator->sizeIdentifierSize = 0;
     PreviousHash_creator->defaultSize = 34;
-    PreviousHash_creator->create = PreviousHash_creator_create;
-    PreviousHash_creator->fromBytes = PreviousHash_creator_fromBytes;
-    PreviousHash_creator->toBytes = PreviousHash_creator_toBytes;
+    PreviousHash_creator->create = &PreviousHash_creator_create;
+    PreviousHash_creator->fromBytes = &PreviousHash_creator_fromBytes;
+    PreviousHash_creator->toBytes = &PreviousHash_creator_toBytes;
     
     typeTable[0x02][0x06] = PreviousHash_creator;
   }

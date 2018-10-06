@@ -29,13 +29,14 @@
 *      Create an empty Bound Witness Object
 *
 *  PARAMETERS
-*     *id                    [in]       char*
-*     *user_data             [in]       void*
+*     *id                         [in]       char*
+*     *user_data                  [in]       void*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYObject* of the Index type.
+*      newObject(id, user_data)   [out]      bool   Returns XYObject_t* of the Index type.
 *----------------------------------------------------------------------------*/
-XYResult* Index_creator_create(char id[2], void* user_data){
+XYResult_t* Index_creator_create(char id[2], void* user_data){
+  
   return newObject(id, user_data);
 }
 
@@ -48,12 +49,12 @@ XYResult* Index_creator_create(char id[2], void* user_data){
 *      include major and minor of array.
 *
 *  PARAMETERS
-*     *data                  [in]       char*
+*     index_data              [in]       char*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYResult* of the Index type.
+*     newObject(id, &index)   [out]      XYResult_t*   Returns XYResult* of the Index type.
 *----------------------------------------------------------------------------*/
-XYResult* Index_creator_fromBytes(char* index_data){
+XYResult_t* Index_creator_fromBytes(char* index_data){
   
   char id[2];
   memcpy(id, index_data, 2);
@@ -71,12 +72,12 @@ XYResult* Index_creator_fromBytes(char* index_data){
 *      the object and return a char* to the serialized bytes.
 *
 *  PARAMETERS
-*    *user_XYObject         [in]       XYObject*
+*    *user_XYObject         [in]       XYObject_t*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns char* to serialized bytes.
+*      XYResult_t*          [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
-XYResult* Index_creator_toBytes(XYObject* user_XYObject){
+XYResult_t* Index_creator_toBytes(XYObject_t* user_XYObject){
   
   uint32_t encoded_bytes;
   char* index = (char*)user_XYObject->payload;
@@ -87,7 +88,7 @@ XYResult* Index_creator_toBytes(XYObject* user_XYObject){
     encoded_bytes = to_uint32((char*)&encoded_bytes);
   }
 
-  XYResult* return_result = malloc(sizeof(XYResult));
+  XYResult_t* return_result = malloc(sizeof(XYResult_t));
   
   if(return_result != NULL){
     return_result->error = OK;

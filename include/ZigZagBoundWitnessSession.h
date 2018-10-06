@@ -23,33 +23,40 @@
  ****************************************************************************************
  */
 
-#include <stdint.h>
-#include "xyo.h"
-#include "ZigZagBoundWitness.h"
-#include "network.h"
+#include "network.h"                // includes <stdint.h>
+#include "ZigZagBoundWitness.h"     // "crypto.h", "BoundWitness.h", "xyobject.h", "hash.h"
 
 /*
  * TYPE DEFINITIONS
  ****************************************************************************************
  */
 
-typedef struct ZigZagBoundWitnessSession ZigZagBoundWitnessSession;
+typedef struct ZigZagBoundWitnessSession ZigZagBoundWitnessSession_t;
 typedef struct NetworkPipe NetworkPipe;
 typedef struct NetworkPeer NetworkPeer;
 
+/*
+ * STRUCTURES
+ ****************************************************************************************
+ */
+
 struct ZigZagBoundWitnessSession {
-  XYResult_t* (*completeBoundWitness)(ZigZagBoundWitnessSession* userSession, ByteArray_t* bwData);
+  XYResult_t*(*completeBoundWitness)(ZigZagBoundWitnessSession_t* userSession, 
+              ByteArray_t* bwData);
   NetworkPipe* NetworkPipe;
-  ZigZagBoundWitness* BoundWitness;
+  ZigZagBoundWitness_t* BoundWitness;
   uint8_t cycles;
   ByteArray_t* choice;
 };
 
 struct NetworkPipe{
   NetworkPeer* peer;
-  NetworkProvider* Provider;
+  proactiveNetworkProvider_t* Provider;   //TODO: wal, this doesn't seem to get used here?
   ByteArray_t* initializationData;
-  XYResult_t* (*send)(ZigZagBoundWitnessSession* self, ByteArray_t* data, XYResult_t* (*callback)(ZigZagBoundWitnessSession* self, ByteArray_t* data));
+  XYResult_t*(*send)(ZigZagBoundWitnessSession_t* self, 
+              ByteArray_t* data, 
+              XYResult_t* (*callback)(ZigZagBoundWitnessSession_t* self, 
+              ByteArray_t* data));
   XYResult_t* (*close)();
 };
 
@@ -57,6 +64,16 @@ struct NetworkPeer{
   XYResult_t* (*getRole)(NetworkPipe* pipe);
 };
 
-XYResult_t* receiverCallback(ZigZagBoundWitnessSession* self, ByteArray_t* data);
+/*
+ * FUNCTION DECLARATIONS
+ ****************************************************************************************
+ */
+
+XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* data);
+XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession_t* userSession, 
+                                 ByteArray_t* boundWitnessData);
 
 #endif
+
+// end of file ZigZagBoundWitnessSession.h
+

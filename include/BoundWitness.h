@@ -23,8 +23,9 @@
  ****************************************************************************************
  */
 
-#include "hash.h"
-#include "xyo.h"
+#include <stdint.h>
+#include "hash.h"   
+#include "xyobject.h"   
 
 /*
  * TYPE DEFINITIONS
@@ -45,7 +46,7 @@ struct BoundWitness {
   IntStrongArray_t* payloads;
   ShortStrongArray_t* signatures;
   XYResult_t* (*getSigningData)(void* user_BoundWitness);
-  XYResult_t* (*getHash)(BoundWitness*, HashProvider*);
+  XYResult_t* (*getHash)(BoundWitness*, HashProvider_t*);
 } ;
 
 struct BoundWitnessTransfer {
@@ -54,7 +55,7 @@ struct BoundWitnessTransfer {
   IntStrongArray_t* payloads;
   ShortStrongArray_t* signatures;
   XYResult_t* (*getSigningData)(void* user_BoundWitness);
-  XYResult_t* (*getHash)(BoundWitness*, HashProvider*);
+  XYResult_t* (*getHash)(BoundWitness*, HashProvider_t*);
   uint8_t  choice;
 } ;
 
@@ -71,7 +72,7 @@ XYResult_t* BoundWitness_creator_create(char id[2], void* user_data);
 XYResult_t* BoundWitness_creator_fromBytes(char* BoundWitness_data);
 XYResult_t* BoundWitness_creator_toBytes(struct XYObject* user_XYObect);
 XYResult_t* BoundWitness_getSigningData(void* user_BoundWitness);
-XYResult_t* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider*);
+XYResult_t* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider_t*);
 
 #endif
 

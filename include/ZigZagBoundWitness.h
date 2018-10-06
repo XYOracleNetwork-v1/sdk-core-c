@@ -5,7 +5,7 @@
  *
  * @XY4 project source code.
  *
- * @brief primary storage routines for the XY4 firmware.
+ * @brief primary ZigZagBoundWitness routines for the XY4 firmware.
  *
  * Copyright (C) 2017 XY - The Findables Company
  *
@@ -20,29 +20,25 @@
  ****************************************************************************************
  */
 
-//#include <stdint.h>
-//#include "xyo.h"
-//#include "XYOHeuristicsBuilder.h"
-//#include "xyobject.h"
 #include "crypto.h"
-#include "BoundWitness.h"
+#include "BoundWitness.h"   // includes "xyobject.h", "hash.h"
 
-#ifndef ZIGZAGBOUNDWITNESS_H
-#define ZIGZAGBOUNDWITNESS_H
+//#ifndef ZIGZAGBOUNDWITNESS_H
+//#define ZIGZAGBOUNDWITNESS_H
 
 /*
  * TYPE DEFINITIONS
  ****************************************************************************************
  */
 
-typedef struct ZigZagBoundWitness ZigZagBoundWitness_2;
+typedef struct ZigZagBoundWitness ZigZagBoundWitness_t;
 
 /*
  * STRUCTURES
  ****************************************************************************************
  */
 
-typedef struct{
+struct ZigZagBoundWitness{
   BoundWitnessTransfer* boundWitness;
   ShortStrongArray_t* dynamicPublicKeys;
   IntStrongArray_t* dynamicPayloads;
@@ -57,32 +53,32 @@ typedef struct{
    * @return A XyoBoundWitnessTransfer to send to the other party wrapped in a XYResult.
    */
   
-   XYResult_t* (*incomingData)(ZigZagBoundWitness_2* self, BoundWitnessTransfer* boundWitness, int endpoint);
-   int (*addTransfer)(ZigZagBoundWitness_2* self, BoundWitnessTransfer* boundWitness);
-   int (*addIncomingKeys)(ZigZagBoundWitness_2* self, ShortStrongArray_t* incomingKeySets);
-   int (*addIncomingPayload)(ZigZagBoundWitness_2* self, IntStrongArray_t* incomingPayloads);
-   int (*addIncomingSignatures)(ZigZagBoundWitness_2* self, ShortStrongArray_t* incomingSignatures);
-   XYResult_t* (*makeSelfKeySet)(ZigZagBoundWitness_2* self);
-   XYResult_t* (*signForSelf)(ZigZagBoundWitness_2* self);
+   XYResult_t* (*incomingData)(ZigZagBoundWitness_t* self, BoundWitnessTransfer* boundWitness, int endpoint);
+   int (*addTransfer)(ZigZagBoundWitness_t* self, BoundWitnessTransfer* boundWitness);
+   int (*addIncomingKeys)(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingKeySets);
+   int (*addIncomingPayload)(ZigZagBoundWitness_t* self, IntStrongArray_t* incomingPayloads);
+   int (*addIncomingSignatures)(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingSignatures);
+   XYResult_t* (*makeSelfKeySet)(ZigZagBoundWitness_t* self);
+   XYResult_t* (*signForSelf)(ZigZagBoundWitness_t* self);
    Signer* signer;
    XYObject_t* payload;
-} ZigZagBoundWitness;
+} ;
 
 /*
  * FUNCTION DECLARATIONS
  ****************************************************************************************
  */
 
-XYResult_t* incomingData(ZigZagBoundWitness* self, 
+XYResult_t* incomingData(ZigZagBoundWitness_t* self, 
                          BoundWitnessTransfer* boundWitness, 
                          int endpoint);
-int addTransfer(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitness);
-int addIncomingKeys(ZigZagBoundWitness* self, ShortStrongArray_t* incomingKeySets);
-int addIncomingPayload(ZigZagBoundWitness* self, IntStrongArray_t* incomingPayloads);
-int addIncomingSignatures(ZigZagBoundWitness* self, ShortStrongArray_t* incomingSignatures);
-XYResult_t* makeSelfKeySet(ZigZagBoundWitness* self);
+int addTransfer(ZigZagBoundWitness_t* self, BoundWitnessTransfer* boundWitness);
+int addIncomingKeys(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingKeySets);
+int addIncomingPayload(ZigZagBoundWitness_t* self, IntStrongArray_t* incomingPayloads);
+int addIncomingSignatures(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingSignatures);
+XYResult_t* makeSelfKeySet(ZigZagBoundWitness_t* self);
 
-#endif
+//#endif
 
 // end of file ZigZagBoundWitness.h
 

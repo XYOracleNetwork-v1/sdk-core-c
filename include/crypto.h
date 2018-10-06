@@ -23,11 +23,7 @@
  ****************************************************************************************
  */
 
-//#include <stdlib.h>
-//#include <stddef.h>
-//#include <string.h>
-//#include "xyobject.h"
-#include "hash.h"
+#include "hash.h"   // includes "xyobject.h"
 
 /*
  * DEFINES
@@ -55,8 +51,8 @@ typedef struct{
 
 struct Signer{
   
-  struct ByteArray* publicKey;                    // Cryptographic Public Key
-  struct ByteArray* privateKey;                   // Cryptographic Private Key
+  struct ByteArray* publicKey;                      // Cryptographic Public Key
+  struct ByteArray* privateKey;                     // Cryptographic Private Key
   XYResult_t* (*getPublicKey)(Signer*);             // Returns public key
   XYResult_t* (*sign)(Signer*, struct ByteArray*);  // Returns signed byte array
   
@@ -71,7 +67,7 @@ struct Signer{
   ByteArray_t* (*encrypt)(struct Signer*, ByteArray_t*); // Encrypt the data to the key of this Signer object
   ByteArray_t* (*decrypt)(struct Signer*, ByteArray_t*); // Decrypt the data with the key of this Signer object.
   
-  HashProvider* hashingProvider;
+  HashProvider_t* hashingProvider;
 };
 
 struct CryptoCreator{
@@ -79,11 +75,12 @@ struct CryptoCreator{
   char id[2];
   char* (*getId)(struct CryptoCreator*);  // Fetch the above id object and return it.
   
-  Signer* (*newInstance)(struct ByteArray* user_PrivateKey, HashProvider* hashingProvider); // Generate a 
-                                                                                            // new Signer object which 
-                                                                                            // includes generating a new 
-                                                                                            // keypair.
-};
+  Signer* (*newSignerInstance)(struct ByteArray* user_PrivateKey, 
+                               HashProvider_t* hashingProvider);  // Generate a 
+                                                                  // new Signer object which 
+                                                                  // includes generating a new 
+                                                                  // keypair.
+}; 
 
 /*
  * FUNCTION DECLARATIONS
@@ -92,8 +89,9 @@ struct CryptoCreator{
 
 char* cryptoGetId(CryptoCreator* object);
 XYResult_t* getPublicKey(Signer* signer);
-Signer* newInstance(ByteArray_t* user_PrivateKey, HashProvider* hashingProvider);
+Signer* newSignerInstance(ByteArray_t* user_PrivateKey, HashProvider_t* hashingProvider);
 CryptoCreator* newCryptoCreator(void);
+int newPrivateKey(void);
 
 #endif
 

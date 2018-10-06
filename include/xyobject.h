@@ -5,7 +5,7 @@
  *
  * @XY4 project source code.
  *
- * @brief primary node base routines for the XY4 firmware.
+ * @brief primary xy object routines for the XY4 firmware.
  *
  * Copyright (C) 2017 XY - The Findables Company
  *
@@ -15,125 +15,108 @@
  ****************************************************************************************
  */
 
-#ifndef XYOBJECT_H
-#define XYOBJECT_H
-
 /*
  * INCLUDES
  ****************************************************************************************
  */
 
-//#include <stdio.h>
 #include <stdint.h>
-#include <stdlib.h>
-//#include <string.h>
-//#include "XYOHeuristicsBuilder.h"
 
-/*
- * TYPE DEFINITIONS
- ****************************************************************************************
- */
-
-/*
-typedef struct XYResult anXYResult;
-typedef struct XYObject XYObject;
-typedef struct ByteStrongArray ByteStrongArray;
-typedef struct ShortStrongArray ShortStrongArray;
-typedef struct IntStrongArray IntStrongArray;
-typedef struct ByteWeakArray ByteWeakArray;
-typedef struct ShortWeakArray ShortWeakArray;
-typedef struct IntWeakArray IntWeakArray;
-typedef struct ByteArray ByteArray;
-typedef struct NextPublicKey NextPublicKey;
-typedef struct PreviousHash PreviousHash;
-typedef struct Payload Payload;
-typedef struct SignatureSet SignatureSet;
-typedef struct ECDSA_secp256k1_uncompressed ECDSA_secp256k1_uncompressed;
-typedef struct secp256k1Signature secp256k1Signature;
-typedef struct ObjectProvider ObjectProvider;
-*/
+#ifndef XYOBJECT_H
+#define XYOBJECT_H
 
 /*
  * STRUCTURES
  ****************************************************************************************
  */
 
-/*
- * Our documentation uses the terminology of Multi or Single Element arrays.
- * A Multi element array is one which can contain many different types within it.
- * Each element in a Multi Element array has the following structure.
- *      char    id[2];
- *      void*   payload;
- * Each element in a sigle element array is only the payload. The major
- * and minor for the elements in the array are in the array object itself.
- * In this header file Multi-type element arrays will be referred to as
- * Weak arrays, and Single-type element array will be referred to as a
- * Strong array.
- */
-
-typedef struct XYResult{
+struct XYResult{
   //enum EXyoErrors error;
   int error;
   void* result;
-} XYResult_t;
+} ;
 
-typedef struct XYObject{
+struct XYObject{
   char id[2];
   void* payload;
   char* (*GetXyobjectId)(struct XYObject*);  // Fetch the above id object and return it.
   void* (*GetPayload)(struct XYObject*);     // Fetch the above payload pointer object and return it.
-} XYObject_t;
+} ;
 
-typedef struct ByteStrongArray{
+/*
+ * TYPE DEFINITIONS
+ ****************************************************************************************
+ */
+
+typedef struct XYResult XYResult_t;
+typedef struct XYObject XYObject_t;
+typedef struct ByteStrongArray ByteStrongArray_t;
+typedef struct ShortStrongArray ShortStrongArray_t;
+
+struct ByteStrongArray{
   uint8_t  size;
   char     id[2];
   XYResult_t* (*add)(struct ByteStrongArray* self_ByteStrongArray, XYObject_t* user_XYObject);
   XYResult_t* (*remove)(struct ByteStrongArray* self_ByteStrongArray, int index);
   XYResult_t* (*get)(struct ByteStrongArray* self_ByteStrongArray, int index);
   char* payload;
-} ByteStrongArray_t; //0x01
+} ; //0x01
 
-typedef struct ShortStrongArray {
+struct ShortStrongArray {
   uint16_t size;
   char     id[2];
   XYResult_t* (*add)(struct ShortStrongArray* self_ShortStrongArray, XYObject_t* user_XYObject);
   XYResult_t* (*remove)(struct ShortStrongArray* self_ShortStrongArray, int index);
   XYResult_t* (*get)(struct ShortStrongArray* self_ShortStrongArray, int index);
   void* payload;
-} ShortStrongArray_t; //0x02
+} ; //0x02
 
-typedef struct IntStrongArray {
+typedef struct IntStrongArray IntStrongArray_t;
+typedef struct ByteWeakArray ByteWeakArray_t;
+typedef struct ShortWeakArray ShortWeakArray_t;
+typedef struct IntWeakArray IntWeakArray_t;
+typedef struct ByteArray ByteArray_t;
+typedef struct NextPublicKey NextPublicKey;
+typedef struct PreviousHash PreviousHash_t;
+typedef struct Payload Payload_t;
+typedef struct SignatureSet SignatureSet_t;
+typedef struct NextPublicKey NextPublicKey_t;
+typedef struct ECDSA_secp256k1_uncompressed ECDSA_secp256k1_uncompressed_t;
+typedef struct secp256k1Signature secp256k1Signature_t;
+typedef struct ObjectProvider ObjectProvider_t;
+
+struct IntStrongArray {
   uint32_t  size;
   char      id[2];
   XYResult_t* (*add)(struct IntStrongArray* self_IntStrongArray, XYObject_t* user_XYObject);
   XYResult_t* (*remove)(struct IntStrongArray* self_IntStrongArray, int index);
   XYResult_t* (*get)(struct IntStrongArray* self_IntStrongArray, int index);
   void* payload;
-} IntStrongArray_t; //0x03
+} ; //0x03
 
-typedef struct ByteWeakArray {
+struct ByteWeakArray {
   uint8_t  size;
   XYResult_t* (*add)(struct ByteWeakArray* self_ByteWeakArray, XYObject_t* user_XYObject);
   XYResult_t* (*remove)(struct ByteWeakArray* self_ByteWeakArray, int index);
   XYResult_t* (*get)(struct ByteWeakArray* self_ByteWeakArray, int index);
   void* payload;
-} ByteWeakArray_t; //0x04
+} ; //0x04
 
-typedef struct ShortWeakArray {
+struct ShortWeakArray {
   uint16_t size;
   XYResult_t* (*add)(struct ShortWeakArray* self_ShortWeakArray, XYObject_t* user_XYObject);
   XYResult_t* (*remove)(struct ShortWeakArray* self_ShortWeakArray, int index);
   XYResult_t* (*get)(struct ShortWeakArray* self_ShortWeakArray, int index);
   void* payload;
-} ShortWeakArray_t; //0x05
+} ; //0x05
 
-typedef struct IntWeakArray {
+struct IntWeakArray {
   uint32_t  size;
   XYResult_t* (*add)(struct IntWeakArray* self_IntWeakArray, XYObject_t* user_XYObject);
   XYResult_t* (*remove)(struct IntWeakArray* self_IntWeakArray, int index);
   XYResult_t* (*get)(struct IntWeakArray* self_IntWeakArray, int index);
   void* payload;
-} IntWeakArray_t; //0x06
+} ; //0x06
 
 enum EXyoErrors{
   OK,
@@ -159,61 +142,98 @@ enum EXyoErrors{
   ERR_KEY_DOES_NOT_EXIST // Returned if key isn't found in map.
 };
 
-typedef struct KeySet{
+struct KeySet{
   struct ShortWeakArray* keys;
-} KeySet_t;
+} ;
 
-typedef struct SignatureSet{
+struct SignatureSet{
   struct ShortWeakArray* signatures;
-} SignatureSet_t;
+} ;
 
-typedef struct Payload{
+struct Payload{
   uint32_t size;
   struct IntWeakArray* signedHeuristics;
   struct IntWeakArray* unsignedHeuristics;
-} Payload_t;
+} ;
 
-typedef struct PreviousHash{
+struct PreviousHash{
   char id[2];
   char* hash;
-} PreviousHash_t;
+} ;
 
-typedef struct NextPublicKey{
+struct NextPublicKey{
   char id[2];
   char* publicKey;
-} NextPublicKey_t;
+} ;
 
-typedef struct ECDSA_secp256k1_uncompressed{
+struct ECDSA_secp256k1_uncompressed{
   char point_x[32];
   char point_y[32];
-} ECDSA_secp256k1_uncompressed_t;
+} ;
 
-typedef struct secp256k1Signature{
+struct secp256k1Signature{
   uint8_t size;
   char* signature;
-} secp256k1Signature_t;
+} ;
 
-typedef struct ByteArray{
+struct ByteArray{
   uint32_t size;
   char reserved[2];
   char* payload;
-} ByteArray_t;
+} ;
 
-typedef struct ObjectProvider {
+struct ObjectProvider {
    int        sizeIdentifierSize;
    int        defaultSize;
    XYResult_t*  (*create)(char[2], void*);
    XYResult_t*  (*fromBytes)(char*);
-   XYResult_t*  (*toBytes)(XYResult_t*);
-} ObjectProvider_t;
+   XYResult_t*  (*toBytes)(XYObject_t*);
+} ;
 
 extern XYResult_t* preallocated_result;
 extern void* typeTable[17][16];
 
 /*
+ * STRUCTURES
+ ****************************************************************************************
+ */
+
+/*
+ * Our documentation uses the terminology of Multi or Single Element arrays.
+ * A Multi element array is one which can contain many different types within it.
+ * Each element in a Multi Element array has the following structure.
+ *      char    id[2];
+ *      void*   payload;
+ * Each element in a sigle element array is only the payload. The major
+ * and minor for the elements in the array are in the array object itself.
+ * In this header file Multi-type element arrays will be referred to as
+ * Weak arrays, and Single-type element array will be referred to as a
+ * Strong array.
+ */
+
+/*
  * FUNCTION DECLARATIONS
  ****************************************************************************************
  */
+
+XYResult_t* ByteStrongArray_creator_create(char id[2], void* user_data);
+XYResult_t* ByteStrongArray_creator_fromBytes(char* data);
+XYResult_t* ShortStrongArray_creator_create(char id[2], void* user_data);
+XYResult_t* ShortStrongArray_creator_fromBytes(char* data);
+XYResult_t* ShortStrongArray_creator_toBytes(struct XYObject* user_XYObject);
+XYResult_t* IntStrongArray_creator_create(char id[2], void* user_data);
+XYResult_t* IntStrongArray_creator_fromBytes(char* data);
+XYResult_t* IntStrongArray_creator_toBytes(XYObject_t* user_XYObject);
+XYResult_t* ByteWeakArray_creator_create(char id[2], void* user_data);
+XYResult_t* ByteWeakArray_creator_fromBytes(char* data);
+XYResult_t* ShortWeakArray_creator_create(char id[2], void* user_data);
+XYResult_t* ShortWeakArray_creator_fromBytes(char* data);
+XYResult_t* ShortWeakArray_creator_toBytes(struct XYObject* user_XYObject);
+XYResult_t* ByteStrongArray_creator_toBytes(XYObject_t* user_XYObject);
+XYResult_t* ByteWeakArray_creator_toBytes(XYObject_t* user_XYObject);
+XYResult_t* IntWeakArray_creator_create(char id[2], void* user_data);
+XYResult_t* IntWeakArray_creator_fromBytes(char* data);
+XYResult_t* IntWeakArray_creator_toBytes(XYObject_t* user_XYObject);
 
 char* getXyobjectId(XYObject_t* xyobject);
 void* getPayload(XYObject_t* xyobject);
@@ -221,6 +241,9 @@ XYResult_t* newObject(char id[2], void* payload);
 XYResult_t* initTable(void);
 void registerType(char id[2], void* creator);
 XYResult_t* tableLookup(char id[2]);
+
+extern uint32_t to_uint32(char* data);
+extern uint16_t to_uint16(char* data);
 
 /* Standard Object IDs */
 static const char ByteStrongArray_id[2]       = { 0x01, 0x01 };

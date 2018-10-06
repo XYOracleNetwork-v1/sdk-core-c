@@ -1,11 +1,11 @@
 /**
  ****************************************************************************************
  *
- * @file hash.h
+ * @file bytestrongarray.h
  *
  * @XY4 project source code.
  *
- * @brief primary hash routines for the XY4 firmware.
+ * @brief primary bytestrongarray routines for the XY4 firmware.
  *
  * Copyright (C) 2017 XY - The Findables Company
  *
@@ -15,56 +15,51 @@
  ****************************************************************************************
  */
 
-#ifndef HASH_H
-#define HASH_H
-
 /*
  * INCLUDES
  ****************************************************************************************
  */
 
-#include "xyobject.h"
+//#include "xyobject.h"
+
+#ifndef BYTESTRONGARRAY_H
+#define BYTESTRONGARRAY_H
 
 /*
  * DEFINES
  ****************************************************************************************
  */
 
+
 /*
  * TYPE DEFINITIONS
  ****************************************************************************************
  */
 
-typedef struct HashProvider HashProvider_t;
 
 /*
  * STRUCTURES
  ****************************************************************************************
  */
 
-struct HashProvider{
-  
-  char id[2];                         // 2 bytes representing major and minor
-  XYResult_t* (*hash)(ByteArray_t*);  // Given just a null terminated char* return a 
-                                      // cryptographic hash for it
-  /*
-   * Given a cryptographic hash and a piece of data, verify the given hash == hash(data).
-   */
-  
-  int (*verifyHash)(ByteArray_t* hash, ByteArray_t* data);
-  char* (*getHashId)(HashProvider_t* hashProviderObject);   // Fetch the above id object 
-                                                            // and return it.
-};
 
 /*
  * FUNCTION DECLARATIONS
  ****************************************************************************************
  */
 
-char* hashGetId(HashProvider_t* hashProviderObject);
-HashProvider_t* newHashProvider(void);
+/*
+XYResult_t* ByteStrongArray_add_T(ByteStrongArray_t* self_ByteStrongArray, 
+                                  XYObject_t* user_XYObject); //TODO: consider changing self to XYObject
+XYResult_t* ByteStrongArray_get(ByteStrongArray_t* self_ByteStrongArray, int index);
+XYResult_t* ByteStrongArray_creator_create(char id[2], void* user_data);   
+XYResult_t* ByteStrongArray_creator_fromBytes(char* data);
+XYResult_t* ByteStrongArray_creator_toBytes_t(XYObject_t* user_XYObject);
+*/
 
 #endif
 
-// end of file hash.h
+// end of file bytestrongarray.h
+                                
+                                
 

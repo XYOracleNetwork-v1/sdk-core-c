@@ -15,8 +15,8 @@
  ****************************************************************************************
  */
 
-#include "xyo.h"
-#include "XYOHeuristicsBuilder.h"
+#include <stdlib.h>
+#include "shortweakarray.h"
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -26,21 +26,22 @@
 *      Adds a supplied XYObject to a supplied ShortStrongArray
 *
 *  PARAMETERS
-*     *self_ShortStrongArray  [in]       XYObject*
+*     *self_ShortStrongArray  [in]      XYObject*
 *     *user_XYObject          [in]      ShortStrongArray*
 *
 *  RETURNS
-*      XYResult  [out]      bool       Returns EXyoErrors::OK if adding succeeded.
+*      XYResult_t             [out]     bool       Returns EXyoErrors::OK if adding succeeded.
 *----------------------------------------------------------------------------*/
-XYResult* ShortStrongArray_add(ShortStrongArray* self_ShortStrongArray, XYObject* user_XYObject){ //TODO: consider changing self to XYObject
+XYResult_t* ShortStrongArray_add(ShortStrongArray_t* self_ShortStrongArray, XYObject_t* user_XYObject){ 
+                                                              //TODO: consider changing self to XYObject
 
   // Lookup the ObjectProvider for the object so we can infer if the object has a default
   // size or a variable size per each element. We know every element in a single-type array
   // has the same type, but we don't know if they have uniform size. An array of Bound Witness
   // objects will be variable size, but all the same type.
-  XYResult* lookup_result = lookup(user_XYObject->id);
+  XYResult_t* lookup_result = tableLookup(user_XYObject->id);
   if(lookup_result->error == OK){
-    ObjectProvider* user_ObjectProvider = lookup_result->result;
+    ObjectProvider_t* user_ObjectProvider = lookup_result->result;
 
     // First we calculate how much space we need for the payload with
     // the addition of this new element.
@@ -91,9 +92,9 @@ XYResult* ShortStrongArray_add(ShortStrongArray* self_ShortStrongArray, XYObject
        char* user_object_payload = user_XYObject->payload;
        char id[2];
        memcpy(id, user_object_payload, 2);
-       lookup_result = lookup(id);
+       lookup_result = tableLookup(id);
        if(lookup_result->error == OK){
-         ObjectProvider* deeper_ObjectProvider = lookup_result->result;
+         ObjectProvider_t* deeper_ObjectProvider = lookup_result->result;
          if(deeper_ObjectProvider->defaultSize != 0){
 
            object_size = deeper_ObjectProvider->defaultSize;
@@ -123,11 +124,11 @@ XYResult* ShortStrongArray_add(ShortStrongArray* self_ShortStrongArray, XYObject
         object_payload = &(object_payload[self_ShortStrongArray->size - (sizeof(char)*4)]);
 
         // Finally copy the element into the array
-        XYResult* toBytes_result = user_ObjectProvider->toBytes(user_XYObject);
+        XYResult_t* toBytes_result = user_ObjectProvider->toBytes(user_XYObject);
         memcpy(object_payload, toBytes_result->result, object_size);
 
         self_ShortStrongArray->size = newSize;
-        XYResult* return_result = malloc(sizeof(XYResult));
+        XYResult_t* return_result = malloc(sizeof(XYResult_t));
         if(return_result != NULL){
           return_result->error = OK;
           return_result->result = 0;
@@ -161,18 +162,23 @@ XYResult* ShortStrongArray_add(ShortStrongArray* self_ShortStrongArray, XYObject
 *
 *  PARAMETERS
 *     *self_ShortStrongArray  [in]       XYObject*
-*     *index                 [in]       Int;
+*     *index                  [in]       Int;
 *
 *  RETURNS
-*      XYResult  [out]      bool       Returns EXyoErrors::OK if adding succeeded.
+*      XYResult_t*            [out]      bool       Returns EXyoErrors::OK if adding succeeded.
 *----------------------------------------------------------------------------*/
-XYResult* ShortStrongArray_get(ShortStrongArray* self_ShortStrongArray, int index) {
-  XYResult* general_result = lookup(self_ShortStrongArray->id);
+XYResult_t* ShortStrongArray_get(ShortStrongArray_t* self_ShortStrongArray, int index) {
+  
+  XYResult_t* general_result = tableLookup(self_ShortStrongArray->id);
+  
   if(general_result->error == OK){
-    ObjectProvider* element_creator = general_result->result;
+    
+    ObjectProvider_t* element_creator = general_result->result;
+    
     if(element_creator->defaultSize != 0){
       uint8_t totalSize = self_ShortStrongArray->size;
       totalSize = totalSize - 4*sizeof(char);
+      
       if((totalSize % element_creator->defaultSize) == 0){
         char* array_elements = self_ShortStrongArray->payload;
         return newObject(self_ShortStrongArray->id, &array_elements[element_creator->defaultSize*index]);
@@ -186,18 +192,21 @@ XYResult* ShortStrongArray_get(ShortStrongArray* self_ShortStrongArray, int inde
       uint16_t totalSize = self_ShortStrongArray->size;
       char* array_elements = self_ShortStrongArray->payload;
       uint16_t array_offset = 0;
+      
       for(int i = 0; i<=index; i++){
         if(array_offset>totalSize){
           RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);
         }
+        
         char* element_size = malloc(element_creator->sizeIdentifierSize);
         memcpy(element_size, &array_elements[array_offset], element_creator->sizeIdentifierSize);
         uint16_t int_size = to_uint16(element_size);
         free(element_size);
+        
         if(i == index){
           char* return_object_payload = malloc(int_size);
           memcpy(return_object_payload, &array_elements[array_offset], int_size);
-          XYResult* return_result = newObject(self_ShortStrongArray->id, return_object_payload);
+          XYResult_t* return_result = newObject(self_ShortStrongArray->id, return_object_payload);
           return return_result;
         }
         else {
@@ -212,6 +221,7 @@ XYResult* ShortStrongArray_get(ShortStrongArray* self_ShortStrongArray, int inde
   else {
     RETURN_ERROR(ERR_BADDATA);
   }
+  
   RETURN_ERROR(ERR_BADDATA);
 }
 
@@ -223,16 +233,18 @@ XYResult* ShortStrongArray_get(ShortStrongArray* self_ShortStrongArray, int inde
 *      Create an empty Strong Byte Array
 *
 *  PARAMETERS
-*     *id (id of elements)   [in]       char*
-*     *user_data             [in]       void*
+*     *id (id of elements)    [in]       char*
+*     *user_data              [in]       void*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYObject* of the ShortStrongArray type.
+*      XYResult_t*            [out]      bool   Returns XYObject* of the ShortStrongArray type.
 *----------------------------------------------------------------------------*/
-XYResult* ShortStrongArray_creator_create(char id[2], void* user_data){ // consider allowing someone to create array with one object
-  ShortStrongArray* ShortStrongArrayObject = malloc(sizeof(ShortStrongArray));
+XYResult_t* ShortStrongArray_creator_create(char id[2], void* user_data){ 
+                                  // consider allowing someone to create array with one object
+  
+  ShortStrongArray_t* ShortStrongArrayObject = malloc(sizeof(ShortStrongArray_t));
   char ShortStrongArrayID[2] = {0x01, 0x02};
-  XYResult* newObject_result = newObject(ShortStrongArrayID, ShortStrongArrayObject);
+  XYResult_t* newObject_result = newObject(ShortStrongArrayID, ShortStrongArrayObject);
   if(newObject_result->error == OK && ShortStrongArrayObject != NULL){
     ShortStrongArrayObject->id[0] = id[0];
     ShortStrongArrayObject->id[1] = id[1];
@@ -240,22 +252,25 @@ XYResult* ShortStrongArray_creator_create(char id[2], void* user_data){ // consi
     ShortStrongArrayObject->add = &ShortStrongArray_add;
     ShortStrongArrayObject->get = &ShortStrongArray_get;
     ShortStrongArrayObject->payload = NULL;
-    XYResult* return_result = malloc(sizeof(XYResult));
+    XYResult_t* return_result = malloc(sizeof(XYResult_t));
     if(return_result != NULL){
       return_result->error = OK;
-      XYObject* return_object = newObject_result->result;
+      XYObject_t* return_object = newObject_result->result;
       return_result->result = return_object;
+      
       return return_result;
     }
     else {
       preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
       preallocated_result->result = NULL;
+      
       return preallocated_result;
     }
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_result->result = NULL;
+    
     return preallocated_result;
   }
 
@@ -274,10 +289,10 @@ XYResult* ShortStrongArray_creator_create(char id[2], void* user_data){ // consi
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* of the ShortStrongArray type.
 *----------------------------------------------------------------------------*/
-XYResult* ShortStrongArray_creator_fromBytes(char* data){
+XYResult_t* ShortStrongArray_creator_fromBytes(char* data){
 
-  XYResult* return_result = malloc(sizeof(XYResult));
-  ShortStrongArray* return_array = malloc(sizeof(ShortStrongArray));
+  XYResult_t* return_result = malloc(sizeof(XYResult_t));
+  ShortStrongArray_t* return_array = malloc(sizeof(ShortStrongArray_t));
   if(return_result && return_array){
       return_array->add = &ShortStrongArray_add;
       return_array->remove = NULL;
@@ -305,6 +320,7 @@ XYResult* ShortStrongArray_creator_fromBytes(char* data){
   else{
     if(return_result) free(return_result);
     if(return_array) free(return_array);
+    
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
 }
@@ -321,14 +337,17 @@ XYResult* ShortStrongArray_creator_fromBytes(char* data){
 *    *user_XYObject         [in]       XYObject*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns char* to serialized bytes.
+*      XYResult_t*          [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
-XYResult* ShortStrongArray_creator_toBytes(struct XYObject* user_XYObject){
+XYResult_t* ShortStrongArray_creator_toBytes(struct XYObject* user_XYObject){
+  
   if(user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x02){
-    ShortStrongArray* user_array = user_XYObject->GetPayload(user_XYObject);
+    
+    ShortStrongArray_t* user_array = user_XYObject->GetPayload(user_XYObject);
     uint8_t totalSize = user_array->size;
     char* byteBuffer = malloc(sizeof(char)*totalSize);
-    XYResult* return_result = malloc(sizeof(XYResult));
+    XYResult_t* return_result = malloc(sizeof(XYResult_t));
+    
     if(return_result != NULL && byteBuffer != NULL){
 
       /*
@@ -343,11 +362,13 @@ XYResult* ShortStrongArray_creator_toBytes(struct XYObject* user_XYObject){
 
       memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 4);
       memcpy(byteBuffer+4, user_array->payload, sizeof(char)*(totalSize-4));
+      
       if(littleEndian()){
         user_array->size = to_uint16((char*)(uintptr_t)user_array->size);
       }
       return_result->error = OK;
       return_result->result = byteBuffer;
+      
       return return_result;
     }
     else {
@@ -359,3 +380,5 @@ XYResult* ShortStrongArray_creator_toBytes(struct XYObject* user_XYObject){
   }
 
 }
+
+// end of file shortstrongarray.c

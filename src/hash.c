@@ -20,7 +20,9 @@
  ****************************************************************************************
  */
 
-#include "hash.h"
+#include <stdlib.h>
+#include "hash.h"     
+#include "xyobject.h"
 
 /*
  * FUNCTIONS & METHODS
@@ -45,7 +47,7 @@
  *      
  ****************************************************************************************
  */
-char* getHashId(HashProvider* hashProviderObject){
+char* getHashId(HashProvider_t* hashProviderObject){
   
   return hashProviderObject->id;
 }
@@ -68,9 +70,9 @@ char* getHashId(HashProvider* hashProviderObject){
  *      will return NULL if there is insufficient memory to create a hasher
  ****************************************************************************************
  */
-HashProvider* newHashProvider(){
+HashProvider_t* newHashProvider(){
   
-  HashProvider* hasher = malloc(sizeof(HashProvider));    //TODO: wal, where is this freed?
+  HashProvider_t* hasher = malloc(sizeof(HashProvider_t*));    //TODO: wal, where is this freed?
   
   if (hasher) {
     

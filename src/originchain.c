@@ -117,8 +117,6 @@ XYResult_t* getOriginBlockByPreviousHash(OriginChainNavigator* self_OriginChainN
   } else {
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
-    
-  return NULL;  //TODO: wal, is this what should be returned?
 }
 
 /*----------------------------------------------------------------------------*
@@ -142,7 +140,7 @@ XYResult_t* addBoundWitness(OriginChainNavigator* self_OriginChainNavigator,
   
   XYResult_t* lookup_result = tableLookup((char*)BoundWitness_id);
   ObjectProvider_t* BoundWitness_creator = lookup_result->result;
-  XYResult_t* toBytes_result = BoundWitness_creator->toBytes((XYResult_t*)user_BoundWitness);
+  XYResult_t* toBytes_result = BoundWitness_creator->toBytes((XYObject_t*)user_BoundWitness);
   char* boundWitnessBytes = toBytes_result->result;
   free(lookup_result);
   free(toBytes_result);
@@ -185,8 +183,6 @@ XYResult_t* addBoundWitness(OriginChainNavigator* self_OriginChainNavigator,
   } else {
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
-  
-  return NULL;    //TODO: wal, is this what should be returned?
 }
 
 /*----------------------------------------------------------------------------*
@@ -254,8 +250,6 @@ XYResult_t* findPreviousBlocks(OriginChainNavigator* self_OriginChainNavigator,
   } else {
     RETURN_ERROR(ERR_BADDATA);
   }
-  
-  return NULL;  //TODO: is this what should be returned here?
 }
 
 // end of file originchain.h

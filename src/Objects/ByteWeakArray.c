@@ -15,8 +15,8 @@
  ****************************************************************************************
  */
 
-#include "xyo.h"
-#include "XYOHeuristicsBuilder.h"
+#include <stdlib.h>
+#include "byteweakarray.h"
 
 //TODO Each array should have it's own header or one master header
 
@@ -35,8 +35,8 @@
 *      XYResult_t*          [out]     bool    Returns EXyoErrors::OK if 
 *                                             adding succeeded.
 *----------------------------------------------------------------------------*/
-XYResult_t* ByteWeakArray_add_t(ByteWeakArray_t* self_ByteWeakArray, 
-                                XYObject_t* user_XYObject){ //TODO: consider changing self to XYObject
+XYResult_t* ByteWeakArray_add(ByteWeakArray_t* self_ByteWeakArray, 
+                              XYObject_t* user_XYObject){ //TODO: consider changing self to XYObject
   
   // Lookup the ObjectProvider for the object so we can infer if the object has a default
   // size or a variable size per each element. We know every element in a single-type array
@@ -46,6 +46,7 @@ XYResult_t* ByteWeakArray_add_t(ByteWeakArray_t* self_ByteWeakArray,
   XYResult_t* lookup_result = tableLookup(user_XYObject->id);
                                   
   if(lookup_result->error == OK){
+    
     ObjectProvider_t* user_ObjectProvider = lookup_result->result;
 
     // First we calculate how much space we need for the payload with
@@ -267,7 +268,8 @@ XYResult_t* ByteWeakArray_get(ByteWeakArray_t* self_ByteWeakArray, int index) {
 *      XYResult_t*           [out]      bool   Returns XYObject* of the 
 *                                              ByteWeakArray type.
 *----------------------------------------------------------------------------*/
-XYResult_t* ByteWeakArray_creator_create(char id[2], void* user_data){ // consider allowing someone to create array with one object
+XYResult_t* ByteWeakArray_creator_create(char id[2], void* user_data){ 
+                    // consider allowing someone to create array with one object
   
   ByteWeakArray_t* ByteWeakArrayObject = malloc(sizeof(ByteWeakArray_t));
   char ByteWeakArrayID[2] = {0x01, 0x04};
@@ -354,7 +356,7 @@ XYResult_t* ByteWeakArray_creator_fromBytes(char* data){
 *  RETURNS
 *      XYResult_t*          [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
-XYResult_t* ByteWeakArray_creator_toBytes_t(struct XYObject* user_XYObject){
+XYResult_t* ByteWeakArray_creator_toBytes(XYObject_t* user_XYObject){
   
   if(user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x04){
     ByteWeakArray_t* user_array = user_XYObject->GetPayload(user_XYObject);

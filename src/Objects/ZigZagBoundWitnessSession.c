@@ -16,28 +16,40 @@
  */
 
 #ifndef ZIGZAGBOUNDWITNESSSESSION_H
+//#define ZIGZAGBOUNDWITNESSSESSION_H
 
+#include <stdlib.h>
+#include "xyo.h"
+#include "boundwitness.h"
 #include "ZigZagBoundWitnessSession.h"
 #include "XYOHeuristicsBuilder.h"
 
+/*
+ * FUNCTION DECLARATIONS
+ ****************************************************************************************
+ */
+
+XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* data);
+
 /*----------------------------------------------------------------------------*
-*  NAME
-*      completeBoundWitness
+*   NAME
+*     completeBoundWitness
 *
-*  DESCRIPTION
+*   DESCRIPTION
 *     Adds data to the bound witness and returns what the party should send back.
 *
-*  PARAMETERS
-*     userSession         [in]      ZigZagBoundWitnessSession*    The data from the other party.
+*   PARAMETERS
+*     userSession         [in]      ZigZagBoundWitnessSession_t*    The data from the other party.
 *     boundWitnessData    [in]      ByteArray_t*    If not already turned around, 
 *                                                   decide if what to send sign and 
 *                                                   send back.
-*
-*  RETURNS
-*      XYResult_t         [out]     XYResult_t*     Returns XYResult<ByteArray*> the 
+*   RETURNS
+*     XYResult_t         [out]     XYResult_t*     Returns XYResult<ByteArray*> the 
 *                                                   data to send to the other party.
+*   NOTES
+*   
 *----------------------------------------------------------------------------*/
-XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession* userSession, 
+XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession_t* userSession, 
                                  ByteArray_t* boundWitnessData){
   
   // Here we infer if the userSession bound witness is already completed or not.
@@ -49,6 +61,7 @@ XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession* userSession,
   }
 
   BoundWitnessTransfer* boundWitness = NULL;
+  
   if(boundWitnessData != NULL){
       XYResult_t* lookup_result = tableLookup((char*)&BoundWitnessTransfer_id);
       if(lookup_result->error != OK) return lookup_result;
@@ -59,17 +72,23 @@ XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession* userSession,
       boundWitness = fromBytes_result->result;
       free(fromBytes_result);
   }
+  
   XYResult_t* incomingData_result = userSession->BoundWitness->incomingData(userSession->BoundWitness, 
                                     boundWitness, 
                                     userSession->cycles && boundWitnessData != NULL);
+  
   if(incomingData_result->error != OK){
     return incomingData_result;
   }
+  
   ByteArray_t* returnData = malloc(sizeof(ByteArray_t));
+  
   if(returnData == NULL) {
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
+  
   returnData->size = to_uint32((char*)&incomingData_result->result);
+  
   if(littleEndian()){
     returnData->size = to_uint32((char*)&returnData->size);
   }
@@ -88,9 +107,11 @@ XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession* userSession,
     returnData->payload = malloc(sizeof(char)*(CATALOG_SIZE + 5) + returnData->size);
     
     if(returnData->payload){
+      
       memcpy(returnData->payload, userSession->choice->payload, sizeof(char)*(CATALOG_SIZE + 5));
       memcpy(returnData->payload, incomingData_result->result, returnData->size);
       returnData->size += CATALOG_SIZE+5;
+      
       return userSession->NetworkPipe->send(userSession, returnData, receiverCallback);
       
     } else {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)}
@@ -107,26 +128,29 @@ XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession* userSession,
 *     Adds data to the bound witness and returns whats the party should send back.
 *
 *  PARAMETERS
-*     *self         [in]      ZigZagBoundWitnessSession*    The data from the other party.
+*     *self         [in]      ZigZagBoundWitnessSession_t*  The data from the other party.
 *     *data         [in]      ByteArray*                    If not already turned around, decide 
 *                                                           if what to send sign and send back.
 *
 *  RETURNS
-*      XYResult_t   [out]     bool                          Returns XYResult<ByteArray*> the 
+*      XYResult_t   [out]     XYResult_t*                   Returns XYResult<ByteArray*> the 
 *                                                           data to send to the other party.
 *----------------------------------------------------------------------------*/
-XYResult_t* receiverCallback(ZigZagBoundWitnessSession* self, ByteArray_t* data){
+XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* data){
   
   if(data->size == 0 ) return 0;
   
   if(self->cycles == 0){
+    
     XYResult_t* lookup_result = tableLookup((char*)&BoundWitnessTransfer_id);
     
     if(lookup_result->error != OK) return lookup_result;
+    
     ObjectProvider_t* BWT_creator = lookup_result->result;
     XYResult_t* transfer_result = BWT_creator->fromBytes(data->payload);
     
     if(transfer_result->error != OK) return transfer_result;
+    
     BoundWitnessTransfer* transfer = transfer_result->result;
     self->BoundWitness->incomingData(self->BoundWitness, transfer, 1);
     
@@ -140,5 +164,6 @@ XYResult_t* receiverCallback(ZigZagBoundWitnessSession* self, ByteArray_t* data)
   }
 }
 
-#define ZIGZAGBOUNDWITNESSSESSION_H
 #endif
+
+// end of file zigzagboundwitnessession.c

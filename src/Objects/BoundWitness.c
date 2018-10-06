@@ -15,7 +15,9 @@
  ****************************************************************************************
  */
 
-#include "BoundWitness.h"
+#include "xyo.h"   
+#include <stdlib.h>
+#include "BoundWitness.h"      // includes "xyobject.h", "hash.h", <stdint.h>
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -33,6 +35,7 @@
 *      XYResult*            [out]      bool   Returns XYObject* with a byteBuffer as the result.
 *----------------------------------------------------------------------------*/
 XYResult_t* BoundWitness_getSigningData(void* user_BoundWitness){
+  
   uint32_t publicKeysSize = ((BoundWitness*)user_BoundWitness)->publicKeys->size;
   uint32_t firstHeuristicsSize;
   uint32_t secondHeuristicsSize;
@@ -79,6 +82,7 @@ XYResult_t* BoundWitness_getSigningData(void* user_BoundWitness){
 
     XYResult_t* toBytes_result = SSA_Creator->toBytes(newObject_result->result);
     free(newObject_result);
+    
     if(toBytes_result->error!=OK){
       free(byteBuffer);
       return toBytes_result;
@@ -95,15 +99,19 @@ XYResult_t* BoundWitness_getSigningData(void* user_BoundWitness){
 
     ByteArray_t* return_bytes = malloc(sizeof(ByteArray_t));
     XYResult_t* return_result = malloc(sizeof(XYResult_t));
+    
     if(return_result && return_bytes){
       return_bytes->size = totalSize;
       return_bytes->payload = byteBuffer;
       return_result->error = OK;
       return_result->result = return_bytes;
+      
       return return_result;
+      
     } else {
       if(return_bytes) free(return_bytes);
       if(return_result) free(return_result);
+      
       RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
     }
 
@@ -126,7 +134,7 @@ XYResult_t* BoundWitness_getSigningData(void* user_BoundWitness){
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* with a byteBuffer as the result.
 *----------------------------------------------------------------------------*/
-XYResult_t* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider* user_HashProvider){
+XYResult_t* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider_t* user_HashProvider){
   
   XYResult_t* signingData_result = user_BoundWitness->getSigningData(user_BoundWitness);
   
@@ -137,7 +145,6 @@ XYResult_t* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider* 
   ByteArray_t* signingData = signingData_result->result;
   
   return user_HashProvider->hash(signingData);
-
 }
 
 /*----------------------------------------------------------------------------*
@@ -154,9 +161,9 @@ XYResult_t* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider* 
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* with a char* as the result.
 *----------------------------------------------------------------------------*/
-XYResult_t* BoundWitnessTransfer_toBytes(XYObject_t* user_XYObect){
+XYResult_t* BoundWitnessTransfer_toBytes(XYObject_t* user_XYObject){
   
-  BoundWitnessTransfer* user_BoundWitness = user_XYObect->payload;
+  BoundWitnessTransfer* user_BoundWitness = user_XYObject->payload;
   uint32_t totalSize = 4;
   uint32_t publicKeysSize = 0;
   uint32_t payloadsSize = 0;

@@ -18,6 +18,8 @@
 #ifndef ZIGZAGBOUNDWITNESS_H
 #define ZIGZAGBOUNDWITNESS_H
 
+#include <stdlib.h>
+#include "xyo.h"
 #include "ZigZagBoundWitness.h"
 
 /*----------------------------------------------------------------------------*
@@ -28,7 +30,7 @@
 *     Adds data to the bound witness and returns whats the party should send back.
 *
 *  PARAMETERS
-*     self              [in]      ZigZagBoundWitness*
+*     self              [in]      ZigZagBoundWitness_t*
 *     *boundWitness     [in]      BoundWitness*     The data from the other party.
 *     
 *     *endpoint         [in]      int               If not already turned around, 
@@ -38,7 +40,7 @@
 *     toBytes_result    [out]     XYResult_t        Returns XYResult<ByteArray*> the data 
 *                                                   to send to the other party.
 *----------------------------------------------------------------------------*/
-XYResult_t* incomingData(ZigZagBoundWitness_2* self, 
+XYResult_t* incomingData(ZigZagBoundWitness_t* self, 
                          BoundWitnessTransfer* boundWitness, 
                          int endpoint){
   
@@ -106,7 +108,7 @@ XYResult_t* incomingData(ZigZagBoundWitness_2* self,
 *  RETURNS
 *      int            [out]     Returns Bool True if it succeeded.
 *----------------------------------------------------------------------------*/
-int addTransfer(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitness){
+int addTransfer(ZigZagBoundWitness_t* self, BoundWitnessTransfer* boundWitness){
   
  if(!boundWitness){
    return 1;          //TODO: wal, 1 what?  Perhaps a good place for a constant
@@ -231,7 +233,7 @@ int addIncomingSignatures(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomi
 *  RETURNS
 *      XYResult_t         [out]   bool        Returns Bool True if it succeeded.
 *----------------------------------------------------------------------------*/
-XYResult_t* makeSelfKeySet(ZigZagBoundWitness* self){
+XYResult_t* makeSelfKeySet(ZigZagBoundWitness_t* self){
   
   // Get a copy of the public key we are using currently
   XYResult_t* getPublicKey_result = self->signer->getPublicKey(self->signer);

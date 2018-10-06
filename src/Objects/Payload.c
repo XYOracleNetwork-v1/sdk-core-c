@@ -33,10 +33,12 @@
 *     *user_data             [in]       void*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYObject* of the Payload type.
+*      XYResult_t*           [out]      bool   Returns XYObject* of the Payload type.
 *----------------------------------------------------------------------------*/
-XYResult* Payload_creator_create(char id[2], void* payload_data){
-  XYResult* xy_result = newObject(id, payload_data);
+XYResult_t* Payload_creator_create(char id[2], void* payload_data){
+  
+  XYResult_t* xy_result = newObject(id, payload_data);
+  
   return xy_result;
 }
 
@@ -49,21 +51,23 @@ XYResult* Payload_creator_create(char id[2], void* payload_data){
 *      include major and minor of array.
 *
 *  PARAMETERS
-*     *payload_data                  [in]       char*
+*     *payload_data     [in]       char*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYResult* of the Payload type.
+*      XYResult_t*      [out]      bool   Returns XYResult* of the Payload type.
 *----------------------------------------------------------------------------*/
-XYResult* Payload_creator_fromBytes(char* payload_data){
-  Payload* return_payload = malloc(sizeof(Payload));
+XYResult_t* Payload_creator_fromBytes(char* payload_data){
+  
+  Payload_t* return_payload = malloc(sizeof(Payload_t));
 
   char IntWeakArrayID[2] = {0x01, 0x06};
-  XYResult* lookup_result = lookup(IntWeakArrayID);
-  ObjectProvider* weakArrayCreator = lookup_result->result;
+  XYResult_t* lookup_result = tableLookup(IntWeakArrayID);
+  ObjectProvider_t* weakArrayCreator = lookup_result->result;
 
-  IntWeakArray* signedWeakArray;
-  IntWeakArray* unsignedWeakArray;
-  XYResult* array_result = weakArrayCreator->fromBytes(&payload_data[sizeof(char)*4]);
+  IntWeakArray_t* signedWeakArray;
+  IntWeakArray_t* unsignedWeakArray;
+  XYResult_t* array_result = weakArrayCreator->fromBytes(&payload_data[sizeof(char)*4]);
+  
   if(array_result->error==OK){
     signedWeakArray = array_result->result;
     uint32_t firstSize = to_uint32((char*)&payload_data[4]);
@@ -73,6 +77,7 @@ XYResult* Payload_creator_fromBytes(char* payload_data){
      * of the second array in the payload.
      */
     array_result = weakArrayCreator->fromBytes(&payload_data[sizeof(char)*(firstSize+4)]);
+    
     if(array_result->error==OK){
       unsignedWeakArray = array_result->result;
     }
@@ -90,7 +95,9 @@ XYResult* Payload_creator_fromBytes(char* payload_data){
   return_payload->size = to_uint32((char*)payload_data);
   return_payload->signedHeuristics = signedWeakArray;
   return_payload->unsignedHeuristics = unsignedWeakArray;
-  XYResult* return_result = malloc(sizeof(XYResult));
+  
+  XYResult_t* return_result = malloc(sizeof(XYResult_t));
+  
   if(return_result){
     return_result->error = OK;
     return_result->result = return_payload;
@@ -112,24 +119,25 @@ XYResult* Payload_creator_fromBytes(char* payload_data){
 *    *user_XYObject         [in]       XYObject*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns char* to serialized bytes.
+*      XYResult_t*          [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
-XYResult* Payload_creator_toBytes(struct XYObject* user_XYObject){
-  Payload* user_Payload = user_XYObject->payload;
+XYResult_t* Payload_creator_toBytes(XYObject_t* user_XYObject){
+  
+  Payload_t* user_Payload = user_XYObject->payload;
   uint32_t size = user_Payload->size;
 
   char IntWeakArrayID[2] = {0x01, 0x06};
-  XYResult* lookup_result = lookup(IntWeakArrayID);
-  ObjectProvider* weakArrayCreator = lookup_result->result;
-  IntWeakArray* signedArray = user_Payload->signedHeuristics;
-  IntWeakArray* unsignedArray = user_Payload->unsignedHeuristics;
+  XYResult_t* lookup_result = tableLookup(IntWeakArrayID);
+  ObjectProvider_t* weakArrayCreator = lookup_result->result;
+  IntWeakArray_t* signedArray = user_Payload->signedHeuristics;
+  IntWeakArray_t* unsignedArray = user_Payload->unsignedHeuristics;
   uint32_t size1 = signedArray->size;
   uint32_t size2 = unsignedArray->size;
-  XYResult* toBytes_result1 = NULL;
-  XYResult* toBytes_result2 = NULL;
+  XYResult_t* toBytes_result1 = NULL;
+  XYResult_t* toBytes_result2 = NULL;
   /* Take the array_raw in, endian the size around, then do toBytes() */
 
-  XYResult* newObject_result1 = newObject(IntWeakArrayID, user_Payload->signedHeuristics);
+  XYResult_t* newObject_result1 = newObject(IntWeakArrayID, user_Payload->signedHeuristics);
   if(newObject_result1->error == OK){
     toBytes_result1 = weakArrayCreator->toBytes( newObject_result1->result );
     if(toBytes_result1->error!=OK){
@@ -140,7 +148,7 @@ XYResult* Payload_creator_toBytes(struct XYObject* user_XYObject){
     return newObject_result1;
   }
 
-  XYResult* newObject_result2 = newObject(IntWeakArrayID, user_Payload->unsignedHeuristics);
+  XYResult_t* newObject_result2 = newObject(IntWeakArrayID, user_Payload->unsignedHeuristics);
   if(newObject_result2->error == OK){
     toBytes_result2 = weakArrayCreator->toBytes( newObject_result2->result );
     if(toBytes_result2->error!=OK){
@@ -170,10 +178,11 @@ XYResult* Payload_creator_toBytes(struct XYObject* user_XYObject){
   free(toBytes_result2);
   free(lookup_result);
   */
-  XYResult* return_result = malloc(sizeof(XYResult));
+  XYResult_t* return_result = malloc(sizeof(XYResult_t));
   return_result->error = OK;
   return_result->result = return_buffer;
+  
   return return_result;
-
-
 }
+
+// end of file payload.c

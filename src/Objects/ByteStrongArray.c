@@ -15,10 +15,23 @@
  ****************************************************************************************
  */
 
+#include <stdlib.h>
 #include "xyo.h"
+#include "xyobject.h"
 #include "XYOHeuristicsBuilder.h"
 
-//TODO: Each array should have it's own header or one master header
+/*
+ * FUNCTION DECLARATIONS
+ ****************************************************************************************
+ */
+
+XYResult_t* ByteStrongArray_add_T(ByteStrongArray_t* self_ByteStrongArray, 
+                                  XYObject_t* user_XYObject); //TODO: consider changing self to XYObject
+XYResult_t* ByteStrongArray_get(ByteStrongArray_t* self_ByteStrongArray, int index);
+XYResult_t* ByteStrongArray_creator_create(char id[2], void* user_data);   
+XYResult_t* ByteStrongArray_creator_fromBytes(char* data);
+XYResult_t* ByteStrongArray_creator_toBytes_t(XYObject_t* user_XYObject);
+
 //#define RETURN_ERROR(ERR)      
 
 /*----------------------------------------------------------------------------*
@@ -36,8 +49,8 @@
 *      XYResult_t             [out]     bool       Returns EXyoErrors::OK if 
 *                                                  adding succeeded.
 *----------------------------------------------------------------------------*/
-XYResult_t* ByteStrongArray_add_T(ByteStrongArray_t* self_ByteStrongArray, 
-                              XYObject_t* user_XYObject){ //TODO: consider changing self to XYObject
+XYResult_t* ByteStrongArray_add(ByteStrongArray_t* self_ByteStrongArray, 
+                                XYObject_t* user_XYObject){ //TODO: consider changing self to XYObject
 
   // Lookup the ObjectProvider for the object so we can infer if the object has a default
   // size or a variable size per each element. We know every element in a single-type array
@@ -298,6 +311,7 @@ XYResult_t* ByteStrongArray_creator_fromBytes(char* data){
   
   XYResult_t* return_result = malloc(sizeof(XYResult_t));
   ByteStrongArray_t* return_array = malloc(sizeof(ByteStrongArray_t));
+  
   if(return_result && return_array){
       return_array->add = &ByteStrongArray_add;
       return_array->remove = NULL;
@@ -312,6 +326,7 @@ XYResult_t* ByteStrongArray_creator_fromBytes(char* data){
       memcpy(return_array->payload, &data[3], (return_array->size-3));
       return_result->error = OK;
       return_result->result = return_array;
+    
       return return_result;
   }
   else{
@@ -321,7 +336,7 @@ XYResult_t* ByteStrongArray_creator_fromBytes(char* data){
 
 /*----------------------------------------------------------------------------*
 *  NAME
-*      ByteStrongArray_creator_create
+*      ByteStrongArray_creator_toBytes
 *
 *  DESCRIPTION
 *      Given an XYObject of Byte Strong Array type this routine will serialize
@@ -333,7 +348,7 @@ XYResult_t* ByteStrongArray_creator_fromBytes(char* data){
 *  RETURNS
 *      XYResult_t*          [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
-XYResult_t* ByteStrongArray_creator_toBytes_t(XYObject_t* user_XYObject){
+XYResult_t* ByteStrongArray_creator_toBytes(XYObject_t* user_XYObject){
   
   if(user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x01){
     
@@ -348,10 +363,13 @@ XYResult_t* ByteStrongArray_creator_toBytes_t(XYObject_t* user_XYObject){
       memcpy(byteBuffer+3, user_array->payload, sizeof(char)*(totalSize-3));
       return_result->error = OK;
       return_result->result = byteBuffer;
+      
       return return_result;
+      
       } else {
         if(return_result) free(return_result);
         if(byteBuffer) free(byteBuffer);
+        
         RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)
     }
   }

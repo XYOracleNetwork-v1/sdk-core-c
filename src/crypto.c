@@ -20,7 +20,9 @@
  ****************************************************************************************
  */
 
-#include "crypto.h"
+#include <stdlib.h>
+#include "crypto.h"         // includes "xyobject.h", "hash.h"
+#include "wc_rsa.h"         // C:\xycorp\xy4_firmware\src
 
 /*
  * FUNCTIONS & METHODS
@@ -30,7 +32,48 @@
 /**
  ****************************************************************************************
  *  NAME
- *      newInstance
+ *      newPrivateKey
+ *
+ *  DESCRIPTION
+ *      this routine creates and returns a new private key 
+ *
+ *  PARAMETERS
+ *      user_PrivateKey     [in]      ByteArray*
+ *      hashingProvider     [in]      HashProvider* 
+ *
+ *  RETURNS
+ *      err                 [out]     int
+ *
+ *  NOTES
+ *      will return a malloc error if there is insufficient memory to create a signer
+ ****************************************************************************************
+ */
+int newPrivateKey(void){
+  
+  RsaKey priv;
+  WC_RNG randomNumberGenerator;
+  
+  int err = 0;
+  long e = 65537;   // standard value to use for exponent
+  
+  wc_InitRsaKey(&priv, NULL); // not using heap hint. No custom memory
+    
+  wc_InitRng(&randomNumberGenerator);
+    
+  // generate a 2048 bit long private key
+  err = wc_MakeRsaKey(&priv, 2048, e, &randomNumberGenerator);
+    
+  if(err != 0) {
+    // error generating a private key
+  }  
+
+  return err;
+}
+
+/**
+ ****************************************************************************************
+ *  NAME
+ *      newSignerInstance
  *
  *  DESCRIPTION
  *      this routine returns a NEW Signer 
@@ -43,17 +86,19 @@
  *      signer              [out]     Signer*
  *
  *  NOTES
- *      will return NULL if there is insufficient memory to create a signer
+ *      will return a malloc error if there is insufficient memory to create a signer
  ****************************************************************************************
  */
-Signer* newInstance(ByteArray_t* user_PrivateKey, HashProvider* hashingProvider){
+Signer* newSignerInstance(ByteArray_t* user_PrivateKey, HashProvider_t* hashingProvider){
   
   Signer* signer = malloc(sizeof(Signer));    //TODO: wal, where is this freed?
   
   if (signer) {
     
+    int err = newPrivateKey();                // Generate a new private key.
+  
     signer->publicKey = NULL;
-    signer->privateKey = NULL;                // Generate keypair and set these.
+    signer->privateKey = NULL;                
     signer->getPublicKey = &getPublicKey;
     signer->sign = NULL;
     signer->verify = NULL;
@@ -87,7 +132,7 @@ CryptoCreator* newCryptoCreator(){
   if (creator) {
     
     memset(creator->id, 0x00, 2);
-    creator->newInstance = &newInstance;
+    creator->newSignerInstance = &newSignerInstance;
     creator->getId = &cryptoGetId;
   }
   
@@ -132,12 +177,12 @@ char* cryptoGetId(CryptoCreator* object){
  *      return_result     [out]     XYResult_t*
  *
  *  NOTES
- *      will return NULL if there is insufficient memory to create an XYResult
+ *      will return a malloc error if there is insufficient memory to create a keypair.
  ****************************************************************************************
  */
 XYResult_t* getPublicKey(Signer* signer){
   
-  XYResult_t* return_result = malloc(sizeof(XYResult_t));   //TODO: wal, where is this freed?
+  XYResult_t* return_result = malloc(sizeof(XYResult_t));   //TODO: wal, where are these freed?
   
   if(return_result->error != OK) return return_result;
   
@@ -162,7 +207,7 @@ XYResult_t* getPublicKey(Signer* signer){
  *      keypair     [out]     keyPairStruct*
  *
  *  NOTES
- *      will return NULL if there is insufficient memory to create a keypair
+ *      will return a malloc error if there is insufficient memory to create a keypair.
  ****************************************************************************************
  */
 keyPairStruct* generateKeypair(){

@@ -15,6 +15,7 @@
  ****************************************************************************************
  */
 
+#include <stdlib.h>
 #include "xyo.h"
 #include "XYOHeuristicsBuilder.h"
 /*
@@ -34,20 +35,25 @@
 *      Adds a supplied XYObject to a supplied IntStrongArray
 *
 *  PARAMETERS
-*     *self_IntStrongArray  [in]       XYObject*
-*     *user_XYObject          [in]      IntStrongArray*
+*     *self_IntStrongArray  [in]      IntStrongArray_t*
+*     *user_XYObject        [in]      XYObject_t*
 *
 *  RETURNS
-*      XYResult  [out]      bool       Returns EXyoErrors::OK if adding succeeded.
+*      XYResult_t           [out]     bool       Returns EXyoErrors::OK if adding succeeded.
 *----------------------------------------------------------------------------*/
-XYResult* IntStrongArray_add(IntStrongArray* self_IntStrongArray, XYObject* user_XYObject){ //TODO: consider changing self to XYObject
+XYResult_t* IntStrongArray_add(IntStrongArray_t* self_IntStrongArray, XYObject_t* user_XYObject){ 
+                                                        //TODO: consider changing self to XYObject
+  
   // Lookup the ObjectProvider for the object so we can infer if the object has a default
   // size or a variable size per each element. We know every element in a single-type array
   // has the same type, but we don't know if they have uniform size. An array of Bound Witness
   // objects will be variable size, but all the same type.
-  XYResult* lookup_result = lookup(user_XYObject->id);
+  
+  XYResult_t* lookup_result = tableLookup(user_XYObject->id);
+  
   if(lookup_result->error == OK){
-    ObjectProvider* user_ObjectProvider = lookup_result->result;
+    
+    ObjectProvider_t* user_ObjectProvider = lookup_result->result;
 
     // First we calculate how much space we need for the payload with
     // the addition of this new element.
@@ -98,9 +104,9 @@ XYResult* IntStrongArray_add(IntStrongArray* self_IntStrongArray, XYObject* user
        char* user_object_payload = user_XYObject->payload;
        char id[2];
        memcpy(id, user_object_payload, 2);
-       lookup_result = lookup(id);
+       lookup_result = tableLookup(id);
        if(lookup_result->error == OK){
-         ObjectProvider* deeper_ObjectProvider = lookup_result->result;
+         ObjectProvider_t* deeper_ObjectProvider = lookup_result->result;
          if(deeper_ObjectProvider->defaultSize != 0){
 
            object_size = deeper_ObjectProvider->defaultSize;
@@ -131,11 +137,11 @@ XYResult* IntStrongArray_add(IntStrongArray* self_IntStrongArray, XYObject* user
         object_payload = &(object_payload[self_IntStrongArray->size - (sizeof(char)*6)]);
 
         // Finally copy the element into the array
-        XYResult* toBytes_result = user_ObjectProvider->toBytes(user_XYObject);
+        XYResult_t* toBytes_result = user_ObjectProvider->toBytes(user_XYObject);
         memcpy(object_payload, toBytes_result->result, object_size);
 
         self_IntStrongArray->size = newSize;
-        XYResult* return_result = malloc(sizeof(XYResult));
+        XYResult_t* return_result = malloc(sizeof(XYResult_t));
         if(return_result != NULL){
           return_result->error = OK;
           return_result->result = 0;
@@ -168,17 +174,22 @@ XYResult* IntStrongArray_add(IntStrongArray* self_IntStrongArray, XYObject* user
 *      Get an XYObject from a supplied IntStrongArray at a supplied index.
 *
 *  PARAMETERS
-*     *self_IntStrongArray  [in]       XYObject*
-*     *index                 [in]       Int;
+*     *self_IntStrongArray  [in]       XYObject_t*
+*     *index                [in]       Int;
 *
 *  RETURNS
-*      XYResult  [out]      bool       Returns EXyoErrors::OK if adding succeeded.
+*      XYResult_t           [out]      bool       Returns EXyoErrors::OK if adding succeeded.
 *----------------------------------------------------------------------------*/
-XYResult* IntStrongArray_get(IntStrongArray* self_IntStrongArray, int index) {
-  XYResult* general_result = lookup(self_IntStrongArray->id);
+XYResult_t* IntStrongArray_get(IntStrongArray_t* self_IntStrongArray, int index) {
+  
+  XYResult_t* general_result = tableLookup(self_IntStrongArray->id);
+  
   if(general_result->error == OK){
-    ObjectProvider* element_creator = general_result->result;
+    
+    ObjectProvider_t* element_creator = general_result->result;
+    
     if(element_creator->defaultSize != 0){
+      
       uint8_t totalSize = self_IntStrongArray->size;
       totalSize = totalSize - 6*sizeof(char);
       if((totalSize % element_creator->defaultSize) == 0){
@@ -205,7 +216,7 @@ XYResult* IntStrongArray_get(IntStrongArray* self_IntStrongArray, int index) {
         if(i == index){
           char* return_object_payload = malloc(int_size);
           memcpy(return_object_payload, &array_elements[array_offset], int_size);
-          XYResult* return_result = newObject(self_IntStrongArray->id, return_object_payload);
+          XYResult_t* return_result = newObject(self_IntStrongArray->id, return_object_payload);
           return return_result;
         }
         else {
@@ -231,24 +242,30 @@ XYResult* IntStrongArray_get(IntStrongArray* self_IntStrongArray, int index) {
 *      Create an empty Strong Byte Array
 *
 *  PARAMETERS
-*     *id (id of elements)   [in]       char*
-*     *user_data             [in]       void*
+*     *id (id of elements)    [in]       char*
+*     *user_data              [in]       void*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYObject* of the IntStrongArray type.
+*      XYResult_t*            [out]      bool   Returns XYObject* of the IntStrongArray type.
 *----------------------------------------------------------------------------*/
-XYResult* IntStrongArray_creator_create(char id[2], void* user_data){ // consider allowing someone to create array with one object
-  IntStrongArray* IntStrongArrayObject = malloc(sizeof(IntStrongArray));
+XYResult_t* IntStrongArray_creator_create(char id[2], void* user_data){ 
+                                  // consider allowing someone to create array with one object
+  
+  IntStrongArray_t* IntStrongArrayObject = malloc(sizeof(IntStrongArray_t));
   char IntStrongArrayID[2] = {0x01, 0x03};
-  XYResult* newObject_result = newObject(IntStrongArrayID, IntStrongArrayObject);
+  XYResult_t* newObject_result = newObject(IntStrongArrayID, IntStrongArrayObject);
+  
   if(newObject_result->error == OK && IntStrongArrayObject != NULL){
+    
     IntStrongArrayObject->id[0] = id[0];
     IntStrongArrayObject->id[1] = id[1];
     IntStrongArrayObject->size = 6;
     IntStrongArrayObject->add = &IntStrongArray_add;
     IntStrongArrayObject->get = &IntStrongArray_get;
     IntStrongArrayObject->payload = NULL;
-    XYResult* return_result = malloc(sizeof(XYResult));
+    
+    XYResult_t* return_result = malloc(sizeof(XYResult_t));
+    
     if(return_result != NULL){
       return_result->error = OK;
       return_result->result = newObject_result->result;
@@ -265,26 +282,27 @@ XYResult* IntStrongArray_creator_create(char id[2], void* user_data){ // conside
     preallocated_result->result = 0;
     return preallocated_result;
   }
-
 }
 
 /*----------------------------------------------------------------------------*
 *  NAME
-*      IntStrongArray_creator_fromBytes
+*     IntStrongArray_creator_fromBytes
 *
 *  DESCRIPTION
-*      Create an Strong Byte Array given a set of Bytes. Bytes must not include major and minor of array.
+*     Create an Strong Byte Array given a set of Bytes. Bytes must not include 
+*     major and minor of array.
 *
 *  PARAMETERS
-*     *data                  [in]       char*
+*     *data             [in]       char*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYObject* of the IntStrongArray type.
+*      XYResult_t*      [out]      bool   Returns XYObject* of the IntStrongArray type.
 *----------------------------------------------------------------------------*/
-XYResult* IntStrongArray_creator_fromBytes(char* data){
+XYResult_t* IntStrongArray_creator_fromBytes(char* data){
 
-  XYResult* return_result = malloc(sizeof(XYResult));
-  IntStrongArray* return_array = malloc(sizeof(IntStrongArray));
+  XYResult_t* return_result = malloc(sizeof(XYResult_t));
+  IntStrongArray_t* return_array = malloc(sizeof(IntStrongArray_t));
+  
   if(return_result && return_array){
       return_array->add = &IntStrongArray_add;
       return_array->remove = NULL;
@@ -321,17 +339,19 @@ XYResult* IntStrongArray_creator_fromBytes(char* data){
 *      the object and return a char* to the serialized bytes.
 *
 *  PARAMETERS
-*    *user_XYObject         [in]       XYObject*
+*    *user_XYObject         [in]       XYObject_t*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns char* to serialized bytes.
+*      XYResult_t*          [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
-XYResult* IntStrongArray_creator_toBytes(struct XYObject* user_XYObject){
+XYResult_t* IntStrongArray_creator_toBytes(XYObject_t* user_XYObject){
+  
   if(user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x03){
-    IntStrongArray* user_array = user_XYObject->GetPayload(user_XYObject);
+    
+    IntStrongArray_t* user_array = user_XYObject->GetPayload(user_XYObject);
     uint8_t totalSize = user_array->size;
     char* byteBuffer = malloc(sizeof(char)*totalSize);
-    XYResult* return_result = malloc(sizeof(XYResult));
+    XYResult_t* return_result = malloc(sizeof(XYResult_t));
     if(return_result != NULL && byteBuffer != NULL){
 
       /*
@@ -355,11 +375,13 @@ XYResult* IntStrongArray_creator_toBytes(struct XYObject* user_XYObject){
     } else {
       if(byteBuffer) free(byteBuffer);
       if(return_result) free(return_result);
-      RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)
+      RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
     }
   }
   else {
-    RETURN_ERROR(ERR_BADDATA)
+    RETURN_ERROR(ERR_BADDATA);
   }
-
 }
+
+// end of file intstrongarray.c
+
