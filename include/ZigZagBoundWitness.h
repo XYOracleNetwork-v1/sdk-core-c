@@ -60,7 +60,7 @@ struct ZigZagBoundWitness{
    int (*addIncomingSignatures)(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingSignatures);
    XYResult_t* (*makeSelfKeySet)(ZigZagBoundWitness_t* self);
    XYResult_t* (*signForSelf)(ZigZagBoundWitness_t* self);
-   Signer* signer;
+   Signer_t* signer;
    XYObject_t* payload;
 } ;
 

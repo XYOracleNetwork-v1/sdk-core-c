@@ -24,6 +24,7 @@
  */
 
 #include "xyobject.h"
+#include "wc_sha256.h"                // wc_ = wolf crypto library routine (SHA-256)
 
 /*
  * DEFINES
@@ -36,6 +37,7 @@
  */
 
 typedef struct HashProvider HashProvider_t;
+typedef unsigned char  byte;
 
 /*
  * STRUCTURES
@@ -44,14 +46,14 @@ typedef struct HashProvider HashProvider_t;
 
 struct HashProvider{
   
-  char id[2];                         // 2 bytes representing major and minor
-  XYResult_t* (*hash)(ByteArray_t*);  // Given just a null terminated char* return a 
-                                      // cryptographic hash for it
+  char id[2];                               // 2 bytes representing major and minor
+  XYResult_t* (*createHash)(ByteArray_t*);  // Given just a null terminated char* return a 
+                                            // cryptographic hash for it
   /*
    * Given a cryptographic hash and a piece of data, verify the given hash == hash(data).
    */
   
-  int (*verifyHash)(ByteArray_t* hash, ByteArray_t* data);
+  XYResult_t* (*verifyHash)(ByteArray_t* dataHashed, XYObject_t* hash);
   char* (*getHashId)(HashProvider_t* hashProviderObject);   // Fetch the above id object 
                                                             // and return it.
 };
@@ -61,8 +63,10 @@ struct HashProvider{
  ****************************************************************************************
  */
 
-char* hashGetId(HashProvider_t* hashProviderObject);
 HashProvider_t* newHashProvider(void);
+char* hashGetId(HashProvider_t* hashProviderObject);
+XYResult_t* createHash(ByteArray_t* dataToHash);
+XYResult_t* verifyHash(ByteArray_t* dataHashed, XYObject_t* hash);
 
 #endif
 

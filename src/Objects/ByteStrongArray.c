@@ -217,11 +217,15 @@ XYResult_t* ByteStrongArray_get(ByteStrongArray_t* self_ByteStrongArray, int ind
           RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);
         }
         char* element_size = malloc(element_creator->sizeIdentifierSize);
+        //TODO: wal, should check for any malloc errors
+
         memcpy(element_size, &array_elements[array_offset], element_creator->sizeIdentifierSize);
         uint16_t int_size = to_uint16(element_size);
         free(element_size);
         if(i == index){
           char* return_object_payload = malloc(int_size);
+          //TODO: wal, should check for any malloc errors
+
           memcpy(return_object_payload, &array_elements[array_offset], int_size);
           XYResult_t* return_result = newObject(self_ByteStrongArray->id, return_object_payload);
           return return_result;
@@ -323,6 +327,8 @@ XYResult_t* ByteStrongArray_creator_fromBytes(char* data){
       array_id[2] = '\00';
       strcpy(return_array->id, array_id);
       return_array->payload = malloc(sizeof(char)*(return_array->size-3));
+      //TODO: wal, should check for any malloc errors
+
       memcpy(return_array->payload, &data[3], (return_array->size-3));
       return_result->error = OK;
       return_result->result = return_array;

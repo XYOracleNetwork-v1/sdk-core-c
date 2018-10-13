@@ -136,24 +136,24 @@ enum EXyoErrors{
   ERR_KEY_ALREADY_EXISTS, // Returned if can't insert because key is already mapped.
   ERR_INSUFFICIENT_MEMORY, // Returned if there wasn't enough memory to store.
   ERR_INTERNAL_ERROR, // Returned if there was a hardware error.
-  ERR_TIMEOUT, // Returned if the disk timed out on read/write.
+  ERR_TIME_OUT, // Returned if the disk timed out on read/write.
   ERR_COULD_NOT_DELETE, // Returned if delete failed.
   ERR_PERMISSION, // Returned if permissions are improper.
   ERR_KEY_DOES_NOT_EXIST // Returned if key isn't found in map.
 };
 
 struct KeySet{
-  struct ShortWeakArray* keys;
+  ShortWeakArray_t* keys;
 } ;
 
 struct SignatureSet{
-  struct ShortWeakArray* signatures;
+  ShortWeakArray_t* signatures;
 } ;
 
 struct Payload{
   uint32_t size;
-  struct IntWeakArray* signedHeuristics;
-  struct IntWeakArray* unsignedHeuristics;
+  IntWeakArray_t* signedHeuristics;
+  IntWeakArray_t* unsignedHeuristics;
 } ;
 
 struct PreviousHash{

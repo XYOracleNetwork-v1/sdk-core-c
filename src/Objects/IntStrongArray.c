@@ -210,11 +210,15 @@ XYResult_t* IntStrongArray_get(IntStrongArray_t* self_IntStrongArray, int index)
           RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);
         }
         char* element_size = malloc(element_creator->sizeIdentifierSize);
+        //TODO: wal, should check for any malloc errors
+
         memcpy(element_size, &array_elements[array_offset], element_creator->sizeIdentifierSize);
         uint32_t int_size = to_uint32(element_size);
         free(element_size);
         if(i == index){
           char* return_object_payload = malloc(int_size);
+          //TODO: wal, should check for any malloc errors
+
           memcpy(return_object_payload, &array_elements[array_offset], int_size);
           XYResult_t* return_result = newObject(self_IntStrongArray->id, return_object_payload);
           return return_result;

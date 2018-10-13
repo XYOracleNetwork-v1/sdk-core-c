@@ -227,6 +227,7 @@ XYResult_t* findPreviousBlocks(OriginChainNavigator* self_OriginChainNavigator,
               ObjectProvider_t* previousHash_creator = lookup_result->result;
               free(lookup_result);
               ByteArray_t* blockHash = malloc(sizeof(ByteArray_t));
+              //TODO: wal, should check for any malloc errors
               blockHash->payload = previous_hash->hash;
               blockHash->size = previousHash_creator->defaultSize-2;
               XYResult_t* foundParent = self_OriginChainNavigator->getOriginBlockByBlockHash(self_OriginChainNavigator, blockHash);

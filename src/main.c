@@ -91,7 +91,7 @@ int main(){
           ShortStrongArray_t* keySet_raw = keyset_object->payload;
 
           ECDSA_secp256k1_uncompressed_t* publicKey = malloc(sizeof(ECDSA_secp256k1_uncompressed_t));   //TODO: wal, where is this freed?
-          //TODO: wal, where's the error check for the malloc?
+          //TODO: wal, should check for any malloc errors
           //free(create_result);
           strcpy(publicKey->point_x, "Hello");
           strcpy(publicKey->point_y, "World!");
@@ -178,14 +178,14 @@ int main(){
           }
           
           Payload_t* user_payload = malloc(sizeof(Payload_t));    //TODO: wal, where is this freed?
-          //TODO: wal, where's the error check for the malloc?
+          //TODO: wal, should check for any malloc errors
           user_payload->size = user_signedHeuristics->size + user_unsignedHeuristics->size + 4;
           user_payload->signedHeuristics = user_signedHeuristics;
           user_payload->unsignedHeuristics = user_unsignedHeuristics;
           newObject_result = newObject((char*)&Payload_id, user_payload);
           add_result = payload_raw->add(payload_raw, newObject_result->result);
           Payload_t* user_payload2 = malloc(sizeof(Payload_t));   //TODO: wal, where is this freed?
-          //TODO: wal, where's the error check for the malloc?
+          //TODO: wal, should check for any malloc errors
           user_payload2->size = user_signedHeuristics->size + user_unsignedHeuristics->size + 4;
           user_payload2->signedHeuristics = user_signedHeuristics;
           user_payload2->unsignedHeuristics = user_unsignedHeuristics;

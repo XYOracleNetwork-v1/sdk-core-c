@@ -159,6 +159,8 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
       if(PH_creator->defaultSize != 0){
         element_size = PH_creator->defaultSize;
         byteBuffer = malloc(2*sizeof(char) + (element_size*sizeof(char)));
+        //TODO: wal, should check for any malloc errors
+
         memcpy(byteBuffer, &id, 2);
         memcpy(byteBuffer+2, user_PH->hash, 2*sizeof(char) + (element_size*sizeof(char)));
       }
@@ -169,6 +171,8 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
           case 1:
             element_size = casted_PH[0];
             byteBuffer = malloc(2*sizeof(char) + (element_size*sizeof(char)));
+            //TODO: wal, should check for any malloc errors
+
             memcpy(byteBuffer, &id, 2);
             memcpy(byteBuffer+2, user_PH->hash, 2*sizeof(char) + (element_size*sizeof(char)));
             break;
@@ -178,6 +182,8 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
             uint16_t encodedSize16 = element_size;
             int mallocNumber = 2*sizeof(char) + (element_size*sizeof(char));
             byteBuffer = malloc(mallocNumber);
+            //TODO: wal, should check for any malloc errors
+
             if(littleEndian()){
                encodedSize16 = to_uint16((char*)&element_size);
             }
@@ -191,6 +197,8 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
             element_size = to_uint32(&casted_PH[0]);
             uint32_t encodedSize32 = element_size;
             byteBuffer = malloc(2*sizeof(char) + (element_size*sizeof(char)));
+            //TODO: wal, should check for any malloc errors
+
             if(littleEndian()){
                encodedSize32 = to_uint32((char*)&element_size);
             }

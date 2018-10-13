@@ -42,9 +42,9 @@ typedef struct OriginChainState OriginChainState;
  
 struct OriginChainState {
   XYResult_t* (*newOriginBlock)(OriginChainState* self_OriginChainState, ByteArray_t* newHash);
-  XYResult_t* (*addSigner)(OriginChainState* self_OriginChainState, Signer* newSigner);
-  Signer* currentSigner;
-  Signer* nextSigner;
+  XYResult_t* (*addSigner)(OriginChainState* self_OriginChainState, Signer_t* newSigner);
+  Signer_t* currentSigner;
+  Signer_t* nextSigner;
   ByteArray_t* latestHash;
   uint32_t index;
 };
@@ -55,7 +55,7 @@ struct OriginChainState {
  */
 
 XYResult_t* newOriginBlock(OriginChainState* self_OriginChainState, ByteArray_t* originBlockHash);
-XYResult_t* addSigner(OriginChainState* self_OriginChainState, Signer* user_Signer);
+XYResult_t* addSigner(OriginChainState* self_OriginChainState, Signer_t* user_Signer);
 
 #endif
 

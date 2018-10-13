@@ -189,7 +189,7 @@ XYResult_t* Heuristic_Text_Creator_create(char id[2], void* text){
 *     newObject(id, payload_bytes)      [out]     XYResult_t*   
 *
 *  NOTES
-*
+*     //TODO: wal, should return any malloc errors if malloc fails
 *----------------------------------------------------------------------------
 */
 XYResult_t* Heuristic_Text_Creator_fromBytes(char* heuristic_data){
@@ -198,6 +198,8 @@ XYResult_t* Heuristic_Text_Creator_fromBytes(char* heuristic_data){
   memcpy(id, heuristic_data, 2);
   uint16_t size = to_uint16(&heuristic_data[2]);
   char* payload_bytes = malloc(size*sizeof(char));
+  //TODO: wal, should check for any malloc errors
+  
   memcpy(payload_bytes, &heuristic_data[2], size);
   
   return newObject(id, payload_bytes);
@@ -290,7 +292,7 @@ XYResult_t* ECDSA_secp256k1Uncompressed_creator_create(char id[2], void* text){
 *     newObject(id, key)    [out]     XYResult_t*   
 *
 *  NOTES
-*
+*     //TODO: wal, should return any malloc errors if malloc fails
 *----------------------------------------------------------------------------
 */
 XYResult_t* ECDSA_secp256k1Uncompressed_creator_fromBytes(char* key_data){
@@ -298,6 +300,8 @@ XYResult_t* ECDSA_secp256k1Uncompressed_creator_fromBytes(char* key_data){
   char id[2];
   memcpy(id, key_data, 2);
   ECDSA_secp256k1_uncompressed_t* key = malloc(sizeof(ECDSA_secp256k1_uncompressed_t));
+  //TODO: wal, should check for any malloc errors
+  
   memcpy(key->point_x, &key_data[2], 32*sizeof(char));
   memcpy(key->point_y, &key_data[2+32], 32*sizeof(char));
   
@@ -386,7 +390,7 @@ XYResult_t* ECDSA_secp256k1Sig_creator_create(char id[2], void* text){
 *     newObject(id, return_signature)   [out]     XYResult_t*   
 *
 *  NOTES
-*
+*     //TODO: wal, should return any malloc errors if malloc fails
 *----------------------------------------------------------------------------
 */
 XYResult_t* ECDSA_secp256k1Sig_creator_fromBytes(char* heuristic_data){
@@ -395,8 +399,12 @@ XYResult_t* ECDSA_secp256k1Sig_creator_fromBytes(char* heuristic_data){
   memcpy(id, heuristic_data, 2);
   uint8_t size = heuristic_data[3];
   char* payload_bytes = malloc(size-(1*sizeof(char)));
+  //TODO: wal, should check for any malloc errors
+  
   memcpy(payload_bytes, &heuristic_data[2], size);
   secp256k1Signature_t* return_signature = malloc(sizeof(secp256k1Signature_t));
+  //TODO: wal, should check for any malloc errors
+  
   return_signature->size = size;
   return_signature->signature = payload_bytes;
   

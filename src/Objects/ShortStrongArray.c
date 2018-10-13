@@ -199,12 +199,16 @@ XYResult_t* ShortStrongArray_get(ShortStrongArray_t* self_ShortStrongArray, int 
         }
         
         char* element_size = malloc(element_creator->sizeIdentifierSize);
+        //TODO: wal, should check for any malloc errors
+
         memcpy(element_size, &array_elements[array_offset], element_creator->sizeIdentifierSize);
         uint16_t int_size = to_uint16(element_size);
         free(element_size);
         
         if(i == index){
           char* return_object_payload = malloc(int_size);
+          //TODO: wal, should check for any malloc errors
+
           memcpy(return_object_payload, &array_elements[array_offset], int_size);
           XYResult_t* return_result = newObject(self_ShortStrongArray->id, return_object_payload);
           return return_result;

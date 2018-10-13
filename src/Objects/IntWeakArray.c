@@ -246,6 +246,8 @@ XYResult_t* IntWeakArray_creator_create(char id[2], void* user_data){
                               // consider allowing someone to create array with one object
   
   IntWeakArray_t* IntWeakArrayObject = malloc(sizeof(IntWeakArray_t));
+  //TODO: wal, should check for any malloc errors
+
   char IntWeakArrayID[2] = {0x01, 0x06};
   XYResult_t* newObject_result = newObject(IntWeakArrayID, IntWeakArrayObject);
   

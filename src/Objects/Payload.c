@@ -59,6 +59,7 @@ XYResult_t* Payload_creator_create(char id[2], void* payload_data){
 XYResult_t* Payload_creator_fromBytes(char* payload_data){
   
   Payload_t* return_payload = malloc(sizeof(Payload_t));
+  //TODO: wal, should check for any malloc errors
 
   char IntWeakArrayID[2] = {0x01, 0x06};
   XYResult_t* lookup_result = tableLookup(IntWeakArrayID);
@@ -160,6 +161,8 @@ XYResult_t* Payload_creator_toBytes(XYObject_t* user_XYObject){
   }
 
   char* return_buffer = malloc(sizeof(char)*size);
+  //TODO: wal, should check for any malloc errors
+
   uint32_t encoded_size = size1 + size2 + (4*sizeof(char));
   if(littleEndian()){
     encoded_size = to_uint32((char*)&encoded_size);
@@ -179,6 +182,8 @@ XYResult_t* Payload_creator_toBytes(XYObject_t* user_XYObject){
   free(lookup_result);
   */
   XYResult_t* return_result = malloc(sizeof(XYResult_t));
+  //TODO: wal, should check for any malloc errors
+
   return_result->error = OK;
   return_result->result = return_buffer;
   

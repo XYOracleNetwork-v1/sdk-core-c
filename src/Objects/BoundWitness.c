@@ -29,7 +29,7 @@
 *      as parameters
 *
 *  PARAMETERS
-*     *user_BoundWitness                    [in]       void* (BoundWitness*)(BoundWitnessTransfer*)
+*     *user_BoundWitness    [in]       void* (BoundWitness*)(BoundWitnessTransfer*)
 *
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* with a byteBuffer as the result.
@@ -144,7 +144,7 @@ XYResult_t* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider_t
   
   ByteArray_t* signingData = signingData_result->result;
   
-  return user_HashProvider->hash(signingData);
+  return user_HashProvider->createHash(signingData);
 }
 
 /*----------------------------------------------------------------------------*
@@ -268,10 +268,12 @@ XYResult_t* BoundWitnessTransfer_toBytes(XYObject_t* user_XYObject){
 *     *user_BoundWitness                    [in]       BoundWitness*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYResult* of the BoundWitnessTransfer type.
+*      XYResult*      [out]      bool   Returns XYResult* of the BoundWitnessTransfer type.
 *----------------------------------------------------------------------------*/
 XYResult_t* BoundWitnessTransfer_fromBytes(char* user_Transfer){
   BoundWitnessTransfer* return_BoundWitness = malloc(sizeof(BoundWitnessTransfer));
+  //TODO: wal, should check for any malloc errors
+
   uint32_t BoundWitnessSize = to_uint32((char*)&user_Transfer);
   if(littleEndian()){
     BoundWitnessSize = to_uint32((char*)&BoundWitnessSize);
@@ -478,6 +480,8 @@ XYResult_t* BoundWitness_creator_create(char id[2], void* user_data){
 XYResult_t* BoundWitness_creator_fromBytes(char* data){
   
   BoundWitness* return_BoundWitness = malloc(sizeof(BoundWitness));
+  //TODO: wal, should check for any malloc errors
+  
   uint32_t BoundWitnessSize = to_uint32(data);
   return_BoundWitness->size = BoundWitnessSize;
   ShortStrongArray_t* publicKeysPtr;
@@ -581,10 +585,11 @@ XYResult_t* BoundWitness_creator_toBytes(struct XYObject* user_XYObject){
   BoundWitness* user_BoundWitness = user_XYObject->payload;
   XYResult_t* lookup_result = tableLookup((char*)&ShortStrongArray_id);
   ObjectProvider_t* SSA_Creator = lookup_result->result;
- //free(lookup_result);
+  //free(lookup_result);
   lookup_result = tableLookup((char*)&IntStrongArray_id);
   ObjectProvider_t* ISA_Creator = lookup_result->result;
   char* byteBuffer = malloc(user_BoundWitness->size*sizeof(char));
+  //TODO: wal, should check for any malloc errors
   
   if(littleEndian()){
     uint32_t encodedSize = to_uint32((char*)&user_BoundWitness->size);

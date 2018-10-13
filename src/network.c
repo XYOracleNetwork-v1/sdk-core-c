@@ -33,13 +33,14 @@
  *      proactiveNetworkProvider      [out]     proactiveNetworkProvider_t*
  *
  *  NOTES
- *      
+ *      returns a malloc error if malloc fails
  ****************************************************************************************
  */
 proactiveNetworkProvider_t* newProactiveNetworkProvider(){
   
   proactiveNetworkProvider_t* proactiveNetworkProvider = malloc(sizeof(proactiveNetworkProvider_t));
-  
+  //TODO: wal, should check for any malloc errors
+
   proactiveNetworkProvider->requestConnection = NULL;
   proactiveNetworkProvider->sendData = NULL;
   proactiveNetworkProvider->disconnect = NULL;
@@ -62,12 +63,13 @@ proactiveNetworkProvider_t* newProactiveNetworkProvider(){
  *      reactiveNetworkProvider      [out]     reactiveNetworkProvider_t*
  *
  *  NOTES
- *      
+ *      returns a malloc error if malloc fails
  ****************************************************************************************
  */
 reactiveNetworkProvider_t* newReactiveNetworkProvider(){
   
   reactiveNetworkProvider_t* reactiveNetworkProvider = malloc(sizeof(proactiveNetworkProvider_t));
+  //TODO: wal, should check for any malloc errors
   
   reactiveNetworkProvider->listen = NULL;
   reactiveNetworkProvider->disconnect = NULL;

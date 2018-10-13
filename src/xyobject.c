@@ -97,7 +97,7 @@ void* getPayload(XYObject_t* xyobject){
  */
 XYResult_t* newObject(char id[2], void* payload){
   
-  XYObject_t* new_object = malloc(sizeof(XYObject_t));
+  XYObject_t* new_object = malloc(sizeof(XYObject_t));   // wal, confirm these are released.
   
   if(new_object != NULL){
     if(payload != 0){
@@ -109,7 +109,7 @@ XYResult_t* newObject(char id[2], void* payload){
     strncpy(new_object->id, id, 2);
     new_object->GetXyobjectId = &getXyobjectId;
     new_object->GetPayload = &getPayload;
-    XYResult_t* return_result = malloc(sizeof(XYResult_t));
+    XYResult_t* return_result = malloc(sizeof(XYResult_t));   // wal, confirm these are released.
     if(return_result){
       return_result->error = OK;
       return_result->result = new_object;
@@ -600,7 +600,7 @@ void ArrayIteratorNext(){
  ****************************************************************************************
  */
 XYResult_t* tableLookup(char id[2]){
-  
+
   void* tableValue = typeTable[id[0]][id[1]];
   
   XYResult_t* return_result = malloc(sizeof(XYResult_t));

@@ -37,14 +37,14 @@
  *      store     [out]     StorageProvider*
  *
  *  NOTES
- *      will return NULL if there is insufficient memory to create a storage provider
+ *      will return a malloc error if there is insufficient memory to create a storage provider
  ****************************************************************************************
  */
  StorageProvider* newStorageProvider(){
   
   StorageProvider* store = malloc(sizeof(struct StorageProvider));
-   
-  //TODO: wal, where's the malloc test?
+  //TODO: wal, should check for any malloc errors
+
   store->write = NULL;
   store->read = NULL;
   store->GetAllKeys = NULL;

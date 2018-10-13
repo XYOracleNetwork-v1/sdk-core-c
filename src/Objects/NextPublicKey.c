@@ -163,6 +163,8 @@ XYResult_t* NextPublicKey_creator_toBytes(XYObject_t* user_XYObject){
       if(NPK_creator->defaultSize != 0){
         element_size = NPK_creator->defaultSize;
         byteBuffer = malloc(2*sizeof(char) + (element_size*sizeof(char)));
+        //TODO: wal, should check for any malloc errors
+
         memcpy(byteBuffer, &id, 2);
         memcpy(byteBuffer+2, user_NPK->publicKey, (element_size*sizeof(char)));
       }
@@ -173,6 +175,8 @@ XYResult_t* NextPublicKey_creator_toBytes(XYObject_t* user_XYObject){
           case 1:
             element_size = casted_NPK[0];
             byteBuffer = malloc(2*sizeof(char) + (element_size*sizeof(char)));
+            //TODO: wal, should check for any malloc errors
+
             memcpy(byteBuffer, &id, 2);
             memcpy(byteBuffer+2, user_NPK->publicKey, 2*sizeof(char) + (element_size*sizeof(char)));
             break;
@@ -181,9 +185,12 @@ XYResult_t* NextPublicKey_creator_toBytes(XYObject_t* user_XYObject){
             element_size = to_uint16(&casted_NPK[0]);
             uint16_t encodedSize16 = element_size;
             byteBuffer = malloc(2*sizeof(char) + (element_size*sizeof(char)));
+            //TODO: wal, should check for any malloc errors
+
             if(littleEndian()){
                encodedSize16 = to_uint16((char*)&element_size);
             }
+            
             memcpy(byteBuffer, &id, 2);
             memcpy(byteBuffer+(2*sizeof(char)), &encodedSize16, 2);
             memcpy(byteBuffer+(4*sizeof(char)), user_NPK->publicKey+2, (element_size-(sizeof(char)*2)));
@@ -193,9 +200,12 @@ XYResult_t* NextPublicKey_creator_toBytes(XYObject_t* user_XYObject){
             element_size = to_uint32(&casted_NPK[0]);
             uint32_t encodedSize32 = element_size;
             byteBuffer = malloc(2*sizeof(char) + (element_size*sizeof(char)));
+            //TODO: wal, should check for any malloc errors
+
             if(littleEndian()){
                encodedSize32 = to_uint32((char*)&element_size);
             }
+            
             memcpy(byteBuffer, &id, 2);
             memcpy(byteBuffer+(2*sizeof(char)), &encodedSize32, 4);
             memcpy(byteBuffer+(6*sizeof(char)), user_NPK->publicKey+4, (element_size-(sizeof(char)*4)));
