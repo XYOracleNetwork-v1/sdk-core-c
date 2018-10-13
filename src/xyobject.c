@@ -190,6 +190,22 @@ XYResult* initTable(void){
     return preallocated_result;
   }
 
+  // Initialize Signature Set Creator
+  struct ObjectProvider* SS_creator = malloc(sizeof(ObjectProvider));
+  if(SS_creator != NULL){
+    SS_creator->sizeIdentifierSize = 2;
+    SS_creator->defaultSize = 0;
+    SS_creator->create = &ShortWeakArray_creator_create;
+    SS_creator->fromBytes = &ShortWeakArray_creator_fromBytes;
+    SS_creator->toBytes = &ShortWeakArray_creator_toBytes;
+    typeTable[MAJOR_CORE][MINOR_SIGNATURE_SET] = SS_creator;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
   // Initialize Payload Creator
   struct ObjectProvider* Payload_creator = malloc(sizeof(ObjectProvider));
   if(Payload_creator != NULL){
@@ -275,9 +291,9 @@ XYResult* initTable(void){
   if(SHA256_creator != NULL){
     SHA256_creator->sizeIdentifierSize = 0;
     SHA256_creator->defaultSize = 32;
-    SHA256_creator->create = NULL;
-    SHA256_creator->fromBytes = NULL;
-    SHA256_creator->toBytes = NULL;
+    SHA256_creator->create = Heuristic_sha256_Creator_create;
+    SHA256_creator->fromBytes = Heuristic_sha256_Creator_fromBytes;
+    SHA256_creator->toBytes = Heuristic_sha256_Creator_toBytes;
     typeTable[MAJOR_HASH][MINOR_SHA256] = SHA256_creator;
   }
   else {
@@ -305,7 +321,7 @@ XYResult* initTable(void){
   // Initialize SECP256k1 Signature type
   struct ObjectProvider* secp256k1sig_creator = malloc(sizeof(ObjectProvider));
   if(secp256k1sig_creator != NULL){
-    secp256k1sig_creator->sizeIdentifierSize = 1;
+    secp256k1sig_creator->sizeIdentifierSize = 0;
     secp256k1sig_creator->defaultSize = 0;
     secp256k1sig_creator->create = NULL;
     secp256k1sig_creator->fromBytes = NULL;

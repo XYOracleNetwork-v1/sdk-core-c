@@ -196,7 +196,6 @@ int main(){
           if(newObject_result->error != OK){
             return newObject_result->error;
           }
-          //breakpoint();
           add_result = signatures_raw->add(signatures_raw, newObject_result->result);
           if(add_result->error != OK){
             return add_result->error;
@@ -211,7 +210,6 @@ int main(){
             char* theBytes = toBytes_result->result;
             XYResult* GetSigningData_result = BoundWitness_raw->getSigningData(BoundWitness_raw);
             char* signingBytes = GetSigningData_result->result;
-            breakpoint();
             printf("End Test <3");
           }
         } else {

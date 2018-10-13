@@ -42,7 +42,8 @@ XYResult* initRelayNode(RelayNode* self, OriginChainProvider* repository, HashPr
   NodeBase* baseNode;
   initNode(&baseNode, repository, hashingProvider, heuristicCount);
   self->node = baseNode;
-  self->getChoice = Relay_getChoice;
+  self->node->getChoice = Relay_getChoice;
+  //self->getChoice = Relay_getChoice;
   self->doConnection = doConnection;
   XYResult* return_result = malloc(sizeof(XYResult));
   if(return_result){
@@ -72,25 +73,12 @@ XYResult* initRelayNode(RelayNode* self, OriginChainProvider* repository, HashPr
  *
  ****************************************************************************************
  */
- uint8_t Relay_getChoice(ProcedureCatalogue* ourCatalog, uint8_t theirCatalog){
-   ByteArray* localByteArray = malloc(sizeof(ByteArray));
-   localByteArray->size = 1;
-   localByteArray->payload = malloc(sizeof(char));
-   *localByteArray->payload = GIVE_ORIGIN_CHAIN_OPTION;
-   if((theirCatalog & GIVE_ORIGIN_CHAIN_OPTION) && ourCatalog->canDo(localByteArray)){
-     free(localByteArray->payload);
-     free(localByteArray);
-     return TAKE_ORIGIN_CHAIN_OPTION;
+ uint8_t Relay_getChoice(uint8_t* theirCatalog){
+   if(*theirCatalog & BOUND_WITNESS_OPTION){
+     return BOUND_WITNESS_OPTION;
+   } else {
+     return -1;
    }
-   *localByteArray->payload = TAKE_ORIGIN_CHAIN_OPTION;
-   if ((theirCatalog & TAKE_ORIGIN_CHAIN_OPTION) && ourCatalog->canDo(localByteArray)){
-     free(localByteArray->payload);
-     free(localByteArray);
-     return GIVE_ORIGIN_CHAIN_OPTION;
-   }
-   free(localByteArray->payload);
-   free(localByteArray);
-   return BOUND_WITNESS_OPTION;
 }
 
 /**

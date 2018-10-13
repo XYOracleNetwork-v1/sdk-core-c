@@ -57,6 +57,11 @@ XYResult* Payload_creator_create(char id[2], void* user_data);
 XYResult* Payload_creator_fromBytes(char* payload_data);
 XYResult* Payload_creator_toBytes(struct XYObject* user_XYObject);
 
+XYResult* Heuristic_sha256_Creator_create(char id[2], void* sha256);
+XYResult* Heuristic_sha256_Creator_fromBytes(char* heuristic_data);
+XYResult* Heuristic_sha256_Creator_toBytes(struct XYObject* user_XYObject);
+
+
 XYResult* ByteStrongArray_creator_create(char id[2], void* user_data);
 XYResult* ByteStrongArray_creator_fromBytes(char* data);
 XYResult* ByteStrongArray_creator_toBytes(struct XYObject* user_XYObject);

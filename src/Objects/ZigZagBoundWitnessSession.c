@@ -21,7 +21,7 @@
 
 /*----------------------------------------------------------------------------*
 *  NAME
-*      incomingData
+*      completeBoundWitness
 *
 *  DESCRIPTION
 *     Adds data to the bound witness and returns whats the party should send back.
@@ -35,8 +35,8 @@
 *----------------------------------------------------------------------------*/
 XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray* boundWitnessData){
   // Here we infer if the userSession bound witness is already completed or not.
-  if(userSession->boundWitness->dynamicPublicKeys->size == userSession->boundWitness->dynamicSignatures->size && userSession->boundWitness->dynamicPublicKeys->size != 0){
-    RETURN_ERROR(ERR_INTERNAL_ERROR);
+  if(userSession->boundWitness->dynamicPublicKeys->size == userSession->boundWitness->dynamicSignatures->size && userSession->boundWitness->dynamicPublicKeys->size != 4){
+      RETURN_ERROR(ERR_INTERNAL_ERROR);
   }
 
   BoundWitnessTransfer* boundWitness = NULL;
@@ -50,7 +50,8 @@ XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray
       boundWitness = fromBytes_result->result;
       free(fromBytes_result);
   }
-  XYResult* incomingData_result = userSession->boundWitness->incomingData(userSession->boundWitness, boundWitness, userSession->cycles && boundWitnessData != NULL);
+  XYResult* incomingData_result = userSession->boundWitness->incomingData(userSession->boundWitness, boundWitness, boundWitnessData != NULL);
+
   if(incomingData_result->error != OK){
     return incomingData_result;
   }
@@ -58,11 +59,12 @@ XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray
   if(returnData == NULL) {
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
-  returnData->size = to_uint32((char*)&incomingData_result->result);
+  returnData->size = to_uint32((unsigned char*)incomingData_result->result);
+  /*
   if(littleEndian()){
     returnData->size = to_uint32((char*)&returnData->size);
   }
-
+  */
   if(userSession->cycles && boundWitnessData == NULL){
     /*
      * CATALOG_SIZE + 5 because the first bytes of a packet should be fixed length 5.
@@ -77,10 +79,18 @@ XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray
       memcpy(returnData->payload, &userSession->choice, sizeof(char)*(CATALOG_SIZE + 5));
       memcpy(returnData->payload, incomingData_result->result, returnData->size);
       returnData->size += CATALOG_SIZE+5;
+
       return userSession->NetworkPipe->send((void*)userSession, returnData, receiverCallback);
     } else { RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
   } else {
-    return userSession->NetworkPipe->send(userSession, returnData, receiverCallback);
+    returnData->payload = malloc(sizeof(char) * returnData->size);
+    if(returnData->payload){
+      uint32_t nates_int = ((char*)incomingData_result->result)[3];
+      char* dat = ((char*)incomingData_result->result);
+      uint32_t take2 = to_uint32((unsigned char*)dat);
+      memcpy(returnData->payload, incomingData_result->result, take2);
+      return userSession->NetworkPipe->send((void*)userSession, returnData, receiverCallback);
+    } else { RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
   }
 }
 

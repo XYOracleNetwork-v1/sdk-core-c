@@ -69,10 +69,11 @@ XYResult* getPublicKey(Signer* signer){
 
   XYResult* return_result = malloc(sizeof(XYResult));
 
-  if(return_result->error != OK) return return_result;
-
+  if(return_result == NULL) return NULL;
   return_result->error = OK;
-  return_result->result = signer->publicKey;
+  XYResult* newObject_result = newObject((char*)ECDSASecp256k1_id, signer->publicKey->payload);
+  if(newObject_result->error != OK){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
+  return_result->result = newObject_result->result;
 
   return return_result;
 }
@@ -125,19 +126,22 @@ XYResult* sign(Signer* signer, ByteArray* givenArray){
   if(return_signature == NULL){
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
+  XYResult* newObject_result = newObject((char*)&SignatureSet_id, return_signature);
+  XYObject* return_object = newObject_result->result;
 
-  XYObject* return_object = malloc(sizeof(XYObject));
-  if(return_object == NULL){
-    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-  }
 
-  return_object->id[0] = SignatureSet_id[0];
-  return_object->id[1] = SignatureSet_id[1];
+  XYResult* result_result = lookup((char*)&SignatureSet_id);
+  ObjectProvider* arrayCreator = result_result->result;
+  XYResult* create_result = arrayCreator->create((char*)&SignatureSet_id, NULL);
+  ShortWeakArray* theArray = create_result->result;
+  newObject_result = newObject((char*)&ECDSASecp256k1Sig_id, return_signature);
   return_object->payload = return_signature;
-  return_signature->size = 66;
-  return_signature->signature = malloc(sizeof(char)*66);
-  return_signature->signature[0] = 0x13;
-  return_signature->signature[1] = 0x37;
+  return_signature->size = 67;
+  return_signature->signature = malloc(sizeof(char)*67);
+  memset(return_signature->signature, 0x03, 67);
+  return_signature->signature[0] = 0x05;
+  return_signature->signature[1] = 0x01;
+  return_signature->signature[2] = 65;
 
   XYResult* return_result = malloc(sizeof(XYResult));
   if(return_result){
@@ -189,11 +193,25 @@ Signer* newInstance(ByteArray* user_PrivateKey){
   }
 
   placeholder->size = 64;
-  placeholder->payload[0] = 0x13;
-  placeholder->payload[1] = 0x37;
+  memset(placeholder->payload, 0x01, 64);
+
+  ByteArray* placeholder2 = malloc(sizeof(ByteArray));
+  if(placeholder == NULL ){
+    free(signer);
+    return NULL;
+  }
+  placeholder2->payload = malloc(sizeof(char)*64);
+  if(placeholder2->payload == NULL){
+    free(signer);
+    free(placeholder2);
+    return NULL;
+  }
+
+  placeholder2->size = 64;
+  memset(placeholder2->payload, 0x01, 64);
 
   signer->publicKey = placeholder;
-  signer->privateKey = placeholder;            // Generate keypair and set these.
+  signer->privateKey = placeholder2;            // Generate keypair and set these.
   signer->getPublicKey = &getPublicKey;
   signer->sign = sign;
   signer->verify = verify_sig;

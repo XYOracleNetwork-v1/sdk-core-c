@@ -38,8 +38,18 @@
 *      XYResult*            [out]      bool   Returns XYObject* of the Payload type.
 *----------------------------------------------------------------------------*/
 XYResult* Payload_creator_create(char id[2], void* payload_data){
-  XYResult* xy_result = newObject(id, payload_data);
-  return xy_result;
+  if(payload_data == NULL){
+    Payload* user_payload = malloc(sizeof(Payload));
+    XYResult* lookup_result = lookup((char*)&IntWeakArray_id);
+    ObjectProvider* array_creator = lookup_result->result;
+    XYResult* arrayCreate_result = array_creator->create((char*)&IntWeakArray_id, NULL);
+    user_payload->signedHeuristics = ((XYObject*)arrayCreate_result->result)->payload;
+    arrayCreate_result = array_creator->create((char*)&IntWeakArray_id, NULL);
+    user_payload->unsignedHeuristics = ((XYObject*)arrayCreate_result->result)->payload;
+    user_payload->size = user_payload->signedHeuristics->size + user_payload->unsignedHeuristics->size + 4;
+    return newObject(id, user_payload);
+  }
+  return newObject(id, payload_data);
 }
 
 /*----------------------------------------------------------------------------*
@@ -125,8 +135,14 @@ XYResult* Payload_creator_toBytes(struct XYObject* user_XYObject){
   ObjectProvider* weakArrayCreator = lookup_result->result;
   IntWeakArray* signedArray = user_Payload->signedHeuristics;
   IntWeakArray* unsignedArray = user_Payload->unsignedHeuristics;
-  uint32_t size1 = signedArray->size;
-  uint32_t size2 = unsignedArray->size;
+  uint32_t size1 = 4;
+  uint32_t size2 = 4;
+  if(signedArray != NULL){
+      size1 = signedArray->size;
+  }
+  if(unsignedArray != NULL){
+    size2 = unsignedArray->size;
+  }
   XYResult* toBytes_result1 = NULL;
   XYResult* toBytes_result2 = NULL;
   /* Take the array_raw in, endian the size around, then do toBytes() */
@@ -153,7 +169,10 @@ XYResult* Payload_creator_toBytes(struct XYObject* user_XYObject){
     return newObject_result2;
   }
 
-  char* return_buffer = malloc(sizeof(char)*size);
+  //char* return_buffer = malloc(sizeof(char)*size);
+  char* return_buffer = malloc((sizeof(uint32_t))+(sizeof(char)*size1)+(sizeof(char)*size2));
+
+  /* TODO: payloadsSize is off by 4 here and I am not sure why. disconserting. */
   uint32_t encoded_size = size1 + size2 + (4*sizeof(char));
   if(littleEndian()){
     encoded_size = to_uint32((char*)&encoded_size);
@@ -163,6 +182,7 @@ XYResult* Payload_creator_toBytes(struct XYObject* user_XYObject){
   memcpy(return_buffer, &encoded_size, sizeof(uint32_t));
   memcpy(return_buffer+(sizeof(uint32_t)), signedHeuristicBytes, size1*sizeof(char));
   memcpy(return_buffer+(sizeof(uint32_t))+(sizeof(char)*size1), unsignedHeuristicBytes, size2*sizeof(char));
+
 
   // Cleanup XYResults
   /*

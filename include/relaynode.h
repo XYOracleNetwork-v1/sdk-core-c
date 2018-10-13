@@ -46,7 +46,7 @@ XYResult* initRelayNode(RelayNode* self, OriginChainProvider* repository, HashPr
     */
 
 
-uint8_t Relay_getChoice(ProcedureCatalogue* ourCatalog, uint8_t theirCatalog);
+uint8_t Relay_getChoice(uint8_t* theirCatalog);
 void doConnection(RelayNode* self);
 //extern NetworkPipe* findSomeoneToTalkTo( void );
 

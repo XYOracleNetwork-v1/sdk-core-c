@@ -68,6 +68,7 @@ struct NetworkPipe{
   NetworkPeer* peer;
   NetworkProvider* provider;
   ByteArray* initializationData;
+  ByteArray* catalogBuffer;
   XYResult* (*send)(void* self, ByteArray* data, XYResult* (*callback)(void* self, ByteArray* data));
   XYResult* (*close)();
 };

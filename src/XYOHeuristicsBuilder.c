@@ -40,11 +40,11 @@ void breakpoint(void){};
 *  RETURNS
 *      found          [out]      uintxx   returns unsigned integer representing the data given
 *----------------------------------------------------------------------------*/       // Just a sample doc template.
- uint32_t to_uint32(char* data) {
+ uint32_t to_uint32(unsigned char* data) {
    return 16777216U*data[0] + 65536U*data[1] + 256U*data[2] + data[3];
  }
 
- uint16_t to_uint16(char* data) {
+ uint16_t to_uint16(unsigned char* data) {
    return 256U*data[0] + data[1];
  }
 
@@ -193,7 +193,7 @@ XYResult* ECDSA_secp256k1Sig_creator_fromBytes(char* heuristic_data){
 
 XYResult* ECDSA_secp256k1Sig_creator_toBytes(struct XYObject* user_XYObject){
   secp256k1Signature* raw_signature = user_XYObject->payload;
-  char* encoded_bytes = malloc(raw_signature->size);
+  char* encoded_bytes = malloc(sizeof(char)*raw_signature->size);
 
   if(encoded_bytes == NULL){
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
@@ -211,5 +211,31 @@ XYResult* ECDSA_secp256k1Sig_creator_toBytes(struct XYObject* user_XYObject){
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_result->result = NULL;
     return preallocated_result;
+  }
+}
+
+XYResult* Heuristic_sha256_Creator_create(char id[2], void* sha256){
+  return newObject(id, sha256);
+}
+
+XYResult* Heuristic_sha256_Creator_fromBytes(char* heuristic_data){
+  char id[2];
+  memcpy(id, heuristic_data, 2);
+  char* hash = malloc(sizeof(char)*32);
+  memcpy(hash, heuristic_data+2, 32);
+  return newObject(id, &hash);
+}
+
+XYResult* Heuristic_sha256_Creator_toBytes(struct XYObject* user_XYObject){
+  XYResult* return_result = malloc(sizeof(XYResult));
+  if(return_result){
+    char* return_buffer = malloc(sizeof(char)*34);
+    memcpy(return_buffer, ((PreviousHash*)user_XYObject->payload)->id, 2);
+    memcpy(return_buffer, ((PreviousHash*)user_XYObject->payload)->hash, 32);
+    return_result->error = OK;
+    return_result->result = return_buffer;
+    return return_result;
+  } else {
+    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
 }

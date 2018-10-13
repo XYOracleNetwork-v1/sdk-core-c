@@ -351,7 +351,9 @@ XYResult* IntWeakArray_creator_toBytes(struct XYObject* user_XYObject){
         user_array->size = to_uint32((char*)(uintptr_t)&user_array->size);
       }
       memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 4);
-      memcpy(byteBuffer+4, user_array->payload, sizeof(char)*(totalSize-4));
+      if(totalSize > 4){
+        memcpy(byteBuffer+4, user_array->payload, sizeof(char)*(totalSize-4));
+      }
       if(littleEndian()){
         user_array->size = to_uint32((char*)(uintptr_t)&user_array->size);
       }

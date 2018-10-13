@@ -297,10 +297,8 @@ XYResult* ShortWeakArray_creator_create(char id[2], void* user_data){
 *      XYResult*            [out]      bool   Returns XYResult* of the ShortWeakArray type.
 *----------------------------------------------------------------------------*/
 XYResult* ShortWeakArray_creator_fromBytes(char* data){
-
-  XYResult* return_result = malloc(sizeof(XYResult));
   ShortWeakArray* return_array = malloc(sizeof(ShortWeakArray));
-  if(return_result && return_array){
+  if(return_array){
       return_array->add = &ShortWeakArray_add;
       return_array->remove = NULL;
       return_array->get = &ShortWeakArray_get;
@@ -308,19 +306,19 @@ XYResult* ShortWeakArray_creator_fromBytes(char* data){
       return_array->payload = malloc(sizeof(char)*(return_array->size-2));
       if(return_array->payload != NULL){
         memcpy(return_array->payload, &data[2], (return_array->size-2));
-        return_result->error = OK;
-        return_result->result = return_array;
-        return return_result;
+        if(data[0] == 0x02 && data[1] == 0x02){
+          return newObject((char*)&KeySet_id, return_array);
+        } else {
+          return newObject((char*)&ShortWeakArray_id, return_array);
+        }
       }
       else
       {
-        if(return_result){ free(return_result); }
         if(return_array){ free(return_array); }
         RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
       }
   }
   else{
-    if(return_result){ free(return_result); }
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
 }
@@ -340,7 +338,7 @@ XYResult* ShortWeakArray_creator_fromBytes(char* data){
 *      XYResult*            [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
 XYResult* ShortWeakArray_creator_toBytes(struct XYObject* user_XYObject){
-  if(user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x05){
+  if((user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x05) || (user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x02)){
     ShortWeakArray* user_array = user_XYObject->GetPayload(user_XYObject);
     uint16_t totalSize = user_array->size;
     char* byteBuffer = malloc(sizeof(char)*totalSize);
@@ -358,7 +356,8 @@ XYResult* ShortWeakArray_creator_toBytes(struct XYObject* user_XYObject){
       }
 
       memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 2);
-      memcpy(byteBuffer+2, user_array->payload, sizeof(char)*(totalSize-2));
+      if((totalSize-2)>=0)
+        memcpy(byteBuffer+2, user_array->payload, sizeof(char)*(totalSize-2));
       if(littleEndian()){
         user_array->size = to_uint16((char*)(uintptr_t)&user_array->size);
       }

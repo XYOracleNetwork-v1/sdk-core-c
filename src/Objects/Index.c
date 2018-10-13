@@ -58,8 +58,10 @@ XYResult* Index_creator_create(char id[2], void* user_data){
 XYResult* Index_creator_fromBytes(char* index_data){
   char id[2];
   memcpy(id, index_data, 2);
-  int index = to_uint32(&index_data[2]);
-  return newObject(id, &index);
+  uint32_t* index = malloc(sizeof(uint32_t));
+  uint32_t indexref = to_uint32(&index_data[2]);
+  memcpy(index, &indexref, 4);
+  return newObject(id, index);
 }
 
 /*----------------------------------------------------------------------------*

@@ -118,8 +118,13 @@ void onBoundWitnessEndFailure(enum EXyoErrors error);
 void onBoundWitnessStart( void );
 XYResult* makePayload(NodeBase* self, uint bitFlag);
 
-extern uint8_t (*getChoice)(uint8_t catalog);
-ProcedureCatalogue* procedureCatalogue;
+//extern uint8_t (*getChoice)(uint8_t catalog);
+XYObject* getSignedHash();
+XYObject* getUnSignedHash();
+XYObject* getSignedIndex();
+XYObject* getUnSignedIndex();
+
+//ProcedureCatalogue* procedureCatalogue;
 
 #define NODEBASE_H
 #endif

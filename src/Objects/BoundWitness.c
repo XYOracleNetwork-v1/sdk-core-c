@@ -37,8 +37,8 @@
 *----------------------------------------------------------------------------*/
 XYResult* BoundWitness_getSigningData(void* user_BoundWitness){
   uint32_t publicKeysSize = ((BoundWitness*)user_BoundWitness)->publicKeys->size;
-  uint32_t firstHeuristicsSize;
-  uint32_t secondHeuristicsSize;
+  uint32_t firstHeuristicsSize = 0;
+  uint32_t secondHeuristicsSize = 0;
 
   /* Get Size of keysets + payloads first */
   IntStrongArray* user_payloadsArray = ((BoundWitness*)user_BoundWitness)->payloads;
@@ -46,15 +46,20 @@ XYResult* BoundWitness_getSigningData(void* user_BoundWitness){
   XYObject* user_firstPayloadObject = get_result->result;
   char* user_firstPayload = user_firstPayloadObject->payload;
   free(get_result);
-  firstHeuristicsSize = to_uint32((char*)user_firstPayload+(4*sizeof(char)));
+  firstHeuristicsSize = to_uint32((unsigned char*)user_firstPayload+(4*sizeof(char)));
 
   get_result = user_payloadsArray->get(user_payloadsArray, 1);
-  XYObject* user_secondPayloadObject = get_result->result;
-  char* user_secondPayload = user_secondPayloadObject->payload;
-  free(get_result);
-  secondHeuristicsSize = to_uint32((char*)user_secondPayload+(4*sizeof(char)));
+  XYObject* user_secondPayloadObject = NULL;
+  char* user_secondPayload = NULL;
+  if(get_result->error == OK){
+    user_secondPayloadObject = get_result->result;
+    char* user_secondPayload = user_firstPayloadObject->payload;
+    free(get_result);
+    secondHeuristicsSize = to_uint32((unsigned char*)user_secondPayload+(4*sizeof(char)));
+  }
 
-  uint32_t totalSize = publicKeysSize+firstHeuristicsSize+secondHeuristicsSize+4;
+
+  uint32_t totalSize = publicKeysSize+firstHeuristicsSize+secondHeuristicsSize+4+1;
 
   char* byteBuffer = malloc(sizeof(char)*totalSize);
 
@@ -65,7 +70,6 @@ XYResult* BoundWitness_getSigningData(void* user_BoundWitness){
 
   if(byteBuffer){
     // Copy Public Keys in.
-
     XYResult* newObject_result = newObject((char*)&ShortStrongArray_id, ((BoundWitness*)user_BoundWitness)->publicKeys);
     if(newObject_result->error!=OK){
       free(byteBuffer);
@@ -94,7 +98,8 @@ XYResult* BoundWitness_getSigningData(void* user_BoundWitness){
     memcpy(byteBuffer+(publicKeysSize*sizeof(char)), user_firstPayload+(4*sizeof(char)), firstHeuristicsSize*sizeof(char));
 
     // Copy signed heuristics from the second Payload into the ByteBuffer
-    memcpy(byteBuffer+(publicKeysSize+firstHeuristicsSize*sizeof(char)), user_secondPayload+(4*sizeof(char)), secondHeuristicsSize*sizeof(char));
+    if(user_secondPayload != NULL)
+      memcpy(byteBuffer+(publicKeysSize+firstHeuristicsSize*sizeof(char)), user_secondPayload+(4*sizeof(char)), secondHeuristicsSize*sizeof(char));
 
     ByteArray* return_bytes = malloc(sizeof(ByteArray));
     XYResult* return_result = malloc(sizeof(XYResult));
@@ -155,7 +160,7 @@ XYResult* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider* us
 *----------------------------------------------------------------------------*/
 XYResult* BoundWitnessTransfer_toBytes(XYObject* user_XYObject){
   BoundWitnessTransfer* user_BoundWitness = user_XYObject->payload;
-  uint32_t totalSize = 4;
+  uint32_t totalSize = 5;
   uint32_t publicKeysSize = 0;
   uint32_t payloadsSize = 0;
   uint32_t signaturesSize = 0;
@@ -190,19 +195,21 @@ XYResult* BoundWitnessTransfer_toBytes(XYObject* user_XYObject){
     publicKeysBytes_result = ShortStrongArray_creator->toBytes(newObject_result->result);
     free(newObject_result->result);
     free(newObject_result);
-  } else if(user_BoundWitness->payloads) {
-    totalSize += user_BoundWitness->payloads->size;
-    payloadsSize = user_BoundWitness->payloads->size;
-    newObject_result = newObject((char*)&IntStrongArray_id, user_BoundWitness->payloads);
+  }
+  if(user_BoundWitness->payloads) {
+    totalSize += user_BoundWitness->payloads->size-4-4-6;
+    payloadsSize = user_BoundWitness->payloads->size-4;
+    newObject_result = newObject((char*)&Payload_id, user_BoundWitness->payloads);
     if(newObject_result->error!=OK){
       return newObject_result;
     }
     payloadsBytes_result = IntStrongArray_creator->toBytes(newObject_result->result);
     free(newObject_result->result);
     free(newObject_result);
-  } else if(user_BoundWitness->signatures) {
-    totalSize += user_BoundWitness->signatures->size;
-    signaturesSize = user_BoundWitness->signatures->size;
+  }
+  if(user_BoundWitness->signatures) {
+    totalSize += user_BoundWitness->signatures->size-4;
+    signaturesSize = user_BoundWitness->signatures->size-4;
     newObject_result = newObject((char*)&ShortStrongArray_id, user_BoundWitness->signatures);
     if(newObject_result->error!=OK){
       return newObject_result;
@@ -210,8 +217,6 @@ XYResult* BoundWitnessTransfer_toBytes(XYObject* user_XYObject){
     signaturesBytes_result = ShortStrongArray_creator->toBytes(newObject_result->result);
     free(newObject_result->result);
     free(newObject_result);
-  } else {
-    RETURN_ERROR(ERR_BADDATA);
   }
 
   char* return_bytes = malloc(totalSize*sizeof(char));
@@ -222,18 +227,32 @@ XYResult* BoundWitnessTransfer_toBytes(XYObject* user_XYObject){
 
   uint32_t encodedSize = totalSize;
   if(littleEndian()){
-    encodedSize = to_uint32((char*)&totalSize);
+    encodedSize = to_uint32((unsigned char*)&totalSize);
   }
   uint32_t offset = 4*sizeof(char);
   memcpy(return_bytes, &encodedSize, 4*sizeof(char));
 
+  uint8_t stage = 255;
+  if(publicKeysSize > 4 && payloadsSize > 4 && signaturesSize == 4){
+    stage = 1;
+  } else if(publicKeysSize > 4 && payloadsSize > 4 && signaturesSize > 4){
+    stage = 2;
+  } else if ( publicKeysSize == 4 && payloadsSize == 4 && signaturesSize > 4){
+    stage = 3;
+  }
+  memcpy(return_bytes+offset, &stage, 1);
+  offset = offset + 1;
+
   if(user_BoundWitness->publicKeys){
     memcpy(return_bytes+offset, publicKeysBytes_result->result, publicKeysSize);
     offset+=publicKeysSize;
-  } else if(user_BoundWitness->payloads) {
-    memcpy(return_bytes+offset, payloadsBytes_result->result, payloadsSize);
-    offset+=payloadsSize;
-  } else if(user_BoundWitness->signatures){
+  }
+  if(user_BoundWitness->payloads) {
+    /* TODO: I am not sure how payloadsSize got off by 4 */
+    memcpy(return_bytes+offset, payloadsBytes_result->result, payloadsSize+4);
+    offset+=payloadsSize+4;
+  }
+  if(user_BoundWitness->signatures){
     memcpy(return_bytes+offset, signaturesBytes_result->result, signaturesSize);
     offset+=signaturesSize;
   }
@@ -263,7 +282,7 @@ XYResult* BoundWitnessTransfer_toBytes(XYObject* user_XYObject){
 *----------------------------------------------------------------------------*/
 XYResult* BoundWitnessTransfer_fromBytes(char* user_Transfer){
   BoundWitnessTransfer* return_BoundWitness = malloc(sizeof(BoundWitnessTransfer));
-  uint32_t BoundWitnessSize = to_uint32((char*)&user_Transfer);
+  uint32_t BoundWitnessSize = to_uint32(user_Transfer);
   if(littleEndian()){
     BoundWitnessSize = to_uint32((char*)&BoundWitnessSize);
   }
@@ -271,6 +290,8 @@ XYResult* BoundWitnessTransfer_fromBytes(char* user_Transfer){
 
   return_BoundWitness->size = BoundWitnessSize;
   return_BoundWitness->choice = choice;
+  return_BoundWitness->getSigningData = BoundWitness_getSigningData;
+  return_BoundWitness->getHash = BoundWitness_getHash;
   ShortStrongArray* publicKeysPtr = NULL;
   IntStrongArray* payloadPtr = NULL;
   ShortStrongArray* signaturesPtr = NULL;
@@ -278,11 +299,13 @@ XYResult* BoundWitnessTransfer_fromBytes(char* user_Transfer){
   if(choice == 0x01){
 
     // Set up the Public Key Array
-    uint32_t publicKeysSize = to_uint32((char*)&user_Transfer[4]);
+
+    uint16_t publicKeysSize = to_uint16((char*)&user_Transfer[5]);
     XYResult* lookup_result = lookup((char*)&ShortStrongArray_id);
+
     if(lookup_result->error == OK){
       ObjectProvider* SWA_Creator = lookup_result->result;
-      XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[4*sizeof(char)]);
+      XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[5]);
       if(fromBytes_result->error == OK)
       {
         publicKeysPtr = fromBytes_result->result;
@@ -300,7 +323,7 @@ XYResult* BoundWitnessTransfer_fromBytes(char* user_Transfer){
     lookup_result = lookup((char*)&IntStrongArray_id);
     if(lookup_result->error == OK){
       ObjectProvider* SWA_Creator = lookup_result->result;
-      XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[4+publicKeysSize*sizeof(char)]);
+      XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[5+publicKeysSize*sizeof(char)]);
 
       if(fromBytes_result->error == OK)
       {
@@ -318,12 +341,12 @@ XYResult* BoundWitnessTransfer_fromBytes(char* user_Transfer){
 
   } else if(choice == 0x02){
     // Set up the Public Key Array
-    uint32_t publicKeysSize = to_uint32((char*)&user_Transfer[4]);
+    uint32_t publicKeysSize = to_uint32((char*)&user_Transfer[5]);
     XYResult* lookup_result = lookup((char*)&ShortStrongArray_id);
     if(lookup_result->error == OK){
       ObjectProvider* SWA_Creator = lookup_result->result;
       free(lookup_result);
-      XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[4*sizeof(char)]);
+      XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[5*sizeof(char)]);
       if(fromBytes_result->error == OK)
       {
         publicKeysPtr = fromBytes_result->result;
@@ -338,12 +361,12 @@ XYResult* BoundWitnessTransfer_fromBytes(char* user_Transfer){
     }
 
     // Payload
-    uint32_t payloadSize = to_uint32((char*)&user_Transfer[4+publicKeysSize*sizeof(char)]);
+    uint32_t payloadSize = to_uint32((char*)&user_Transfer[5+publicKeysSize*sizeof(char)]);
     lookup_result = lookup((char*)&IntStrongArray_id);
     if(lookup_result->error == OK){
       ObjectProvider* SWA_Creator = lookup_result->result;
       free(lookup_result);
-      XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[4+publicKeysSize*sizeof(char)]);
+      XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[5+publicKeysSize*sizeof(char)]);
 
       if(fromBytes_result->error == OK)
       {

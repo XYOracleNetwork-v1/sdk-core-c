@@ -337,7 +337,7 @@ XYResult* IntStrongArray_creator_fromBytes(char* data){
 *      XYResult*            [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
 XYResult* IntStrongArray_creator_toBytes(struct XYObject* user_XYObject){
-  if(user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x03){
+  if((user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x03) || (user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x04)){
     IntStrongArray* user_array = user_XYObject->GetPayload(user_XYObject);
     uint8_t totalSize = user_array->size;
     char* byteBuffer = malloc(sizeof(char)*totalSize);
@@ -355,6 +355,10 @@ XYResult* IntStrongArray_creator_toBytes(struct XYObject* user_XYObject){
       }
 
       memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 6);
+      if(user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x04){
+        memcpy(byteBuffer+4, (char*)&Payload_id , 2);
+      }
+      
       memcpy(byteBuffer+6, user_array->payload, sizeof(char)*(totalSize-6));
       if(littleEndian()){
         user_array->size = to_uint32((char*)(uintptr_t)&user_array->size);
