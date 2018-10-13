@@ -10,8 +10,7 @@ You can add sdk-core-c to your existing app by cloning the project, building the
 ```
 git clone git@github.com:XYOracleNetwork/sdk-core-c.git
 cd sdk-core-c
-mkdir build
-cd build
+mkdir build && cd build
 cmake ..
 make
 
