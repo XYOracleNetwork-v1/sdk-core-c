@@ -80,7 +80,7 @@ struct NodeBase {
   /*
   * Create bound witness, handle outcome, and store if needed
   */
-  void (*doBoundWitness)(NodeBase* self, ByteArray* startingData, NetworkPipe* pipe);
+  XYResult* (*doBoundWitness)(NodeBase* self, ByteArray* startingData, NetworkPipe* pipe);
   /*
   * Update the state of the origin chain.
   */
@@ -111,7 +111,7 @@ XYObject* getUnSignedPayloads(NodeBase* self, uint bitFlag);
 XYObject* getSignedPayloads(NodeBase* self, uint bitFlag);
 void notifyListeners(NodeBase* self, BoundWitness* boundWitness);
 XYResult* getBridgedBlocks(NodeBase* self);
-void doBoundWitness(NodeBase* self, ByteArray* startingData, NetworkPipe* pipe);
+XYResult* doBoundWitness(NodeBase* self, ByteArray* startingData, NetworkPipe* pipe);
 uint8_t updateOriginState(NodeBase* self, BoundWitness* boundWitness);
 void onBoundWitnessEndSuccess(NodeBase* self, BoundWitness* boundWitness);
 void onBoundWitnessEndFailure(enum EXyoErrors error);

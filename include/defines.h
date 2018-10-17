@@ -73,7 +73,7 @@
 /*
  * MAJOR_SIGNATURES group Minor values
  */
-#define MINOR_ECDSA_SECP256K1_SHA256_SIGNATURE  0x01
+#define MINOR_ECDSA_SECP256K1_SHA256_SIGNATURE  0x01 // TODO: Flip these two back
 #define MINOR_ECDSA_SECP256K1_SHA1_SIGNATURE    0x02
 #define MINOR_ECDSA_SECP256K1_SHA3_SIGNATURE    0x03
 #define MINOR_RSA_SHA256                        0x08
@@ -139,3 +139,4 @@
 #define MAX_PEERS                                10
 #define CATALOG_BUFFER_SIZE                       9
 #define CATALOG_SIZE                              4
+#define DEFAULT_NUM_PEERS                         1

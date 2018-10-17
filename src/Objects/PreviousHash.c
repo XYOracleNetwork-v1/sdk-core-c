@@ -77,11 +77,11 @@ XYResult* PreviousHash_creator_fromBytes(char* hash_data){
           return_PH->hash = malloc(element_size*sizeof(char));
           break;
         case 2:
-          element_size = to_uint16(&hash_data[4]);
+          element_size = to_uint16((unsigned char*)&hash_data[4]);
           return_PH->hash = malloc(element_size*sizeof(char));
           break;
         case 4:
-          element_size = to_uint32(&hash_data[4]);
+          element_size = to_uint32((unsigned char*)&hash_data[4]);
           return_PH->hash = malloc(element_size*sizeof(char));
           break;
       }
@@ -164,7 +164,7 @@ XYResult* PreviousHash_creator_toBytes(XYObject* user_XYObject){
             break;
           case 2:
           {
-            element_size = to_uint16(&casted_PH[0]);
+            element_size = to_uint16((unsigned char*)&casted_PH[0]);
             uint16_t encodedSize16 = element_size;
             encodedSize16 = (element_size*sizeof(char));
             byteBuffer = malloc(element_size);

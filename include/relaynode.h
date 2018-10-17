@@ -33,7 +33,7 @@ struct RelayNode {
   */
   uint8_t (*getChoice)(ProcedureCatalogue* ourCatalog, uint8_t theirCatalog);
   NetworkPipe* (*findSomeoneToTalkTo)( void );
-  void (*doConnection)( RelayNode* self );
+  XYResult* (*doConnection)( RelayNode* self );
 
 };
 
@@ -47,7 +47,7 @@ XYResult* initRelayNode(RelayNode* self, OriginChainProvider* repository, HashPr
 
 
 uint8_t Relay_getChoice(uint8_t* theirCatalog);
-void doConnection(RelayNode* self);
+XYResult* doConnection(RelayNode* self);
 //extern NetworkPipe* findSomeoneToTalkTo( void );
 
 

@@ -124,7 +124,9 @@ enum EXyoErrors{
   ERR_TIMEOUT, // Returned if the disk timed out on read/write.
   ERR_COULD_NOT_DELETE, // Returned if delete failed.
   ERR_PERMISSION, // Returned if permissions are improper.
-  ERR_KEY_DOES_NOT_EXIST // Returned if key isn't found in map.
+  ERR_KEY_DOES_NOT_EXIST, // Returned if key isn't found in map.
+  ERR_PEER_INCOMPATABLE,  // Returned if peer isn't capable of interfacing with us
+  ERR_BOUNDWITNESS_FAILED // Returned if the Bound Witness failed unexpextedly
 };
 
 struct XYResult{

@@ -78,7 +78,7 @@ XYResult* Payload_creator_fromBytes(char* payload_data){
   XYResult* array_result = weakArrayCreator->fromBytes(&payload_data[sizeof(char)*4]);
   if(array_result->error==OK){
     signedWeakArray = array_result->result;
-    uint32_t firstSize = to_uint32((char*)&payload_data[4]);
+    uint32_t firstSize = to_uint32((unsigned char*)&payload_data[4]);
     /*
      * We ask the first payload what it's size is and then add that to
      * the offset of 4 (for Payload.size) in order to derrive the position
@@ -99,7 +99,7 @@ XYResult* Payload_creator_fromBytes(char* payload_data){
     free(return_payload);
     return array_result;
   }
-  return_payload->size = to_uint32((char*)payload_data);
+  return_payload->size = to_uint32((unsigned char*)payload_data);
   return_payload->signedHeuristics = signedWeakArray;
   return_payload->unsignedHeuristics = unsignedWeakArray;
   XYResult* return_result = malloc(sizeof(XYResult));
@@ -175,7 +175,7 @@ XYResult* Payload_creator_toBytes(struct XYObject* user_XYObject){
   /* TODO: payloadsSize is off by 4 here and I am not sure why. disconserting. */
   uint32_t encoded_size = size1 + size2 + (4*sizeof(char));
   if(littleEndian()){
-    encoded_size = to_uint32((char*)&encoded_size);
+    encoded_size = to_uint32((unsigned char*)&encoded_size);
   }
   char* signedHeuristicBytes = toBytes_result1->result;
   char* unsignedHeuristicBytes = toBytes_result2->result;

@@ -126,17 +126,12 @@ XYResult* sign(Signer* signer, ByteArray* givenArray){
   if(return_signature == NULL){
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
-  XYResult* newObject_result = newObject((char*)&SignatureSet_id, return_signature);
+  XYResult* newObject_result = newObject((char*)&ECDSASecp256k1Sig_id, return_signature);
   XYObject* return_object = newObject_result->result;
-
-
   XYResult* result_result = lookup((char*)&SignatureSet_id);
   ObjectProvider* arrayCreator = result_result->result;
-  XYResult* create_result = arrayCreator->create((char*)&SignatureSet_id, NULL);
-  ShortWeakArray* theArray = create_result->result;
-  newObject_result = newObject((char*)&ECDSASecp256k1Sig_id, return_signature);
   return_object->payload = return_signature;
-  return_signature->size = 67;
+  return_signature->size = 69;
   return_signature->signature = malloc(sizeof(char)*67);
   memset(return_signature->signature, 0x03, 67);
   return_signature->signature[0] = 0x05;

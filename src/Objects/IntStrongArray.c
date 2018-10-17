@@ -79,15 +79,15 @@ XYResult* IntStrongArray_add(IntStrongArray* self_IntStrongArray, XYObject* user
           /* First we read 2 bytes of the payload to get the size,
            * the to_uint16 function reads ints in big endian.
            */
-          object_size = to_uint16(object_payload); //TODO: Check compatibility on big endian devices.
+          object_size = to_uint16((unsigned char*)object_payload); //TODO: Check compatibility on big endian devices.
           if(littleEndian()){
-            object_size = to_uint16((char*)&object_size);
+            object_size = to_uint16((unsigned char*)&object_size);
           }
           break;
         case 4:
-          object_size = to_uint32(object_payload);
+          object_size = to_uint32((unsigned char*)object_payload);
           if(littleEndian()){
-            object_size = to_uint32((char*)&object_size);
+            object_size = to_uint32((unsigned char*)&object_size);
           }
           break;
       }
@@ -200,12 +200,12 @@ XYResult* IntStrongArray_get(IntStrongArray* self_IntStrongArray, int index) {
       char* array_elements = self_IntStrongArray->payload;
       uint32_t array_offset = 0;
       for(int i = 0; i<=index; i++){
-        if(array_offset>totalSize){
+        if(array_offset>totalSize-4){
           RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);
         }
         char* element_size = malloc(element_creator->sizeIdentifierSize);
         memcpy(element_size, &array_elements[array_offset], element_creator->sizeIdentifierSize);
-        uint32_t int_size = to_uint32(element_size);
+        uint32_t int_size = to_uint32((unsigned char*)element_size);
         free(element_size);
         if(i == index){
           char* return_object_payload = malloc(int_size);
@@ -298,7 +298,7 @@ XYResult* IntStrongArray_creator_fromBytes(char* data){
       return_array->add = &IntStrongArray_add;
       return_array->remove = NULL;
       return_array->get = &IntStrongArray_get;
-      return_array->size = to_uint32(data);
+      return_array->size = to_uint32((unsigned char*)data);
       char array_id[3];
       array_id[0] = data[4];
       array_id[1] = data[5];
@@ -351,17 +351,17 @@ XYResult* IntStrongArray_creator_toBytes(struct XYObject* user_XYObject){
        * are in the network byte order.
        */
       if(littleEndian()){
-        user_array->size = to_uint32((char*)(uintptr_t)&user_array->size);
+        user_array->size = to_uint32((unsigned char*)(uintptr_t)&user_array->size);
       }
 
       memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 6);
       if(user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x04){
         memcpy(byteBuffer+4, (char*)&Payload_id , 2);
       }
-      
+
       memcpy(byteBuffer+6, user_array->payload, sizeof(char)*(totalSize-6));
       if(littleEndian()){
-        user_array->size = to_uint32((char*)(uintptr_t)&user_array->size);
+        user_array->size = to_uint32((unsigned char*)(uintptr_t)&user_array->size);
       }
       return_result->error = OK;
       return_result->result = byteBuffer;

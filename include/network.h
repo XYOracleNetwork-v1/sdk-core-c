@@ -48,9 +48,10 @@ struct NetworkProvider {
    * the only file that uses these variables at the time
    * of writing is network.c for TCP.
    */
-   struct sockaddr_in* peers[MAX_PEERS];
+   struct sockaddr_in* *peers;
    ProcedureCatalogue* procedureCatalogue;
    int port;
+   int peerCount;
 };
 
 struct ProcedureCatalogue {

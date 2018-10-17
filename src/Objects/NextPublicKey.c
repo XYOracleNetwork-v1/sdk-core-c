@@ -78,11 +78,11 @@ XYResult* NextPublicKey_creator_fromBytes(char* pubkey_data){
           return_NPK->publicKey = malloc(element_size*sizeof(char));
           break;
         case 2:
-          element_size = to_uint16(&pubkey_data[4]);
+          element_size = to_uint16((unsigned char*)&pubkey_data[4]);
           return_NPK->publicKey = malloc(element_size*sizeof(char));
           break;
         case 4:
-          element_size = to_uint32(&pubkey_data[4]);
+          element_size = to_uint32((unsigned char*)&pubkey_data[4]);
           return_NPK->publicKey = malloc(element_size*sizeof(char));
           break;
       }
@@ -164,11 +164,11 @@ XYResult* NextPublicKey_creator_toBytes(struct XYObject* user_XYObject){
             break;
           case 2:
           {
-            element_size = to_uint16(&casted_NPK[0]);
+            element_size = to_uint16((unsigned char*)&casted_NPK[0]);
             uint16_t encodedSize16 = element_size;
             byteBuffer = malloc(2*sizeof(char) + (element_size*sizeof(char)));
             if(littleEndian()){
-               encodedSize16 = to_uint16((char*)&element_size);
+               encodedSize16 = to_uint16((unsigned char*)&element_size);
             }
             memcpy(byteBuffer, &id, 2);
             memcpy(byteBuffer+(2*sizeof(char)), &encodedSize16, 2);
@@ -176,11 +176,11 @@ XYResult* NextPublicKey_creator_toBytes(struct XYObject* user_XYObject){
             break;
           }
           case 4:
-            element_size = to_uint32(&casted_NPK[0]);
+            element_size = to_uint32((unsigned char*)&casted_NPK[0]);
             uint32_t encodedSize32 = element_size;
             byteBuffer = malloc(2*sizeof(char) + (element_size*sizeof(char)));
             if(littleEndian()){
-               encodedSize32 = to_uint32((char*)&element_size);
+               encodedSize32 = to_uint32((unsigned char*)&element_size);
             }
             memcpy(byteBuffer, &id, 2);
             memcpy(byteBuffer+(2*sizeof(char)), &encodedSize32, 4);

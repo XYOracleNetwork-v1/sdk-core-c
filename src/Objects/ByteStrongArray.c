@@ -72,15 +72,15 @@ XYResult* ByteStrongArray_add(ByteStrongArray* self_ByteStrongArray, XYObject* u
           /* First we read 2 bytes of the payload to get the size,
            * the to_uint16 function reads ints in big endian.
            */
-          object_size = to_uint16(object_payload); //TODO: Check compatibility on big endian devices.
+          object_size = to_uint16((unsigned char*)object_payload); //TODO: Check compatibility on big endian devices.
           if(littleEndian()){
-            object_size = to_uint16((char*)&object_size);
+            object_size = to_uint16((unsigned char*)&object_size);
           }
           break;
         case 4:
-          object_size = to_uint32((char*)object_payload);
+          object_size = to_uint32((unsigned char*)object_payload);
           if(littleEndian()){
-            object_size = to_uint32((char*)&object_size);
+            object_size = to_uint32((unsigned char*)&object_size);
           }
           break;
       }
@@ -198,12 +198,12 @@ XYResult* ByteStrongArray_get(ByteStrongArray* self_ByteStrongArray, int index) 
       char* array_elements = self_ByteStrongArray->payload;
       uint8_t array_offset = 0;
       for(int i = 0; i<=index; i++){
-        if(array_offset>totalSize){
+        if(array_offset>totalSize-4){
           RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);
         }
         char* element_size = malloc(element_creator->sizeIdentifierSize);
         memcpy(element_size, &array_elements[array_offset], element_creator->sizeIdentifierSize);
-        uint16_t int_size = to_uint16(element_size);
+        uint16_t int_size = to_uint16((unsigned char*)element_size);
         free(element_size);
         if(i == index){
           char* return_object_payload = malloc(int_size);

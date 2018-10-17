@@ -34,6 +34,9 @@ struct ZigZagBoundWitness {
   ShortStrongArray* dynamicSignatures;
   int hasSentKeysAndPayload;
   int heuristicCount;
+  uint8_t publicKeyCount;
+  uint8_t signatureCount;
+
   /**
    * Adds data to the bound witness and returns whats the party should send back.
    *

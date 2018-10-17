@@ -99,7 +99,7 @@ XYResult* initRelayNode(RelayNode* self, OriginChainProvider* repository, HashPr
  *
  ****************************************************************************************
  */
- void doConnection(RelayNode* self){
+ XYResult* doConnection(RelayNode* self){
   NetworkPipe* connectionToOtherPartyFrom = self->findSomeoneToTalkTo();
   if(connectionToOtherPartyFrom->initializationData == NULL){
     XYResult* whatTheOtherPartyWantsToDo_result = connectionToOtherPartyFrom->peer->getRole(connectionToOtherPartyFrom);
@@ -108,14 +108,12 @@ XYResult* initRelayNode(RelayNode* self, OriginChainProvider* repository, HashPr
     }
     ByteArray* whatTheOtherPartyWantsToDo = whatTheOtherPartyWantsToDo_result->result;
     if(self->procedureCatalogue->canDo(whatTheOtherPartyWantsToDo)){
-      self->node->doBoundWitness(self->node, NULL, connectionToOtherPartyFrom);
-      return;
+      return self->node->doBoundWitness(self->node, NULL, connectionToOtherPartyFrom);;
     } else {
       connectionToOtherPartyFrom->close();
-      return;
+      RETURN_ERROR(ERR_PEER_INCOMPATABLE);
     }
   } else {
-    self->node->doBoundWitness(self->node, connectionToOtherPartyFrom->initializationData, connectionToOtherPartyFrom);
-    return;
+    return self->node->doBoundWitness(self->node, connectionToOtherPartyFrom->initializationData, connectionToOtherPartyFrom);;
   }
 }

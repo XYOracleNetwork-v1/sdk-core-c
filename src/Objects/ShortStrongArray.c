@@ -72,15 +72,15 @@ XYResult* ShortStrongArray_add(ShortStrongArray* self_ShortStrongArray, XYObject
           /* First we read 2 bytes of the payload to get the size,
            * the to_uint16 function reads ints in big endian.
            */
-          object_size = to_uint16(object_payload); //TODO: Check compatibility on big endian devices.
+          object_size = to_uint16((unsigned char*)object_payload); //TODO: Check compatibility on big endian devices.
           if(littleEndian()){
-            object_size = to_uint16((char*)&object_size);
+            object_size = to_uint16((unsigned char*)&object_size);
           }
           break;
         case 4:
-          object_size = to_uint32(object_payload);
+          object_size = to_uint32((unsigned char*)object_payload);
           if(littleEndian()){
-            object_size = to_uint32((char*)&object_size);
+            object_size = to_uint32((unsigned char*)&object_size);
           }
           break;
       }
@@ -97,7 +97,6 @@ XYResult* ShortStrongArray_add(ShortStrongArray* self_ShortStrongArray, XYObject
        char* user_object_payload = user_array->payload;
        char id[2];
        memcpy(id, user_object_payload, 2);
-       breakpoint();
        lookup_result = lookup((char*)&id);
        if(lookup_result->error == OK){
          ObjectProvider* deeper_ObjectProvider = lookup_result->result;
@@ -205,12 +204,12 @@ XYResult* ShortStrongArray_get(ShortStrongArray* self_ShortStrongArray, int inde
       char* array_elements = self_ShortStrongArray->payload;
       uint16_t array_offset = 0;
       for(int i = 0; i<=index; i++){
-        if(array_offset>totalSize){
+        if(array_offset>totalSize-4){
           RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);
         }
         char* element_size = malloc(element_creator->sizeIdentifierSize);
         memcpy(element_size, &array_elements[array_offset], element_creator->sizeIdentifierSize);
-        uint16_t int_size = to_uint16(element_size);
+        uint16_t int_size = to_uint16((unsigned char*)element_size);
         free(element_size);
         if(i == index){
           char* return_object_payload = malloc(int_size);
@@ -305,7 +304,7 @@ XYResult* ShortStrongArray_creator_fromBytes(char* data){
       return_array->add = &ShortStrongArray_add;
       return_array->remove = NULL;
       return_array->get = &ShortStrongArray_get;
-      return_array->size = to_uint16(data);
+      return_array->size = to_uint16((unsigned char*)data);
       char array_id[3];
       array_id[0] = data[2];
       array_id[1] = data[3];
@@ -361,12 +360,12 @@ XYResult* ShortStrongArray_creator_toBytes(struct XYObject* user_XYObject){
        * are in the network byte order.
        */
       if(littleEndian()){
-        user_array->size = to_uint16((char*)(uintptr_t)&user_array->size);
+        user_array->size = to_uint16((unsigned char*)(uintptr_t)&user_array->size);
       }
       memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 4);
       memcpy(byteBuffer+4, user_array->payload, sizeof(char)*(totalSize-4));
       if(littleEndian()){
-        user_array->size = to_uint16((char*)(uintptr_t)&user_array->size);
+        user_array->size = to_uint16((unsigned char*)(uintptr_t)&user_array->size);
       }
       return_result->error = OK;
       return_result->result = byteBuffer;

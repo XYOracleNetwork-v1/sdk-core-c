@@ -45,6 +45,10 @@ XYResult* ECDSA_secp256k1Uncompressed_creator_create(char id[2], void* user_data
 XYResult* ECDSA_secp256k1Uncompressed_creator_fromBytes(char* heuristic_data);
 XYResult* ECDSA_secp256k1Uncompressed_creator_toBytes(struct XYObject* user_XYObject);
 
+XYResult* ECDSA_secp256k1Sig_creator_create(char id[2], void* text);
+XYResult* ECDSA_secp256k1Sig_creator_fromBytes(char* heuristic_data);
+XYResult* ECDSA_secp256k1Sig_creator_toBytes(struct XYObject* user_XYObject);
+
 XYResult* PreviousHash_creator_create(char id[2], void* user_data);
 XYResult* PreviousHash_creator_fromBytes(char* hash_data);
 XYResult* PreviousHash_creator_toBytes(struct XYObject* user_XYObject);

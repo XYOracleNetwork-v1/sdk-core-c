@@ -414,27 +414,27 @@ XYResult* getBridgedBlocks(NodeBase* self){
 /*
 * Create bound witness, handle outcome, and store if needed
 */
-void doBoundWitness(NodeBase* self, ByteArray* startingData, NetworkPipe* pipe){
+XYResult* doBoundWitness(NodeBase* self, ByteArray* startingData, NetworkPipe* pipe){
   if(self->session == NULL){
     XYResult* return_result = malloc(sizeof(XYResult));
-    if(return_result == NULL){ return; }
+    if(return_result == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
     self->onBoundWitnessStart();
     XYResult* role_result = pipe->peer->getRole(pipe);
     if(role_result->error != OK) {
       free(return_result);
-      return;
+      RETURN_ERROR(ERR_CRITICAL);
     }
     uint8_t choice = self->getChoice((uint8_t*)role_result->result);
     self->session = malloc(sizeof(ZigZagBoundWitnessSession));
-    if(self->session == NULL){ return; }
+    if(self->session == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
     self->session->boundWitness = malloc(sizeof(ZigZagBoundWitness));
-    if(self->session->boundWitness == NULL){ return; }
+    if(self->session->boundWitness == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
     self->session->NetworkPipe = pipe;
     XYResult* payload_result = self->makePayload(self, self->flag);
-    if(payload_result->error != OK){ return; }
+    if(payload_result->error != OK){ RETURN_ERROR(ERR_CRITICAL); }
     self->session->boundWitness->dynamicPayloads = payload_result->result;
     XYResult* getSigner_result = self->originChainState->getSigners(self->originChainState);
-    if(getSigner_result->error != OK) { return; }
+    if(getSigner_result->error != OK) { RETURN_ERROR(ERR_NOSIGNER); }
     self->session->boundWitness->signer = getSigner_result->result;
     self->session->choice = choice;
 
@@ -468,16 +468,16 @@ void doBoundWitness(NodeBase* self, ByteArray* startingData, NetworkPipe* pipe){
     if(completeBoundWitness_result->error != OK){
       self->onBoundWitnessEndFailure(completeBoundWitness_result->error);
       self->session = NULL;
-      return;
+      RETURN_ERROR(ERR_BOUNDWITNESS_FAILED);
     } else {
       self->updateOriginState(self, completeBoundWitness_result->result);
       self->onBoundWitnessEndSuccess(self, completeBoundWitness_result->result);
       self->session = NULL;
-      return;
+      RETURN_ERROR(OK);
 
     }
   } else {
-    return;
+    RETURN_ERROR(ERR_CRITICAL);
   }
 }
 /*

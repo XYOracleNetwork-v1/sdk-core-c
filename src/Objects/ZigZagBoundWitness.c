@@ -34,10 +34,18 @@
 *      XYResult  [out]      bool       Returns XYResult<ByteArray*> the data to send to the other party.
 *----------------------------------------------------------------------------*/
 XYResult* incomingData(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitness, int endpoint){
+  self->publicKeyCount = 0;
+  self->signatureCount = 0;
   if(boundWitness != NULL){
+    breakpoint();
     int success = self->addTransfer(self, boundWitness);
+
     if(!success){
       RETURN_ERROR(ERR_BADDATA);
+    } else {
+      if(self->publicKeyCount == self->signatureCount && self->signatureCount > 0){
+        RETURN_ERROR(OK);
+      }
     }
   }
   XYObject* selfKeysetObject = NULL;
@@ -106,9 +114,7 @@ XYResult* incomingData(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitn
     if(lookup_result->error != OK){
       return NULL;
     }
-    create_result = SSA_Creator->create((char*)&ShortWeakArray_id, NULL);
-    XYObject* signatureArray_object = create_result->result;
-    ShortStrongArray* signatureArray = signatureArray_object->payload;
+
     pubkeyArray->add(pubkeyArray, selfKeysetObject);
     XYResult* payload_result = self->dynamicPayloads->get(self->dynamicPayloads, 0);
     XYObject* payload_object_two = payload_result->result;
@@ -122,12 +128,6 @@ XYResult* incomingData(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitn
     payloadArray->add(payloadArray, arrayObject);
     free(newObject_result);
 
-    tempWitness_raw->publicKeys = pubkeyArray;
-    tempWitness_raw->payloads = payloadArray;
-    tempWitness_raw->signatures = signatureArray;
-    tempWitness_raw->getSigningData = BoundWitness_getSigningData;
-    tempWitness_raw->getHash = BoundWitness_getHash;
-
     /* TODO: In the future lets replace the following lines with one signForSelf call */
     //XYResult* signForSelf_result = self->signForSelf(tempWitness_raw);
     //XYResult* signingData_result = self->boundWitness->getSigningData(self->boundWitness);
@@ -139,13 +139,23 @@ XYResult* incomingData(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitn
     XYResult* signingData_result = self->boundWitness->getSigningData(self->boundWitness);
     self->boundWitness->payloads->size = to_uint32((unsigned char*)&self->boundWitness->payloads->size);
     ByteArray* signingData = signingData_result->result;
+
+    create_result = SSA_Creator->create((char*)&SignatureSet_id, NULL);
+    XYObject* signatureArray_object = create_result->result;
+    ShortStrongArray* signatureArray = signatureArray_object->payload;
+
     XYResult* sign_result = self->signer->sign(self->signer, signingData);
     XYObject* signatureObject = sign_result->result;
 
     // Create SignatureSet Array
     XYResult* add_result = signatureArray->add(signatureArray, signatureObject);
-    tempWitness_raw->signatures->add(tempWitness_raw->signatures, signatureArray_object);
+    //tempWitness_raw->signatures->add(signatureArray, signatureArray_object);
 
+    tempWitness_raw->signatures = signatureArray;
+    tempWitness_raw->publicKeys = pubkeyArray;
+    tempWitness_raw->payloads = payloadArray;
+    tempWitness_raw->getSigningData = BoundWitness_getSigningData;
+    tempWitness_raw->getHash = BoundWitness_getHash;
 
     newObject_result = newObject((char*)BoundWitnessTransfer_id, tempWitness_raw);
     XYResult* toBytes_result = BountWitnessTransfer_creator->toBytes(newObject_result->result);
@@ -185,13 +195,13 @@ int addTransfer(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitness){
  {
    int result = addIncomingKeys(self, boundWitness->publicKeys);
    if(result) return result;
- } else if (boundWitness->payloads) {
+ } if (boundWitness->payloads) {
    int result = addIncomingPayload(self, boundWitness->payloads);
    if(result) return result;
- } else if (boundWitness->signatures) {
+ } if (boundWitness->signatures) {
    int result = addIncomingSignatures(self, boundWitness->signatures);
    if(result) return result;
- } else {
+ } if(boundWitness->publicKeys == NULL && boundWitness->payloads == NULL && boundWitness->signatures == NULL) {
    return 2;
  }
  return 0;
@@ -212,23 +222,27 @@ int addTransfer(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitness){
 *      XYResult  [out]      bool       Returns Bool True if it succeeded.
 *----------------------------------------------------------------------------*/
 int addIncomingKeys(ZigZagBoundWitness* self, ShortStrongArray* incomingKeySets){
-  for(int i = 0; i<1; i++){ //TODO: i<1 is hardwired. This logic is bugged.
+  for(int i = 0;; i++){ //TODO: i<1 is hardwired. This logic is bugged.
     XYResult* get_result = incomingKeySets->get(incomingKeySets, i);
+    if(get_result->error != OK){ break; }
     XYObject* xyobject = get_result->result;
     if(xyobject->id[0] == 0x02 && xyobject->id[1] == 0x02){
-      uint16_t encoded_size = to_uint16(xyobject->payload);
+      uint16_t encoded_size = to_uint16((unsigned char*)xyobject->payload);
       memcpy(xyobject->payload, &encoded_size, 2);
       XYResult* array_creator_result = lookup((char*)&KeySet_id);
       ObjectProvider* array_creator = array_creator_result->result;
 
       /* The first two bytes were in big endian, to_uint16 flips them to little endian */
-      uint16_t fixSize = to_uint16(xyobject->payload);
+      uint16_t fixSize = to_uint16((unsigned char*)xyobject->payload);
       memcpy(xyobject->payload, &fixSize, 2);
-
       XYResult* create_result = array_creator->fromBytes(xyobject->payload);
       XYObject* payloadObject = create_result->result;
+
+
       XYResult* add_result = self->dynamicPublicKeys->add(self->dynamicPublicKeys, payloadObject);
+      self->publicKeyCount += 1;
       if(add_result->error != OK) return 1;
+      return 0;
     } else {
       return 2;
     }
@@ -254,10 +268,11 @@ int addIncomingPayload(ZigZagBoundWitness* self, IntStrongArray* incomingPayload
     XYResult* get_result = incomingPayloads->get(incomingPayloads, i);
     XYObject* xyobject = get_result->result;
     if(xyobject->id[0] == 0x02 && xyobject->id[1] == 0x02){
-      uint32_t encoded_size = to_uint32(xyobject->payload);
+      uint32_t encoded_size = to_uint32((unsigned char*)xyobject->payload);
       memcpy(xyobject->payload, &encoded_size, 4);
       XYResult* add_result = self->dynamicPayloads->add(self->dynamicPayloads, xyobject);
       if(add_result->error != OK) return 1;
+      return 0;
     } else {
       return 2;
     }
@@ -284,6 +299,8 @@ int addIncomingSignatures(ZigZagBoundWitness* self, ShortStrongArray* incomingSi
     if(xyobject->id[0] == 0x02 && xyobject->id[1] == 0x02){
       XYResult* add_result = self->dynamicSignatures->add(self->dynamicSignatures, xyobject);
       if(add_result->error != OK) return 1;
+      self->signatureCount += 1;
+      return 0;
     } else {
       return 2;
     }

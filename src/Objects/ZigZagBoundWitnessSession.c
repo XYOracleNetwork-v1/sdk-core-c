@@ -79,16 +79,16 @@ XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray
       memcpy(returnData->payload, &userSession->choice, sizeof(char)*(CATALOG_SIZE + 5));
       memcpy(returnData->payload, incomingData_result->result, returnData->size);
       returnData->size += CATALOG_SIZE+5;
-
+      userSession->cycles += 1;
       return userSession->NetworkPipe->send((void*)userSession, returnData, receiverCallback);
     } else { RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
   } else {
     returnData->payload = malloc(sizeof(char) * returnData->size);
     if(returnData->payload){
-      uint32_t nates_int = ((char*)incomingData_result->result)[3];
       char* dat = ((char*)incomingData_result->result);
-      uint32_t take2 = to_uint32((unsigned char*)dat);
-      memcpy(returnData->payload, incomingData_result->result, take2);
+      uint32_t boundWitnessSize = to_uint32((unsigned char*)dat);
+      memcpy(returnData->payload, incomingData_result->result, boundWitnessSize);
+      userSession->cycles += 1;
       return userSession->NetworkPipe->send((void*)userSession, returnData, receiverCallback);
     } else { RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
   }
@@ -114,6 +114,7 @@ XYResult* receiverCallback(void* self, ByteArray* data){
     XYResult* lookup_result = lookup((char*)&BoundWitnessTransfer_id);
     if(lookup_result->error != OK) return lookup_result;
     ObjectProvider* BWT_creator = lookup_result->result;
+    breakpoint();
     XYResult* transfer_result = BWT_creator->fromBytes(data->payload);
     if(transfer_result->error != OK) return transfer_result;
     BoundWitnessTransfer* transfer = transfer_result->result;

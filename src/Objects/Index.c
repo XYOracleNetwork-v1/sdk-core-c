@@ -59,7 +59,7 @@ XYResult* Index_creator_fromBytes(char* index_data){
   char id[2];
   memcpy(id, index_data, 2);
   uint32_t* index = malloc(sizeof(uint32_t));
-  uint32_t indexref = to_uint32(&index_data[2]);
+  uint32_t indexref = to_uint32((unsigned char*)&index_data[2]);
   memcpy(index, &indexref, 4);
   return newObject(id, index);
 }
@@ -81,9 +81,9 @@ XYResult* Index_creator_fromBytes(char* index_data){
 XYResult* Index_creator_toBytes(struct XYObject* user_XYObject){
   uint32_t encoded_bytes;
   char* index = (char*)user_XYObject->payload;
-  encoded_bytes = to_uint32(&index[0]);
+  encoded_bytes = to_uint32((unsigned char*)&index[0]);
   if(!littleEndian()){
-    encoded_bytes = to_uint32((char*)&encoded_bytes);
+    encoded_bytes = to_uint32((unsigned char*)&encoded_bytes);
   }
 
 

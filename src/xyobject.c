@@ -322,11 +322,27 @@ XYResult* initTable(void){
   struct ObjectProvider* secp256k1sig_creator = malloc(sizeof(ObjectProvider));
   if(secp256k1sig_creator != NULL){
     secp256k1sig_creator->sizeIdentifierSize = 0;
-    secp256k1sig_creator->defaultSize = 0;
-    secp256k1sig_creator->create = NULL;
-    secp256k1sig_creator->fromBytes = NULL;
-    secp256k1sig_creator->toBytes = NULL;
+    secp256k1sig_creator->defaultSize = 69;
+    secp256k1sig_creator->create = &ECDSA_secp256k1Sig_creator_create;
+    secp256k1sig_creator->fromBytes = &ECDSA_secp256k1Sig_creator_fromBytes;
+    secp256k1sig_creator->toBytes = &ECDSA_secp256k1Sig_creator_toBytes;
     typeTable[MAJOR_SIGNATURES][MINOR_ECDSA_SECP256K1_SHA256_SIGNATURE] = secp256k1sig_creator;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
+  // Initialize SECP256k1 Signature type
+  struct ObjectProvider* secp256k1sha1sig_creator = malloc(sizeof(ObjectProvider));
+  if(secp256k1sha1sig_creator != NULL){
+    secp256k1sha1sig_creator->sizeIdentifierSize = 0;
+    secp256k1sha1sig_creator->defaultSize = 69;
+    secp256k1sha1sig_creator->create = &ECDSA_secp256k1Sig_creator_create;
+    secp256k1sha1sig_creator->fromBytes = &ECDSA_secp256k1Sig_creator_fromBytes;
+    secp256k1sha1sig_creator->toBytes = &ECDSA_secp256k1Sig_creator_toBytes;
+    typeTable[MAJOR_SIGNATURES][MINOR_ECDSA_SECP256K1_SHA1_SIGNATURE] = secp256k1sha1sig_creator;
   }
   else {
     preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
