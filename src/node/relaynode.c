@@ -104,13 +104,14 @@ XYResult* initRelayNode(RelayNode* self, OriginChainProvider* repository, HashPr
   if(connectionToOtherPartyFrom->initializationData == NULL){
     XYResult* whatTheOtherPartyWantsToDo_result = connectionToOtherPartyFrom->peer->getRole(connectionToOtherPartyFrom);
     if(whatTheOtherPartyWantsToDo_result->error != OK){
-      connectionToOtherPartyFrom->close();
+      connectionToOtherPartyFrom->close(connectionToOtherPartyFrom);
+      RETURN_ERROR(ERR_PEER_INCOMPATABLE); //TODO: close the pipe?!?
     }
     ByteArray* whatTheOtherPartyWantsToDo = whatTheOtherPartyWantsToDo_result->result;
     if(self->procedureCatalogue->canDo(whatTheOtherPartyWantsToDo)){
       return self->node->doBoundWitness(self->node, NULL, connectionToOtherPartyFrom);;
     } else {
-      connectionToOtherPartyFrom->close();
+      connectionToOtherPartyFrom->close(connectionToOtherPartyFrom);
       RETURN_ERROR(ERR_PEER_INCOMPATABLE);
     }
   } else {

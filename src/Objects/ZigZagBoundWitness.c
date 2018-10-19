@@ -33,18 +33,26 @@
 *  RETURNS
 *      XYResult  [out]      bool       Returns XYResult<ByteArray*> the data to send to the other party.
 *----------------------------------------------------------------------------*/
+int publicKeyCount = 0;
+int signatureCount = 0;
 XYResult* incomingData(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitness, int endpoint){
   self->publicKeyCount = 0;
   self->signatureCount = 0;
   if(boundWitness != NULL){
-    breakpoint();
     int success = self->addTransfer(self, boundWitness);
 
-    if(!success){
+    if(success){
       RETURN_ERROR(ERR_BADDATA);
     } else {
-      if(self->publicKeyCount == self->signatureCount && self->signatureCount > 0){
-        RETURN_ERROR(OK);
+      if(publicKeyCount == signatureCount && signatureCount > 0){
+        publicKeyCount = 0;
+        signatureCount = 0;
+        XYResult* return_result = malloc(sizeof(XYResult));
+        if(return_result){
+          return_result->error = OK;
+          return_result->result = (void*)1;
+          return return_result;
+        }
       }
     }
   }
@@ -65,11 +73,13 @@ XYResult* incomingData(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitn
   if(BoundWitness_raw == NULL){
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
+
   BoundWitness_raw->size = self->dynamicPublicKeys->size + self->dynamicPayloads->size + self->dynamicSignatures->size +(4*sizeof(char));
   BoundWitness_raw->publicKeys = self->dynamicPublicKeys;
   BoundWitness_raw->payloads = self->dynamicPayloads;
   BoundWitness_raw->signatures = self->dynamicSignatures;
   BoundWitness_raw->getSigningData = BoundWitness_getSigningData;
+  BoundWitness_raw->getHash = BoundWitness_getHash;
   self->boundWitness = BoundWitness_raw;
 
   if(endpoint){
@@ -79,7 +89,6 @@ XYResult* incomingData(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitn
     }
     free(signForSelf_result);
   }
-
 
   XYResult* lookup_result = lookup((char*)BoundWitnessTransfer_id);
   if(lookup_result->error != OK) {
@@ -149,7 +158,12 @@ XYResult* incomingData(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitn
 
     // Create SignatureSet Array
     XYResult* add_result = signatureArray->add(signatureArray, signatureObject);
-    //tempWitness_raw->signatures->add(signatureArray, signatureArray_object);
+    if(add_result->error != OK) { RETURN_ERROR(ERR_CORRUPTDATA); }
+    free(add_result);
+    add_result = self->dynamicSignatures->add(self->dynamicSignatures, signatureObject);
+    if(add_result->error != OK) { RETURN_ERROR(ERR_CORRUPTDATA); }
+
+    BoundWitness_raw->size = self->dynamicPublicKeys->size + self->dynamicPayloads->size + self->dynamicSignatures->size +(4*sizeof(char));
 
     tempWitness_raw->signatures = signatureArray;
     tempWitness_raw->publicKeys = pubkeyArray;
@@ -240,7 +254,7 @@ int addIncomingKeys(ZigZagBoundWitness* self, ShortStrongArray* incomingKeySets)
 
 
       XYResult* add_result = self->dynamicPublicKeys->add(self->dynamicPublicKeys, payloadObject);
-      self->publicKeyCount += 1;
+      publicKeyCount += 1;
       if(add_result->error != OK) return 1;
       return 0;
     } else {
@@ -267,9 +281,33 @@ int addIncomingPayload(ZigZagBoundWitness* self, IntStrongArray* incomingPayload
   for(int i = 0; i<2; i++){ //TODO: i<1 is hardwired. This logic is bugged.
     XYResult* get_result = incomingPayloads->get(incomingPayloads, i);
     XYObject* xyobject = get_result->result;
-    if(xyobject->id[0] == 0x02 && xyobject->id[1] == 0x02){
+    if(xyobject->id[0] == 0x02 && xyobject->id[1] == 0x04){
+      char* userPayloadBytes = xyobject->payload;
+      if(littleEndian()){
+        uint32_t correctedSize = to_uint32((unsigned char*)userPayloadBytes);
+        memcpy(userPayloadBytes, &correctedSize, 4);
+      }
+      char IntWeakArrayID[2] = {0x01, 0x06};
+      XYResult* lookup_result = lookup(IntWeakArrayID);
+      ObjectProvider* weakArrayCreator = lookup_result->result;
+
+      XYResult* fromBytes_result = weakArrayCreator->fromBytes(&userPayloadBytes[4]);
+      if(fromBytes_result->error != OK) return 1;
+      IntWeakArray* signedHeuristicsArray = fromBytes_result->result;
+
+      free(fromBytes_result);
+      fromBytes_result = weakArrayCreator->fromBytes(&userPayloadBytes[4+signedHeuristicsArray->size]);
+      if(fromBytes_result->error != OK) return 1;
+      IntWeakArray* unsignedHeuristicsArray = fromBytes_result->result;
+
+      Payload* userPayload = (Payload*)userPayloadBytes;
+      userPayload->signedHeuristics = signedHeuristicsArray;
+      userPayload->unsignedHeuristics = unsignedHeuristicsArray;
+
+      /*
       uint32_t encoded_size = to_uint32((unsigned char*)xyobject->payload);
       memcpy(xyobject->payload, &encoded_size, 4);
+      */
       XYResult* add_result = self->dynamicPayloads->add(self->dynamicPayloads, xyobject);
       if(add_result->error != OK) return 1;
       return 0;
@@ -296,10 +334,22 @@ int addIncomingSignatures(ZigZagBoundWitness* self, ShortStrongArray* incomingSi
   for(int i = 0; ; i++){
     XYResult* get_result = incomingSignatures->get(incomingSignatures, i);
     XYObject* xyobject = get_result->result;
-    if(xyobject->id[0] == 0x02 && xyobject->id[1] == 0x02){
-      XYResult* add_result = self->dynamicSignatures->add(self->dynamicSignatures, xyobject);
+    if(xyobject->id[0] == 0x02 && xyobject->id[1] == 0x03){
+      char* userSignatureBytes = xyobject->payload;
+      if(littleEndian()){
+        uint32_t correctedSize = to_uint32((unsigned char*)userSignatureBytes);
+        memcpy(userSignatureBytes, &correctedSize, 4);
+      }
+      char ShortWeakArrayID[2] = {0x01, 0x05};
+      XYResult* lookup_result = lookup(ShortWeakArrayID);
+      ObjectProvider* weakArrayCreator = lookup_result->result;
+      XYResult* fromBytes_result = weakArrayCreator->fromBytes(&userSignatureBytes[3]);
+      if(fromBytes_result->error != OK) return 1;
+      XYObject* signatureArrayObject = fromBytes_result->result;
+      free(fromBytes_result);
+      XYResult* add_result = self->dynamicSignatures->add(self->dynamicSignatures, signatureArrayObject);
       if(add_result->error != OK) return 1;
-      self->signatureCount += 1;
+      signatureCount += 1;
       return 0;
     } else {
       return 2;

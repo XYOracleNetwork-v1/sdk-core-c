@@ -44,16 +44,19 @@ XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray
       XYResult* lookup_result = lookup((char*)&BoundWitnessTransfer_id);
       if(lookup_result->error != OK) return lookup_result;
       ObjectProvider* BoundWitnessTransfer_creator = lookup_result->result;
-      free(lookup_result);
+      //free(lookup_result);
       XYResult* fromBytes_result = BoundWitnessTransfer_creator->fromBytes(boundWitnessData->payload);
       if(fromBytes_result->error != OK) return fromBytes_result;
       boundWitness = fromBytes_result->result;
-      free(fromBytes_result);
+      //free(fromBytes_result);
   }
+
   XYResult* incomingData_result = userSession->boundWitness->incomingData(userSession->boundWitness, boundWitness, boundWitnessData != NULL);
 
   if(incomingData_result->error != OK){
     return incomingData_result;
+  } else if(incomingData_result->error == OK && incomingData_result->result == (void*)1){
+    RETURN_ERROR(OK);
   }
   ByteArray* returnData = malloc(sizeof(ByteArray));
   if(returnData == NULL) {
@@ -114,7 +117,6 @@ XYResult* receiverCallback(void* self, ByteArray* data){
     XYResult* lookup_result = lookup((char*)&BoundWitnessTransfer_id);
     if(lookup_result->error != OK) return lookup_result;
     ObjectProvider* BWT_creator = lookup_result->result;
-    breakpoint();
     XYResult* transfer_result = BWT_creator->fromBytes(data->payload);
     if(transfer_result->error != OK) return transfer_result;
     BoundWitnessTransfer* transfer = transfer_result->result;

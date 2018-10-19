@@ -130,10 +130,12 @@ TODO: Implement getOriginBlockByPreviousHash
 XYResult* addBoundWitness(OriginChainNavigator* self_OriginChainNavigator, BoundWitness* user_BoundWitness) {
   XYResult* lookup_result = lookup((char*)BoundWitness_id);
   ObjectProvider* BoundWitness_creator = lookup_result->result;
-  XYResult* toBytes_result = BoundWitness_creator->toBytes((XYObject*)user_BoundWitness);
+  XYResult* boundWitness_result = newObject((char*)&BoundWitness_id, user_BoundWitness);
+  XYObject* boundWitness_object = boundWitness_result->result;
+  XYResult* toBytes_result = BoundWitness_creator->toBytes(boundWitness_object);
   char* boundWitnessBytes = toBytes_result->result;
-  free(lookup_result);
-  free(toBytes_result);
+  //free(lookup_result);
+  //free(toBytes_result);
   XYResult* blockHash_result = user_BoundWitness->getHash(user_BoundWitness, self_OriginChainNavigator->Hash);
   ByteArray* blockHashValue = blockHash_result->result;
 
@@ -154,8 +156,8 @@ XYResult* addBoundWitness(OriginChainNavigator* self_OriginChainNavigator, Bound
     write_ByteArray->payload = boundWitnessBytes;
     self_OriginChainNavigator->originChainRepository->append(self_OriginChainNavigator->originChainRepository, write_ByteArray, DEFAULT_TIMEOUT);
     self_OriginChainNavigator->originChainRepository->logicalEnd = self_OriginChainNavigator->originChainRepository->logicalEnd+1;
-    free(write_ByteArray);
-    free(payload);
+    //free(write_ByteArray);
+    //free(payload);
 
     /*
      * Here we add the hash of the block to our bridgeQueue

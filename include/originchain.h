@@ -44,3 +44,5 @@ typedef struct OriginChainNavigatorT {
 
 //OriginChainNavigator* initOriginChainProvider( OriginChainNavigator** self, char* bits);
 XYResult* getMostRecentOriginBlock(OriginChainNavigator* self_OriginChainNavigator);
+XYResult* containsOriginBlock(OriginChainNavigator* self_OriginChainNavigator, BoundWitness* user_BoundWitness);
+XYResult* addBoundWitness(OriginChainNavigator* self_OriginChainNavigator, BoundWitness* user_BoundWitness);

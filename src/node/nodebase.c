@@ -49,6 +49,21 @@ XYResult* initNode(NodeBase** self, OriginChainProvider* repository, HashProvide
   (*self)->hashingProvider = hashingProvider;
 
   (*self)->originChainNavigator = malloc(sizeof(OriginChainNavigator));
+  (*self)->originChainNavigator->containsOriginBlock = containsOriginBlock;
+  (*self)->originChainNavigator->Hash = hashingProvider;
+  (*self)->originChainNavigator->addBoundWitness = addBoundWitness;
+  XYResult* result = IntStrongArray_creator_create((char*)&BoundWitness_id, NULL);
+  XYObject* repoArray_object = result->result;
+  IntStrongArray* repoArray = repoArray_object->payload;
+  (*self)->originChainNavigator->originChainRepository = malloc(sizeof(OriginChainProvider));
+  (*self)->originChainNavigator->originChainRepository->repository = repoArray;
+  if((*self)->originChainNavigator->originChainRepository == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
+  if((*self)->originChainNavigator->originChainRepository->repository == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
+  (*self)->originChainNavigator->originChainRepository->append = append;
+  (*self)->originChainNavigator->originChainRepository->getChain = getChain;
+  (*self)->originChainNavigator->originChainRepository->deleteChain = deleteChain;
+
+
   if((*self)->originChainNavigator == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY) }
 
   (*self)->originChainState = malloc(sizeof(OriginChainState));
@@ -136,6 +151,7 @@ uint8_t addHeuristic(NodeBase* self, uint key, XYObject* heuristic){
     }
   }
 }
+
 /*
 * Removes a heuristic from the current heuristic pool.
 */
@@ -316,10 +332,9 @@ uint8_t selfSignOriginChain(NodeBase* self, uint flag){
       free(boundWitness);
       return FALSE;
     }
-    free(lookup_result);
     ObjectProvider* boundWitnessCreator = lookup_result->result;
-
     XYResult* fromBytes_result = boundWitnessCreator->fromBytes(transferBytes);
+
     if(fromBytes_result->error != OK ){
       free(fromBytes_result);
       free(boundWitness->boundWitness);
@@ -464,14 +479,14 @@ XYResult* doBoundWitness(NodeBase* self, ByteArray* startingData, NetworkPipe* p
     self->session->boundWitness->dynamicSignatures = signatureArray;
 
     XYResult* completeBoundWitness_result = self->session->completeBoundWitness(self->session, startingData);
-    pipe->close();
+    pipe->close(self->session);
     if(completeBoundWitness_result->error != OK){
       self->onBoundWitnessEndFailure(completeBoundWitness_result->error);
       self->session = NULL;
       RETURN_ERROR(ERR_BOUNDWITNESS_FAILED);
     } else {
-      self->updateOriginState(self, completeBoundWitness_result->result);
-      self->onBoundWitnessEndSuccess(self, completeBoundWitness_result->result);
+      self->updateOriginState(self, (BoundWitness*)self->session->boundWitness->boundWitness);
+      self->onBoundWitnessEndSuccess(self, (BoundWitness*)self->session->boundWitness->boundWitness);
       self->session = NULL;
       RETURN_ERROR(OK);
 
