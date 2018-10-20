@@ -28,7 +28,7 @@ struct RelayNode {
   NodeListener* listener;
   ProcedureCatalogue* procedureCatalogue;
   NetworkProvider* networkProvider;
-  /*
+ /*
   * Gets the choice of a catalog from another party.
   */
   uint8_t (*getChoice)(ProcedureCatalogue* ourCatalog, uint8_t theirCatalog);
@@ -38,7 +38,7 @@ struct RelayNode {
 };
 
 XYResult* initRelayNode(RelayNode* self, OriginChainProvider* repository, HashProvider* hashingProvider, uint8_t heuristicCount);
-/**
+  /**
     * Gets the choice of a catalog from another party.
     *
     * @param catalog The catalog of the other party.

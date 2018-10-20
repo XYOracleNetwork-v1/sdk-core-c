@@ -112,7 +112,7 @@ XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray
 *      XYResult  [out]      bool       Returns XYResult<ByteArray*> the data to send to the other party.
 *----------------------------------------------------------------------------*/
 XYResult* receiverCallback(void* self, ByteArray* data){
-  if(data->size == 0 ) return 0;
+  if(data->size == 0 ) { free(data); RETURN_ERROR(OK); };
   if(((ZigZagBoundWitnessSession*)self)->cycles == 0){
     XYResult* lookup_result = lookup((char*)&BoundWitnessTransfer_id);
     if(lookup_result->error != OK) return lookup_result;

@@ -430,6 +430,7 @@ XYResult* getBridgedBlocks(NodeBase* self){
 * Create bound witness, handle outcome, and store if needed
 */
 XYResult* doBoundWitness(NodeBase* self, ByteArray* startingData, NetworkPipe* pipe){
+  breakpoint();
   if(self->session == NULL){
     XYResult* return_result = malloc(sizeof(XYResult));
     if(return_result == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
