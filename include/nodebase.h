@@ -119,10 +119,10 @@ void onBoundWitnessStart( void );
 XYResult* makePayload(NodeBase* self, uint bitFlag);
 
 //extern uint8_t (*getChoice)(uint8_t catalog);
-XYObject* getSignedHash();
-XYObject* getUnSignedHash();
-XYObject* getSignedIndex();
-XYObject* getUnSignedIndex();
+XYObject* getSignedHash(void*);
+XYObject* getUnSignedHash(void*);
+XYObject* getSignedIndex(void*);
+XYObject* getUnSignedIndex(void*);
 
 //ProcedureCatalogue* procedureCatalogue;
 

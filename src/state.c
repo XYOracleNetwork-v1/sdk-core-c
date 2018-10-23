@@ -35,8 +35,10 @@
 XYResult* newOriginBlock(OriginChainState* self_OriginChainState, ByteArray* originBlockHash) {
   self_OriginChainState->latestHash = originBlockHash;
   self_OriginChainState->index = self_OriginChainState->index+1;
-  self_OriginChainState->currentSigner = self_OriginChainState->nextSigner;
-  self_OriginChainState->nextSigner = NULL;
+  if(self_OriginChainState->nextSigner != NULL){
+    self_OriginChainState->currentSigner = self_OriginChainState->nextSigner;
+    self_OriginChainState->nextSigner = NULL;
+  }
   XYResult* return_result = malloc(sizeof(XYResult));
   if(return_result){
     return_result->error = OK;

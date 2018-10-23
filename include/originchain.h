@@ -36,7 +36,9 @@ typedef struct OriginChainNavigatorT {
   XYResult* (*containsOriginBlock)(struct OriginChainNavigatorT* self_OriginChainNavigator, BoundWitness* user_BoundWitness);
   OriginChainProvider* originChainRepository;
   HashProvider* Hash;
-  ByteArray bridgeQueue[MIN_QUEUE];
+  ByteArray* *bridgeQueue;
+  uint32_t queueLen;
+  char lastHash[32];
 
 } OriginChainNavigator;
 #endif

@@ -175,8 +175,18 @@ void onBoundWitnessEndSuccess(NodeBase* self, BoundWitness* boundWitness){
     if(hash_result->error != OK){
       return;
     } else {
+      #ifndef HEADLESS
+      XYObject* hash_object = hash_result->result;
+      ByteArray* hash = hash_object->payload;
+      printf("New block found:  ");
+      for(int i = 0; i<hash->size; i++){
+        printf("%1x", (unsigned)(unsigned char)hash->payload[i]);
+      }
+      printf("\n");
+      #endif
+
       XYResult* contains_result = self->originChainNavigator->containsOriginBlock(self->originChainNavigator, boundWitness);
-      if(contains_result->error != OK){
+      if(contains_result->error != OK ){
         //TODO: De-onion and sort bridge blocks
         self->originChainNavigator->addBoundWitness(self->originChainNavigator, boundWitness);
         notifyListeners(self, boundWitness);
@@ -206,12 +216,74 @@ void onBoundWitnessStart(){
   return;
 }
 
-XYObject* getSignedHash(){
+XYObject* getSignedHash(void* self){
   PreviousHash* return_PH = malloc(sizeof(PreviousHash));
   if(return_PH){
     return_PH->hash = malloc(sizeof(char)*34);
     strncpy(return_PH->id, (char*)&Sha256_id, 2);
-    memset(return_PH->hash, 2, 32);
+    NodeBase* nodebase = (NodeBase*)self;
+    if(nodebase->originChainNavigator->queueLen <= 1){
+        memset(return_PH->hash, 0x00, 32);
+        XYResult* newObject_result = newObject((char*)&PreviousHash_id, return_PH);
+        if(newObject_result->error != OK){
+          if(return_PH) free(return_PH);
+          free(newObject_result);
+          return NULL;
+        }
+        printf("Linking to: NULL\n");
+        return newObject_result->result;
+    }
+    //breakpoint();
+    ByteArray* lastHash = nodebase->originChainNavigator->bridgeQueue[nodebase->originChainNavigator->queueLen-2];
+
+    memcpy(return_PH->hash+2, lastHash->payload, 32);
+    XYResult* newObject_result = newObject((char*)&PreviousHash_id, return_PH);
+    if(newObject_result->error != OK){
+      if(return_PH) free(return_PH);
+      free(newObject_result);
+      return NULL;
+    }
+    /*
+    printf("Bridge Queue: [");
+    for(int j = 0; j< nodebase->originChainNavigator->queueLen-2; j++){
+      ByteArray* lHash = nodebase->originChainNavigator->bridgeQueue[j];
+      for(int i = 0; i<32; i++){
+        printf("%1x", (unsigned)(unsigned char)lHash->payload[i]);
+      }
+      printf(", ");
+    }
+    printf("]\n");
+    */
+    printf("Linking to block: ");
+    for(int i = 0; i<32; i++){
+      printf("%1x", (unsigned)(unsigned char)lastHash->payload[i]);
+    }
+    printf("\n");
+    return newObject_result->result;
+  } else {
+    return NULL;
+  }
+}
+
+XYObject* getUnSignedHash(void* self){
+  PreviousHash* return_PH = malloc(sizeof(PreviousHash));
+  if(return_PH){
+    return_PH->hash = malloc(sizeof(char)*34);
+    strncpy(return_PH->id, (char*)&Sha256_id, 2);
+    NodeBase* nodebase = (NodeBase*)self;
+    if(nodebase->originChainNavigator->queueLen <= 1){
+        memset(return_PH->hash, 0x00, 32);
+        XYResult* newObject_result = newObject((char*)&PreviousHash_id, return_PH);
+        if(newObject_result->error != OK){
+          if(return_PH) free(return_PH);
+          free(newObject_result);
+          return NULL;
+        }
+        return newObject_result->result;
+    }
+    ByteArray* lastHash = nodebase->originChainNavigator->bridgeQueue[nodebase->originChainNavigator->queueLen-2];
+
+    memcpy(return_PH->hash+2, lastHash->payload, 32);
     XYResult* newObject_result = newObject((char*)&PreviousHash_id, return_PH);
     if(newObject_result->error != OK){
       if(return_PH) free(return_PH);
@@ -224,32 +296,14 @@ XYObject* getSignedHash(){
   }
 }
 
-XYObject* getUnSignedHash(){
-  PreviousHash* return_PH = malloc(sizeof(PreviousHash));
-  if(return_PH){
-    return_PH->hash = malloc(sizeof(char)*34);
-    strncpy(return_PH->id, (char*)&Sha256_id, 2);
-    memset(return_PH->hash, 9, 32);
-    XYResult* newObject_result = newObject((char*)&PreviousHash_id, return_PH);
-    if(newObject_result->error != OK){
-      if(return_PH) free(return_PH);
-      free(newObject_result);
-      return NULL;
-    }
-    return newObject_result->result;
-  } else {
-    return NULL;
-  }
-}
-
-XYObject* getSignedIndex(){
+XYObject* getSignedIndex(void* self){
   XYResult* newObject_result = newObject((char*)&Index_id, &gState->index);
   XYObject* return_object = newObject_result->result;
   free(newObject_result);
   return return_object;
 }
 
-XYObject* getUnSignedIndex(){
+XYObject* getUnSignedIndex(void* self){
   XYResult* newObject_result = newObject((char*)&Index_id, &gState->index);
   XYObject* return_object = newObject_result->result;
   free(newObject_result);
@@ -268,6 +322,7 @@ uint8_t selfSignOriginChain(NodeBase* self, uint flag){
     if(signer_result->error!=OK) { return FALSE; }
     boundWitness->signer = signer_result->result;
     boundWitness->incomingData = incomingData;
+    boundWitness->hasSentKeysAndPayload = 0;
     boundWitness->addTransfer = addTransfer;
     boundWitness->addIncomingKeys = addIncomingKeys;
     boundWitness->addIncomingPayload = addIncomingPayload;
@@ -369,7 +424,7 @@ XYObject* getUnSignedPayloads(NodeBase* self, uint bitFlag){
   XYObject* unsignedPayloadItr = unsignedPayloads;
   for(int i = 0; i< count; i++){
     BoundWitnessOption* option = self->boundWitnessOptions[i];
-    XYObject* result = option->getUnsignedPayload();
+    XYObject* result = option->getUnsignedPayload(self);
     if(result){
       *unsignedPayloadItr = *result;
       unsignedPayloadItr = unsignedPayloadItr+1;
@@ -395,7 +450,7 @@ XYObject* getSignedPayloads(NodeBase* self, uint bitFlag){
   XYObject* SignedPayloadItr = SignedPayloads;
   for(int i = 0; i< count; i++){
     BoundWitnessOption* option = self->boundWitnessOptions[i];
-    XYObject* result = option->getSignedPayload();
+    XYObject* result = option->getSignedPayload((void*)self);
     if(result){
       *SignedPayloadItr = *result;
       SignedPayloadItr = SignedPayloadItr+1;
@@ -411,7 +466,7 @@ XYObject* getSignedPayloads(NodeBase* self, uint bitFlag){
 void notifyListeners(NodeBase* self, BoundWitness* boundWitness){
   for(int i = 0; i < MAX_ALLOCATED_LISTENERS; i++){
     if(self->listeners[i] != NULL){
-      self->listeners[i]->onBoundWitnessDiscovered(boundWitness);
+      self->listeners[i]->onBoundWitnessDiscovered((void*)boundWitness);
     } else {
       break;
     }
@@ -430,7 +485,6 @@ XYResult* getBridgedBlocks(NodeBase* self){
 * Create bound witness, handle outcome, and store if needed
 */
 XYResult* doBoundWitness(NodeBase* self, ByteArray* startingData, NetworkPipe* pipe){
-  breakpoint();
   if(self->session == NULL){
     XYResult* return_result = malloc(sizeof(XYResult));
     if(return_result == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
@@ -453,6 +507,7 @@ XYResult* doBoundWitness(NodeBase* self, ByteArray* startingData, NetworkPipe* p
     if(getSigner_result->error != OK) { RETURN_ERROR(ERR_NOSIGNER); }
     self->session->boundWitness->signer = getSigner_result->result;
     self->session->choice = choice;
+    self->session->boundWitness->hasSentKeysAndPayload = 0;
 
     self->session->completeBoundWitness = completeBoundWitness;
     self->session->boundWitness->incomingData = incomingData;

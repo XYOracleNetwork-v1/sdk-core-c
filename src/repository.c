@@ -164,12 +164,15 @@ XYResult* append(OriginChainProvider* self, ByteArray* value, uint timeout){
 
   ObjectProvider* BoundWitness_Creator = lookup_result->result;
   free(lookup_result);
+
   XYResult* fromBytes_result = BoundWitness_Creator->fromBytes(value->payload);
   if(fromBytes_result->error != OK){
     return fromBytes_result;
   }
-  XYObject* boundWitnessObject = fromBytes_result->result;
-
+  BoundWitness* boundWitness = fromBytes_result->result;
+  //XYObject* boundWitnessObject = fromBytes_result->result;
+  XYResult* newObject_result = newObject((char*)&BoundWitness_id, boundWitness);
+  XYObject* boundWitnessObject = newObject_result->result;
   return ((IntStrongArray*)self->repository)->add(self->repository, boundWitnessObject);
 }
 

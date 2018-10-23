@@ -100,7 +100,8 @@ struct TcpClient {
 struct client_arguments{
   uint8_t flags;
   pthread_t* server;
-  struct sockaddr_in* peers[MAX_PEERS];
+  struct sockaddr_in* *peers;
+  uint8_t peerCount;
 };
 
 struct server_arguments{

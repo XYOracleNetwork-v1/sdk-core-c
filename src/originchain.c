@@ -137,21 +137,17 @@ XYResult* addBoundWitness(OriginChainNavigator* self_OriginChainNavigator, Bound
   //free(lookup_result);
   //free(toBytes_result);
   XYResult* blockHash_result = user_BoundWitness->getHash(user_BoundWitness, self_OriginChainNavigator->Hash);
-  ByteArray* blockHashValue = blockHash_result->result;
-
-  XYResult* previousBlock_result = getMostRecentOriginBlock(self_OriginChainNavigator);
-
-  if(previousBlock_result->error != OK){
-    return previousBlock_result;
-  }
-  BoundWitness* previousBlock = previousBlock_result->result;
-  XYResult* prevBlockHash_result = user_BoundWitness->getHash(previousBlock, self_OriginChainNavigator->Hash);
-  ByteArray* prevBlockHashValue = prevBlockHash_result->result;
-  char* payload = malloc(blockHashValue->size + 1*sizeof(char));
+  XYObject* blockHashObject = blockHash_result->result;
+  ByteArray* blockHashValue = blockHashObject->payload;
+  //XYResult* previousBlock_result = getMostRecentOriginBlock(self_OriginChainNavigator);
+  //BoundWitness* previousBlock = previousBlock_result->result;
+  //XYResult* prevBlockHash_result = user_BoundWitness->getHash(previousBlock, self_OriginChainNavigator->Hash);
+  //ByteArray* prevBlockHashValue = prevBlockHash_result->result;
+  //char* payload = malloc(blockHashValue->size + 1*sizeof(char));
   ByteArray* write_ByteArray = malloc(sizeof(ByteArray));;
-  if(write_ByteArray && payload){
-    memset(payload, 0xff, sizeof(char));
-    memcpy(payload+sizeof(char), prevBlockHashValue->payload, blockHashValue->size+(1*sizeof(char)));
+  if(write_ByteArray){
+    //memset(payload, 0xff, sizeof(char));
+    //memcpy(payload+sizeof(char), prevBlockHashValue->payload, blockHashValue->size+(1*sizeof(char)));
     write_ByteArray->size = user_BoundWitness->size;
     write_ByteArray->payload = boundWitnessBytes;
     self_OriginChainNavigator->originChainRepository->append(self_OriginChainNavigator->originChainRepository, write_ByteArray, DEFAULT_TIMEOUT);
@@ -162,23 +158,36 @@ XYResult* addBoundWitness(OriginChainNavigator* self_OriginChainNavigator, Bound
     /*
      * Here we add the hash of the block to our bridgeQueue
      */
-    ByteArray* queue = self_OriginChainNavigator->bridgeQueue;
+    //breakpoint();
+    ByteArray* *queue = self_OriginChainNavigator->bridgeQueue;
     if(queue == NULL) { RETURN_ERROR(ERR_CRITICAL);}
+    if(queue[self_OriginChainNavigator->queueLen-1] != NULL){
+        queue = realloc(self_OriginChainNavigator->bridgeQueue, sizeof(ByteArray**)*self_OriginChainNavigator->queueLen+1);
+        if(queue == NULL){
+          RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
+        }
 
-    if(queue[0].size == (uint32_t)0){
-      queue[0] = *blockHashValue;
-    } else {
+        //queue[self_OriginChainNavigator->queueLen-1] = malloc(sizeof(ByteArray));
+        self_OriginChainNavigator->bridgeQueue[self_OriginChainNavigator->queueLen-1] = blockHashValue;
+        queue[self_OriginChainNavigator->queueLen] = NULL;
+        self_OriginChainNavigator->queueLen = self_OriginChainNavigator->queueLen+1;
+      } else {
+        queue[self_OriginChainNavigator->queueLen-1] = blockHashValue;
+        queue[self_OriginChainNavigator->queueLen] = NULL;
+        self_OriginChainNavigator->queueLen = self_OriginChainNavigator->queueLen+1;
+      }
+      /*
+      for(uint32_t count = 0; count < self_OriginChainNavigator->queueLen; count++){
 
-      for(uint32_t count = 0; count < MAX_QUEUE; count++){
-
-        if(queue[count].size == 0){
-          queue[count] = *blockHashValue;
+        if(queue[count]->size == 0){
+          *queue[count] = *blockHashValue;
         } else {
           continue;
         }
 
       }
     }
+    */
 
     XYResult* return_result = malloc(sizeof(XYResult));
     if(return_result){
@@ -296,9 +305,17 @@ XYResult* containsOriginBlock(OriginChainNavigator* self_OriginChainNavigator, B
     RETURN_ERROR(ERR_CRITICAL);
   }
 
-  for(size_t i = 0; i<MAX_QUEUE; i++){
-    if(self_OriginChainNavigator->bridgeQueue[i].size != (uint8_t)0){
-      if(strcmp( ((ByteArray*)hash_result->result)->payload, self_OriginChainNavigator->bridgeQueue[i].payload) == 0 ){
+  if(self_OriginChainNavigator->bridgeQueue == NULL){
+    self_OriginChainNavigator->bridgeQueue = malloc(sizeof(ByteArray**) * 2);
+    self_OriginChainNavigator->bridgeQueue[1] = NULL;
+    self_OriginChainNavigator->queueLen = 1;
+  }
+
+  for(size_t i = 0; i<self_OriginChainNavigator->queueLen-1; i++){
+    if(self_OriginChainNavigator->bridgeQueue[i] != NULL && self_OriginChainNavigator->bridgeQueue[i]->size != (uint8_t)0){
+      XYObject* hash = hash_result->result;
+      breakpoint();
+      if(strncmp( ((ByteArray*)hash->payload)->payload, self_OriginChainNavigator->bridgeQueue[i]->payload, 32) == 0 ){
         /* strcmp confirms the hashes match. */
         XYResult* return_result = malloc(sizeof(XYResult));
         if(return_result){

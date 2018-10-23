@@ -348,7 +348,7 @@ XYResult* BoundWitnessTransfer_fromBytes(char* user_Transfer){
 
   } else if(choice == 0x02){
     // Set up the Public Key Array
-    uint32_t publicKeysSize = to_uint32((unsigned char*)&user_Transfer[5]);
+    uint16_t publicKeysSize = to_uint16((unsigned char*)&user_Transfer[5]);
     XYResult* lookup_result = lookup((char*)&ShortStrongArray_id);
     if(lookup_result->error == OK){
       ObjectProvider* SWA_Creator = lookup_result->result;
@@ -508,11 +508,11 @@ XYResult* BoundWitness_creator_fromBytes(char* data){
    * in separate chunks here and assign all the pointers
    * at the end. First is publicKeys.
    */
-  uint32_t publicKeysSize = to_uint32((unsigned char*)&data[4]);
+  uint16_t publicKeysSize = to_uint16((unsigned char*)&data[4]);
   XYResult* lookup_result = lookup((char*)&ShortStrongArray_id);
   if(lookup_result->error == OK){
     ObjectProvider* SWA_Creator = lookup_result->result;
-    XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&data[4*sizeof(char)]);
+    XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&data[4]);
     if(fromBytes_result->error == OK)
     {
       publicKeysPtr = fromBytes_result->result;
@@ -527,12 +527,15 @@ XYResult* BoundWitness_creator_fromBytes(char* data){
   }
 
   // Payload
-  uint32_t payloadSize = to_uint32((unsigned char*)&data[4+publicKeysSize*sizeof(char)]);
+  uint32_t payloadSize = to_uint32((unsigned char*)&data[4+publicKeysSize]);
+  if(littleEndian()){
+    payloadSize = to_uint32((unsigned char*)&payloadSize);
+  }
   free(lookup_result);
   lookup_result = lookup((char*)&IntStrongArray_id);
   if(lookup_result->error == OK){
     ObjectProvider* SWA_Creator = lookup_result->result;
-    XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&data[4+publicKeysSize*sizeof(char)]);
+    XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&data[4+publicKeysSize]);
 
     if(fromBytes_result->error == OK)
     {
@@ -552,7 +555,7 @@ XYResult* BoundWitness_creator_fromBytes(char* data){
   lookup_result = lookup((char*)&ShortStrongArray_id);
   if(lookup_result->error == OK){
     ObjectProvider* SWA_Creator = lookup_result->result;
-    XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&data[4+publicKeysSize+payloadSize*sizeof(char)]);
+    XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&data[4+publicKeysSize+payloadSize]);
     if(fromBytes_result->error == OK)
     {
       signaturesPtr = fromBytes_result->result;
@@ -604,7 +607,7 @@ XYResult* BoundWitness_creator_toBytes(struct XYObject* user_XYObject){
   /* TODO: AFAIK this should have worked. Instead of using boundwitness->size we dynamically calculate it. */
   /* TODO: Payload Size in incorrect here */
   //char* byteBuffer = malloc(user_BoundWitness->size*sizeof(char));
-  printf("Payload size: %d\n", to_uint32((unsigned char*)&user_BoundWitness->payloads->size));
+  //printf("Payload size: %d\n", to_uint32((unsigned char*)&user_BoundWitness->payloads->size));
   char* byteBuffer = malloc((4*sizeof(char))+user_BoundWitness->publicKeys->size + to_uint32((unsigned char*)&user_BoundWitness->payloads->size) + user_BoundWitness->signatures->size);
   if(littleEndian()){
     uint32_t encodedSize = to_uint32((unsigned char*)&user_BoundWitness->size);
@@ -631,10 +634,10 @@ XYResult* BoundWitness_creator_toBytes(struct XYObject* user_XYObject){
     user_payloadSize = to_uint32((unsigned char*)&user_payload->size);
     memcpy(user_payload, &user_payloadSize, 4);
   }
-  printf("%d\n", user_payloadSize);
+  //printf("%d\n", user_payloadSize);
   newObject_result = newObject((char*)&IntStrongArray_id, user_payload);
   if(newObject_result->error == OK){
-
+    //user_payload->size = to_uint32((unsigned char*)&user_payload->size);
     XYResult* toBytes_result = ISA_Creator->toBytes(newObject_result->result);
     if(toBytes_result->error == OK){
       memcpy(byteBuffer+sizeof(uint32_t)+user_publicKeysSize, toBytes_result->result, user_payloadSize);
@@ -649,7 +652,6 @@ XYResult* BoundWitness_creator_toBytes(struct XYObject* user_XYObject){
     XYResult* toBytes_result = SSA_Creator->toBytes(newObject_result->result);
     free(newObject_result);
     if(toBytes_result->error == OK){
-      printf("FUCKING MEM CORRUPTION");
       memcpy(byteBuffer+sizeof(uint32_t)+user_publicKeysSize+user_payloadSize, toBytes_result->result, user_signaturesSize);
       free(toBytes_result);
     }

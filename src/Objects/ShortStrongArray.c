@@ -348,7 +348,7 @@ XYResult* ShortStrongArray_creator_fromBytes(char* data){
 XYResult* ShortStrongArray_creator_toBytes(struct XYObject* user_XYObject){
   if((user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x02) || (user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x03)){
     ShortStrongArray* user_array = user_XYObject->GetPayload(user_XYObject);
-    uint8_t totalSize = user_array->size;
+    uint16_t totalSize = user_array->size;
     char* byteBuffer = malloc(sizeof(char)*totalSize);
     XYResult* return_result = malloc(sizeof(XYResult));
     if(return_result != NULL && byteBuffer != NULL){

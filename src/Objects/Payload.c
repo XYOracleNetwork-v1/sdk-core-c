@@ -177,6 +177,7 @@ XYResult* Payload_creator_toBytes(struct XYObject* user_XYObject){
   if(littleEndian()){
     encoded_size = to_uint32((unsigned char*)&encoded_size);
   }
+  //printf("toBytes payload size: %d\n", to_uint32((unsigned char*)&encoded_size));
   char* signedHeuristicBytes = toBytes_result1->result;
   char* unsignedHeuristicBytes = toBytes_result2->result;
   memcpy(return_buffer, &encoded_size, sizeof(uint32_t));

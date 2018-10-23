@@ -35,7 +35,10 @@
 *----------------------------------------------------------------------------*/
 int publicKeyCount = 0;
 int signatureCount = 0;
+int called = 0;
 XYResult* incomingData(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitness, int endpoint){
+  called = called+1;
+
   self->publicKeyCount = 0;
   self->signatureCount = 0;
   if(boundWitness != NULL){
@@ -57,9 +60,13 @@ XYResult* incomingData(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitn
     }
   }
   XYObject* selfKeysetObject = NULL;
+  if(called == 13){
+    breakpoint();
+  }
   if(!self->hasSentKeysAndPayload){
     XYResult* keyset_results = makeSelfKeySet(self);
     selfKeysetObject = keyset_results->result;
+
     self->dynamicPublicKeys->add(self->dynamicPublicKeys, keyset_results->result);
     //for(int i = 0; i< self->heuristicCount; i++){
     //  XYObject add_object = self->payload[i];
@@ -123,7 +130,6 @@ XYResult* incomingData(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitn
     if(lookup_result->error != OK){
       return NULL;
     }
-
     pubkeyArray->add(pubkeyArray, selfKeysetObject);
     XYResult* payload_result = self->dynamicPayloads->get(self->dynamicPayloads, 0);
     XYObject* payload_object_two = payload_result->result;
