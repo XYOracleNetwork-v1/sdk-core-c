@@ -7,10 +7,7 @@
  *
  * @brief primary hash routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -24,7 +21,9 @@
  */
 
 #include "xyobject.h"
-#include "wc_sha256.h"                // wc_ = wolf crypto library routine (SHA-256)
+#include "wc_sha256.h"                      // wc_ = wolf crypto library routine (SHA-256)
+
+extern XYResult_t preallocated_return_result;
 
 /*
  * DEFINES
@@ -54,8 +53,8 @@ struct HashProvider{
    */
   
   XYResult_t* (*verifyHash)(ByteArray_t* dataHashed, XYObject_t* hash);
-  char* (*getHashId)(HashProvider_t* hashProviderObject);   // Fetch the above id object 
-                                                            // and return it.
+  XYResult_t* (*getHashId)(HashProvider_t* hashProviderObject);   // Fetch the above id object 
+                                                                  // and return it.
 };
 
 /*
@@ -63,8 +62,8 @@ struct HashProvider{
  ****************************************************************************************
  */
 
-HashProvider_t* newHashProvider(void);
-char* hashGetId(HashProvider_t* hashProviderObject);
+XYResult_t* newHashProvider(void);
+XYResult_t* hashGetId(HashProvider_t* hashProviderObject);
 XYResult_t* createHash(ByteArray_t* dataToHash);
 XYResult_t* verifyHash(ByteArray_t* dataHashed, XYObject_t* hash);
 

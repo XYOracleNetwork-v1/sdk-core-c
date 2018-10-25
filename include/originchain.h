@@ -7,10 +7,7 @@
  *
  * @brief primary node base routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -52,7 +49,7 @@ struct OriginChainNavigator {
   XYResult_t* (*addBoundWitness)(BoundWitness*);
   XYResult_t* (*getHash)(BoundWitness* user_BoundWitness, HashProvider_t* user_HashProvider);
   XYResult_t* (*findPreviousBlocks)(OriginChainNavigator* self_OriginChainNavigator, BoundWitness* user_BoundWitness);
-  StorageProvider* Storage;
+  StorageProvider_t* Storage;
   HashProvider_t* Hash;
 };
 

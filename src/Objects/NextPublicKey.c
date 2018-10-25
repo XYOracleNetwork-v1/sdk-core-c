@@ -7,10 +7,7 @@
  *
  * @brief primary next public key routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -36,6 +33,13 @@
 *      XYResult_t*          [out]      bool   Returns XYObject_t* of the NextPublicKey type.
 *----------------------------------------------------------------------------*/
 XYResult_t* NextPublicKey_creator_create(char id[2], void* user_data){
+
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_data) {RETURN_ERROR(ERR_BADDATA)};
+
   return newObject(id, user_data);
 }
 
@@ -55,6 +59,12 @@ XYResult_t* NextPublicKey_creator_create(char id[2], void* user_data){
 *----------------------------------------------------------------------------*/
 XYResult_t* NextPublicKey_creator_fromBytes(char* pubkey_data){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!pubkey_data) {RETURN_ERROR(ERR_BADDATA)};
+
   char id[2];
   memcpy(id, pubkey_data, 2);
   char pubkey_id[2];
@@ -64,6 +74,10 @@ XYResult_t* NextPublicKey_creator_fromBytes(char* pubkey_data){
   XYResult_t* lookup_result2 = tableLookup(pubkey_id);
   
   NextPublicKey_t* return_NPK = malloc(sizeof(NextPublicKey_t));
+  
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
   
   if(lookup_result->error == OK && lookup_result2->error == OK && return_NPK){
     
@@ -104,17 +118,14 @@ XYResult_t* NextPublicKey_creator_fromBytes(char* pubkey_data){
     {
       RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
     }
-    XYResult_t* return_result = malloc(sizeof(XYResult_t));
-    if(return_result){
-      return_result->error = OK;
-      return_result->result = return_NPK;
+
+    preallocated_return_result_ptr = &preallocated_return_result;
+
+    preallocated_return_result_ptr->error = OK;
+    preallocated_return_result_ptr->result = return_NPK;
       
-      return return_result;
-    }
-    else
-    {
-      RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-    }
+    return preallocated_return_result_ptr;
+
   } else if(lookup_result->error == OK && lookup_result2->error == OK){
     if(lookup_result) free(lookup_result);
     if(lookup_result2) free(lookup_result2);
@@ -146,9 +157,15 @@ XYResult_t* NextPublicKey_creator_fromBytes(char* pubkey_data){
 *----------------------------------------------------------------------------*/
 XYResult_t* NextPublicKey_creator_toBytes(XYObject_t* user_XYObject){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
+
   if(user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x07){
     
-    NextPublicKey_t* user_NPK = user_XYObject->GetPayload(user_XYObject);
+    NextPublicKey_t* user_NPK = (user_XYObject->GetPayload(user_XYObject))->result;
     
     char id[2];
     memcpy(&id, user_NPK->id, 2);
@@ -216,17 +233,13 @@ XYResult_t* NextPublicKey_creator_toBytes(XYObject_t* user_XYObject){
       {
         RETURN_ERROR(ERR_CRITICAL);
       }
-      XYResult_t* return_result = malloc(sizeof(XYResult_t));
-      if(return_result){
-        return_result->error = OK;
-        return_result->result = byteBuffer;
-        return return_result;
-      }
-      else
-      {
-        free(byteBuffer);
-        RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-      }
+
+      preallocated_return_result_ptr = &preallocated_return_result;
+
+      preallocated_return_result_ptr->error = OK;
+      preallocated_return_result_ptr->result = byteBuffer;
+        
+      return preallocated_return_result_ptr;
     }
     else
     {

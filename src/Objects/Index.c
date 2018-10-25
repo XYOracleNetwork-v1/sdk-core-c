@@ -7,10 +7,7 @@
  *
  * @brief primary indexing routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -37,6 +34,12 @@
 *----------------------------------------------------------------------------*/
 XYResult_t* Index_creator_create(char id[2], void* user_data){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_data) {RETURN_ERROR(ERR_BADDATA)};
+
   return newObject(id, user_data);
 }
 
@@ -56,6 +59,12 @@ XYResult_t* Index_creator_create(char id[2], void* user_data){
 *----------------------------------------------------------------------------*/
 XYResult_t* Index_creator_fromBytes(char* index_data){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!index_data) {RETURN_ERROR(ERR_BADDATA)};
+
   char id[2];
   memcpy(id, index_data, 2);
   int index = to_uint32(&index_data[2]);
@@ -79,6 +88,12 @@ XYResult_t* Index_creator_fromBytes(char* index_data){
 *----------------------------------------------------------------------------*/
 XYResult_t* Index_creator_toBytes(XYObject_t* user_XYObject){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
+
   uint32_t encoded_bytes;
   char* index = (char*)user_XYObject->payload;
   
@@ -88,20 +103,12 @@ XYResult_t* Index_creator_toBytes(XYObject_t* user_XYObject){
     encoded_bytes = to_uint32((char*)&encoded_bytes);
   }
 
-  XYResult_t* return_result = malloc(sizeof(XYResult_t));
+  preallocated_return_result_ptr = &preallocated_return_result;
   
-  if(return_result != NULL){
-    return_result->error = OK;
-    return_result->result = &encoded_bytes;
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = &encoded_bytes;
     
-    return return_result;
-  }
-  else {
-    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-    preallocated_result->result = NULL;
-    
-    return preallocated_result;
-  }
+  return preallocated_return_result_ptr;
 }
 
 // end of file index.c

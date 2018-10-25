@@ -7,10 +7,7 @@
  *
  * @brief primary payload routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -37,6 +34,12 @@
 *----------------------------------------------------------------------------*/
 XYResult_t* Payload_creator_create(char id[2], void* payload_data){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!payload_data) {RETURN_ERROR(ERR_BADDATA)};
+
   XYResult_t* xy_result = newObject(id, payload_data);
   
   return xy_result;
@@ -58,9 +61,20 @@ XYResult_t* Payload_creator_create(char id[2], void* payload_data){
 *----------------------------------------------------------------------------*/
 XYResult_t* Payload_creator_fromBytes(char* payload_data){
   
-  Payload_t* return_payload = malloc(sizeof(Payload_t));
-  //TODO: wal, should check for any malloc errors
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!payload_data) {RETURN_ERROR(ERR_BADDATA)};
 
+  Payload_t* return_payload = malloc(sizeof(Payload_t));
+
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+  
+  if(!return_payload) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+    
   char IntWeakArrayID[2] = {0x01, 0x06};
   XYResult_t* lookup_result = tableLookup(IntWeakArrayID);
   ObjectProvider_t* weakArrayCreator = lookup_result->result;
@@ -97,15 +111,12 @@ XYResult_t* Payload_creator_fromBytes(char* payload_data){
   return_payload->signedHeuristics = signedWeakArray;
   return_payload->unsignedHeuristics = unsignedWeakArray;
   
-  XYResult_t* return_result = malloc(sizeof(XYResult_t));
+  preallocated_return_result_ptr = &preallocated_return_result;
   
-  if(return_result){
-    return_result->error = OK;
-    return_result->result = return_payload;
-    return return_result;
-  } else {
-    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-  }
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = return_payload;
+  
+  return preallocated_return_result_ptr;
 }
 
 /*----------------------------------------------------------------------------*
@@ -124,6 +135,12 @@ XYResult_t* Payload_creator_fromBytes(char* payload_data){
 *----------------------------------------------------------------------------*/
 XYResult_t* Payload_creator_toBytes(XYObject_t* user_XYObject){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
+
   Payload_t* user_Payload = user_XYObject->payload;
   uint32_t size = user_Payload->size;
 
@@ -161,7 +178,12 @@ XYResult_t* Payload_creator_toBytes(XYObject_t* user_XYObject){
   }
 
   char* return_buffer = malloc(sizeof(char)*size);
-  //TODO: wal, should check for any malloc errors
+
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+  
+  if(!return_buffer) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
 
   uint32_t encoded_size = size1 + size2 + (4*sizeof(char));
   if(littleEndian()){
@@ -181,13 +203,14 @@ XYResult_t* Payload_creator_toBytes(XYObject_t* user_XYObject){
   free(toBytes_result2);
   free(lookup_result);
   */
-  XYResult_t* return_result = malloc(sizeof(XYResult_t));
-  //TODO: wal, should check for any malloc errors
-
-  return_result->error = OK;
-  return_result->result = return_buffer;
   
-  return return_result;
+  preallocated_return_result_ptr = &preallocated_return_result;
+
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = return_buffer;
+  
+  return preallocated_return_result_ptr;
 }
 
 // end of file payload.c
+

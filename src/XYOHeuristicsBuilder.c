@@ -85,6 +85,13 @@ int littleEndian(void){
 *----------------------------------------------------------------------------
 */
 XYResult_t* Heuristic_RSSI_Creator_create(char id[2], void* rssi){
+
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!rssi) {RETURN_ERROR(ERR_BADDATA)};
+
   return newObject(id, &rssi);
 }
 
@@ -107,6 +114,12 @@ XYResult_t* Heuristic_RSSI_Creator_create(char id[2], void* rssi){
 */
 XYResult_t* Heuristic_RSSI_Creator_fromBytes(char* heuristic_data){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!heuristic_data) {RETURN_ERROR(ERR_BADDATA)};
+
   char id[2];
   memcpy(id, heuristic_data, 2);
   int rssi = heuristic_data[2];
@@ -125,7 +138,7 @@ XYResult_t* Heuristic_RSSI_Creator_fromBytes(char* heuristic_data){
 *     user_XYObject     [in]       XYObject_t*
 *
 *  RETURNS
-*     return_result     [out]      XYResult_t*   
+*     preallocated_return_result_ptr     [out]      XYResult_t*   
 *
 *  NOTES
 *
@@ -133,24 +146,22 @@ XYResult_t* Heuristic_RSSI_Creator_fromBytes(char* heuristic_data){
 */
 XYResult_t* Heuristic_RSSI_Creator_toBytes(XYObject_t* user_XYObject){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
+
   char encoded_bytes;
   char* rssi = (char*)user_XYObject->payload;
   encoded_bytes = rssi[0];
 
-  XYResult_t* return_result = malloc(sizeof(XYResult_t));
+  preallocated_return_result_ptr = &preallocated_return_result;
   
-  if(return_result != NULL){
-    return_result->error = OK;
-    return_result->result = &encoded_bytes;
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = &encoded_bytes;
     
-    return return_result;
-  }
-  else {
-    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-    preallocated_result->result = NULL;
-    
-    return preallocated_result;
-  }
+  return preallocated_return_result_ptr;
 }
 
 /*----------------------------------------------------------------------------*
@@ -172,6 +183,13 @@ XYResult_t* Heuristic_RSSI_Creator_toBytes(XYObject_t* user_XYObject){
 *----------------------------------------------------------------------------
 */
 XYResult_t* Heuristic_Text_Creator_create(char id[2], void* text){
+
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!text) {RETURN_ERROR(ERR_BADDATA)};
+
   return newObject(id, text);
 }
 
@@ -189,17 +207,30 @@ XYResult_t* Heuristic_Text_Creator_create(char id[2], void* text){
 *     newObject(id, payload_bytes)      [out]     XYResult_t*   
 *
 *  NOTES
-*     //TODO: wal, should return any malloc errors if malloc fails
+*     
 *----------------------------------------------------------------------------
 */
 XYResult_t* Heuristic_Text_Creator_fromBytes(char* heuristic_data){
   
-  char id[2];
-  memcpy(id, heuristic_data, 2);
-  uint16_t size = to_uint16(&heuristic_data[2]);
-  char* payload_bytes = malloc(size*sizeof(char));
-  //TODO: wal, should check for any malloc errors
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
   
+  if(!heuristic_data) {RETURN_ERROR(ERR_BADDATA)};
+
+  char id[2];
+  memcpy(id, heuristic_data, 2);  //TODO: wal, constants please
+  
+  uint16_t size = to_uint16(&heuristic_data[2]);
+  
+  char* payload_bytes = malloc(size*sizeof(char));
+  
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+  
+  if(!payload_bytes) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+    
   memcpy(payload_bytes, &heuristic_data[2], size);
   
   return newObject(id, payload_bytes);
@@ -216,7 +247,7 @@ XYResult_t* Heuristic_Text_Creator_fromBytes(char* heuristic_data){
 *     user_XYObject     [in]      XYObject_t*
 *
 *  RETURNS
-*     return_result     [out]     XYResult_t*   
+*     preallocated_return_result_ptr      [out]     XYResult_t*   
 *
 *  NOTES
 *
@@ -224,36 +255,39 @@ XYResult_t* Heuristic_Text_Creator_fromBytes(char* heuristic_data){
 */
 XYResult_t* Heuristic_Text_Creator_toBytes(XYObject_t* user_XYObject){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
+
   char* text = user_XYObject->payload;
   uint16_t size = to_uint16(text);
   uint16_t encodedSize = size;
   
   if(littleEndian()){
-    uint16_t encodedSize = to_uint16((char*)&encodedSize);
+    encodedSize = to_uint16((char*)&encodedSize);
   }
+  
   char* encoded_bytes = malloc(sizeof(char)*size);
-  if(encoded_bytes == NULL) {
-    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-  }
+  
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+  
+  if(encoded_bytes == NULL) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
   
   memcpy(encoded_bytes, &encodedSize, sizeof(uint16_t));
-  memcpy(encoded_bytes+(2*sizeof(char)), text+(2*sizeof(char)), size-(2*sizeof(char)));
+  memcpy(encoded_bytes+(2*sizeof(char)), 
+                        text+(2*sizeof(char)), 
+                        size-(2*sizeof(char)));
 
-  XYResult_t* return_result = malloc(sizeof(XYResult_t));
+  preallocated_return_result_ptr = &preallocated_return_result;
   
-  if(return_result != NULL){
-    return_result->error = OK;
-    return_result->result = encoded_bytes;
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = encoded_bytes;
     
-    return return_result;
-  }
-  else {
-    if(encoded_bytes) free(encoded_bytes);
-    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-    preallocated_result->result = NULL;
-    
-    return preallocated_result;
-  }
+  return preallocated_return_result_ptr;
 }
 
 /*----------------------------------------------------------------------------*
@@ -275,6 +309,13 @@ XYResult_t* Heuristic_Text_Creator_toBytes(XYObject_t* user_XYObject){
 *----------------------------------------------------------------------------
 */
 XYResult_t* ECDSA_secp256k1Uncompressed_creator_create(char id[2], void* text){
+
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!text) {RETURN_ERROR(ERR_BADDATA)};
+
   return newObject(id, text);
 }
 
@@ -292,20 +333,33 @@ XYResult_t* ECDSA_secp256k1Uncompressed_creator_create(char id[2], void* text){
 *     newObject(id, key)    [out]     XYResult_t*   
 *
 *  NOTES
-*     //TODO: wal, should return any malloc errors if malloc fails
+*     
 *----------------------------------------------------------------------------
 */
 XYResult_t* ECDSA_secp256k1Uncompressed_creator_fromBytes(char* key_data){
   
-  char id[2];
-  memcpy(id, key_data, 2);
-  ECDSA_secp256k1_uncompressed_t* key = malloc(sizeof(ECDSA_secp256k1_uncompressed_t));
-  //TODO: wal, should check for any malloc errors
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
   
-  memcpy(key->point_x, &key_data[2], 32*sizeof(char));
+  if(!key_data) {RETURN_ERROR(ERR_BADDATA)};
+
+  char id[2];
+  
+  memcpy(id, key_data, 2);    //TODO: wal, constant please
+  
+  ECDSA_secp256k1_uncompressed_t* key = malloc(sizeof(ECDSA_secp256k1_uncompressed_t));
+
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+  
+  if(!key) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
+  
+  memcpy(key->point_x, &key_data[2], 32*sizeof(char));    //TODO: wal, constant please
   memcpy(key->point_y, &key_data[2+32], 32*sizeof(char));
   
-  return newObject(id, key);
+  return newObject(id, key);  //TODO: wal, check that we are returning any errors
 }
 
 /*----------------------------------------------------------------------------*
@@ -319,7 +373,7 @@ XYResult_t* ECDSA_secp256k1Uncompressed_creator_fromBytes(char* key_data){
 *     user_XYObject     [in]      XYObject_t*
 *
 *  RETURNS
-*     return_result     [out]     XYResult_t*   
+*     preallocated_return_result_ptr     [out]     XYResult_t*   
 *
 *  NOTES
 *
@@ -327,31 +381,31 @@ XYResult_t* ECDSA_secp256k1Uncompressed_creator_fromBytes(char* key_data){
 */
 XYResult_t* ECDSA_secp256k1Uncompressed_creator_toBytes(XYObject_t* user_XYObject){
   
-  ECDSA_secp256k1_uncompressed_t* raw_key = user_XYObject->payload;
-  char* encoded_bytes = malloc(64*sizeof(char));
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
 
-  if(encoded_bytes == NULL){
-    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-  }
+  ECDSA_secp256k1_uncompressed_t* raw_key = user_XYObject->payload;
+  
+  char* encoded_bytes = malloc(64*sizeof(char));  //TODO: wal, constant please
+
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+  
+  if(encoded_bytes == NULL) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
 
   memcpy(encoded_bytes, raw_key->point_x , 32*sizeof(char));
   memcpy(encoded_bytes+32*sizeof(char), raw_key->point_y , 32*sizeof(char));
 
-  XYResult_t* return_result = malloc(sizeof(XYResult_t));
+  preallocated_return_result_ptr = &preallocated_return_result;
   
-  if(return_result != NULL){
-    return_result->error = OK;
-    return_result->result = encoded_bytes;
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = encoded_bytes;
     
-    return return_result;
-  }
-  else {
-    if(encoded_bytes) free(encoded_bytes);
-    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-    preallocated_result->result = NULL;
-    
-    return preallocated_result;
-  }
+  return preallocated_return_result_ptr;
 }
 
 /*----------------------------------------------------------------------------*
@@ -373,6 +427,13 @@ XYResult_t* ECDSA_secp256k1Uncompressed_creator_toBytes(XYObject_t* user_XYObjec
 *----------------------------------------------------------------------------
 */
 XYResult_t* ECDSA_secp256k1Sig_creator_create(char id[2], void* text){
+
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!text) {RETURN_ERROR(ERR_BADDATA)};
+
   return newObject(id, text);
 }
 
@@ -390,25 +451,43 @@ XYResult_t* ECDSA_secp256k1Sig_creator_create(char id[2], void* text){
 *     newObject(id, return_signature)   [out]     XYResult_t*   
 *
 *  NOTES
-*     //TODO: wal, should return any malloc errors if malloc fails
+*     
 *----------------------------------------------------------------------------
 */
 XYResult_t* ECDSA_secp256k1Sig_creator_fromBytes(char* heuristic_data){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!heuristic_data) {RETURN_ERROR(ERR_BADDATA)};
+
   char id[2];
   memcpy(id, heuristic_data, 2);
   uint8_t size = heuristic_data[3];
+  
   char* payload_bytes = malloc(size-(1*sizeof(char)));
-  //TODO: wal, should check for any malloc errors
-  
+
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+    
+  if(payload_bytes == NULL) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
+
   memcpy(payload_bytes, &heuristic_data[2], size);
-  secp256k1Signature_t* return_signature = malloc(sizeof(secp256k1Signature_t));
-  //TODO: wal, should check for any malloc errors
   
+  secp256k1Signature_t* return_signature = malloc(sizeof(secp256k1Signature_t));
+
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+    
+  if(return_signature == NULL) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
+
   return_signature->size = size;
   return_signature->signature = payload_bytes;
   
-  return newObject(id, return_signature);
+  return newObject(id, return_signature);   //TODO: wal, check that errors are returned
 }
 
 /*----------------------------------------------------------------------------*
@@ -422,7 +501,7 @@ XYResult_t* ECDSA_secp256k1Sig_creator_fromBytes(char* heuristic_data){
 *     user_XYObject       [in]      XYObject_t*
 *
 *  RETURNS
-*     return_result       [out]     XYResult_t*   
+*     preallocated_return_result_ptr       [out]     XYResult_t*   
 *
 *  NOTES
 *
@@ -430,28 +509,30 @@ XYResult_t* ECDSA_secp256k1Sig_creator_fromBytes(char* heuristic_data){
 */
 XYResult_t* ECDSA_secp256k1Sig_creator_toBytes(XYObject_t* user_XYObject){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
+
   secp256k1Signature_t* raw_signature = user_XYObject->payload;
+  
   char* encoded_bytes = malloc(raw_signature->size);
 
-  if(encoded_bytes == NULL){
-    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-  }
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+    
+  if(encoded_bytes == NULL) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
 
   memcpy(encoded_bytes, user_XYObject->payload, raw_signature->size-(1*sizeof(char)));
 
-  XYResult_t* return_result = malloc(sizeof(XYResult_t));
-  if(return_result != NULL){
-    return_result->error = OK;
-    return_result->result = encoded_bytes;
+  preallocated_return_result_ptr = &preallocated_return_result;
+
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = encoded_bytes;
     
-    return return_result;
-  }
-  else {
-    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-    preallocated_result->result = NULL;
-    
-    return preallocated_result;
-  }
+  return preallocated_return_result_ptr;
 }
 
 // end of file xyoheuristicsbuilder.c

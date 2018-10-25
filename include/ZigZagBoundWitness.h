@@ -7,10 +7,7 @@
  *
  * @brief primary ZigZagBoundWitness routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -54,10 +51,10 @@ struct ZigZagBoundWitness{
    */
   
    XYResult_t* (*incomingData)(ZigZagBoundWitness_t* self, BoundWitnessTransfer* boundWitness, int endpoint);
-   int (*addTransfer)(ZigZagBoundWitness_t* self, BoundWitnessTransfer* boundWitness);
-   int (*addIncomingKeys)(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingKeySets);
-   int (*addIncomingPayload)(ZigZagBoundWitness_t* self, IntStrongArray_t* incomingPayloads);
-   int (*addIncomingSignatures)(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingSignatures);
+   XYResult_t*/*int*/ (*addTransfer)(ZigZagBoundWitness_t* self, BoundWitnessTransfer* boundWitness);
+   XYResult_t*/*int*/ (*addIncomingKeys)(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingKeySets);
+   XYResult_t*/*int*/ (*addIncomingPayload)(ZigZagBoundWitness_t* self, IntStrongArray_t* incomingPayloads);
+   XYResult_t*/*int*/ (*addIncomingSignatures)(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingSignatures);
    XYResult_t* (*makeSelfKeySet)(ZigZagBoundWitness_t* self);
    XYResult_t* (*signForSelf)(ZigZagBoundWitness_t* self);
    Signer_t* signer;
@@ -72,10 +69,10 @@ struct ZigZagBoundWitness{
 XYResult_t* incomingData(ZigZagBoundWitness_t* self, 
                          BoundWitnessTransfer* boundWitness, 
                          int endpoint);
-int addTransfer(ZigZagBoundWitness_t* self, BoundWitnessTransfer* boundWitness);
-int addIncomingKeys(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingKeySets);
-int addIncomingPayload(ZigZagBoundWitness_t* self, IntStrongArray_t* incomingPayloads);
-int addIncomingSignatures(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingSignatures);
+XYResult_t*/*int*/ addTransfer(ZigZagBoundWitness_t* self, BoundWitnessTransfer* boundWitness);
+XYResult_t*/*int*/ addIncomingKeys(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingKeySets);
+XYResult_t*/*int*/ addIncomingPayload(ZigZagBoundWitness_t* self, IntStrongArray_t* incomingPayloads);
+XYResult_t*/*int*/ addIncomingSignatures(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingSignatures);
 XYResult_t* makeSelfKeySet(ZigZagBoundWitness_t* self);
 
 //#endif

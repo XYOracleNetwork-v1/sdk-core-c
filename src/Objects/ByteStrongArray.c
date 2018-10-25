@@ -7,10 +7,7 @@
  *
  * @brief primary byte strong array routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -51,6 +48,12 @@ XYResult_t* ByteStrongArray_creator_toBytes_t(XYObject_t* user_XYObject);
 *----------------------------------------------------------------------------*/
 XYResult_t* ByteStrongArray_add(ByteStrongArray_t* self_ByteStrongArray, 
                                 XYObject_t* user_XYObject){ //TODO: consider changing self to XYObject
+
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!self_ByteStrongArray || !user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
 
   // Lookup the ObjectProvider for the object so we can infer if the object has a default
   // size or a variable size per each element. We know every element in a single-type array
@@ -151,15 +154,13 @@ XYResult_t* ByteStrongArray_add(ByteStrongArray_t* self_ByteStrongArray,
         memcpy(object_payload, toBytes_result->result, object_size);
 
         self_ByteStrongArray->size = newSize;
-        XYResult_t* return_result = malloc(sizeof(XYResult_t));
-        if(return_result != NULL){
-          return_result->error = OK;
-          return_result->result = NULL;
-          return return_result;
-        }
-        else {
-          RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-        }
+        
+        preallocated_return_result_ptr = &preallocated_return_result;
+        
+        preallocated_return_result_ptr->error = OK;
+        preallocated_return_result_ptr->result = NULL;
+        
+        return preallocated_return_result_ptr;
       }
       else {
         RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
@@ -191,11 +192,18 @@ XYResult_t* ByteStrongArray_add(ByteStrongArray_t* self_ByteStrongArray,
 *----------------------------------------------------------------------------*/
 XYResult_t* ByteStrongArray_get(ByteStrongArray_t* self_ByteStrongArray, int index) {
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!self_ByteStrongArray) {RETURN_ERROR(ERR_BADDATA)};
+
   XYResult_t* general_result = tableLookup(self_ByteStrongArray->id);
   
   if(general_result->error == OK){
     
     ObjectProvider_t* element_creator = general_result->result;
+    
     if(element_creator->defaultSize != 0){
       uint8_t totalSize = self_ByteStrongArray->size;
       totalSize = totalSize - 3*sizeof(char);
@@ -227,8 +235,12 @@ XYResult_t* ByteStrongArray_get(ByteStrongArray_t* self_ByteStrongArray, int ind
           //TODO: wal, should check for any malloc errors
 
           memcpy(return_object_payload, &array_elements[array_offset], int_size);
-          XYResult_t* return_result = newObject(self_ByteStrongArray->id, return_object_payload);
-          return return_result;
+          
+          preallocated_return_result_ptr = &preallocated_return_result;
+
+          preallocated_return_result_ptr = newObject(self_ByteStrongArray->id, return_object_payload);
+          
+          return preallocated_return_result_ptr;
         }
         else {
           array_offset += int_size;
@@ -263,7 +275,17 @@ XYResult_t* ByteStrongArray_get(ByteStrongArray_t* self_ByteStrongArray, int ind
 *----------------------------------------------------------------------------*/
 XYResult_t* ByteStrongArray_creator_create(char id[2], void* user_data){  // consider allowing someone 
                                                                           // to create array with one object
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_data) {RETURN_ERROR(ERR_BADDATA)};
+
   ByteStrongArray_t* ByteStrongArrayObject = malloc(sizeof(ByteStrongArray_t));
+  
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
   
   char byteStrongArrayID[2] = {0x01, 0x01};
   
@@ -278,19 +300,13 @@ XYResult_t* ByteStrongArray_creator_create(char id[2], void* user_data){  // con
     ByteStrongArrayObject->get = &ByteStrongArray_get;
     ByteStrongArrayObject->payload = NULL;
     
-    XYResult_t* return_result = malloc(sizeof(XYResult_t));
+    preallocated_return_result_ptr = &preallocated_return_result;
     
-    if(return_result != NULL){
+    preallocated_return_result_ptr->error = OK;
+    XYObject_t* return_object = newObject_result->result;
+    preallocated_return_result_ptr->result = return_object;
       
-      return_result->error = OK;
-      XYObject_t* return_object = newObject_result->result;
-      return_result->result = return_object;
-      
-      return return_result;
-    }
-    else {
-      RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-    }
+    return preallocated_return_result_ptr;
   }
   else {
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
@@ -309,14 +325,24 @@ XYResult_t* ByteStrongArray_creator_create(char id[2], void* user_data){  // con
 *     *data                  [in]       char*
 *
 *  RETURNS
-*      XYResult_t*           [out]      bool   Returns XYObject* of the ByteStrongArray type.
+*      preallocated_return_result_ptr            [out]      XYResult_t*   
+*                                                           Returns XYObject* of the ByteStrongArray type.
 *----------------------------------------------------------------------------*/
 XYResult_t* ByteStrongArray_creator_fromBytes(char* data){
   
-  XYResult_t* return_result = malloc(sizeof(XYResult_t));
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!data) {RETURN_ERROR(ERR_BADDATA)};
+
   ByteStrongArray_t* return_array = malloc(sizeof(ByteStrongArray_t));
   
-  if(return_result && return_array){
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+  
+  if(return_array){
       return_array->add = &ByteStrongArray_add;
       return_array->remove = NULL;
       return_array->get = &ByteStrongArray_get;
@@ -327,13 +353,21 @@ XYResult_t* ByteStrongArray_creator_fromBytes(char* data){
       array_id[2] = '\00';
       strcpy(return_array->id, array_id);
       return_array->payload = malloc(sizeof(char)*(return_array->size-3));
-      //TODO: wal, should check for any malloc errors
+
+      /********************************/
+      /* guard against malloc errors  */
+      /********************************/
+  
+      if(!return_array->payload) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
 
       memcpy(return_array->payload, &data[3], (return_array->size-3));
-      return_result->error = OK;
-      return_result->result = return_array;
+
+      preallocated_return_result_ptr = &preallocated_return_result;
+
+      preallocated_return_result_ptr->error = OK;
+      preallocated_return_result_ptr->result = return_array;
     
-      return return_result;
+      return preallocated_return_result_ptr;
   }
   else{
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
@@ -352,28 +386,41 @@ XYResult_t* ByteStrongArray_creator_fromBytes(char* data){
 *    *user_XYObject         [in]       XYObject*
 *
 *  RETURNS
-*      XYResult_t*          [out]      bool   Returns char* to serialized bytes.
+*    preallocated_return_result_ptr   [out]     XYResult_t*
+*                                               Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
 XYResult_t* ByteStrongArray_creator_toBytes(XYObject_t* user_XYObject){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
+
   if(user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x01){
     
-    ByteStrongArray_t* user_array = user_XYObject->GetPayload(user_XYObject);
+    ByteStrongArray_t* user_array = (user_XYObject->GetPayload(user_XYObject))->result;
     uint8_t totalSize = user_array->size;
     char* byteBuffer = malloc(sizeof(char)*totalSize);
-    XYResult_t* return_result = malloc(sizeof(XYResult_t));
+
+    preallocated_return_result_ptr = &preallocated_return_result;
     
-    if(return_result != NULL && byteBuffer != NULL){
+    /********************************/
+    /* guard against malloc errors  */
+    /********************************/
+  
+    if(byteBuffer != NULL){
       
       memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 3);
       memcpy(byteBuffer+3, user_array->payload, sizeof(char)*(totalSize-3));
-      return_result->error = OK;
-      return_result->result = byteBuffer;
       
-      return return_result;
+      preallocated_return_result_ptr->error = OK;
+      preallocated_return_result_ptr->result = byteBuffer;
+      
+      return preallocated_return_result_ptr;
       
       } else {
-        if(return_result) free(return_result);
+        
         if(byteBuffer) free(byteBuffer);
         
         RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)

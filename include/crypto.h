@@ -7,10 +7,7 @@
  *
  * @brief primary crypto routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -30,6 +27,8 @@
  ****************************************************************************************
  */
 
+#define PRIVATE_KEY_LENGTH_2048 2048
+#define PRIVATE_KEY_LENGTH_1024 1024
 
 /*
  * TYPE DEFINITIONS
@@ -43,6 +42,8 @@ typedef struct{
   char* publicKey;
   char* privateKey;
 } keyPairStruct;
+
+extern XYResult_t preallocated_return_result;
 
 /*
  * STRUCTURES
@@ -68,10 +69,10 @@ struct Signer{
                 XYObject_t* signature, 
                 XYObject_t* publicKey);
   
-  ByteArray_t* (*encrypt)(Signer_t*, ByteArray_t*);               // Encrypt the data to the key of 
-                                                                  // this Signer object
-  ByteArray_t* (*decrypt)(Signer_t*, ByteArray_t*);               // Decrypt the data with the key 
-                                                                  // of this Signer object.
+  ByteArray_t* (*encrypt)(Signer_t*, ByteArray_t*);     // Encrypt the data to the key of 
+                                                        // this Signer object
+  ByteArray_t* (*decrypt)(Signer_t*, ByteArray_t*);     // Decrypt the data with the key 
+                                                        // of this Signer object.
   HashProvider_t* hashingProvider;
 };
 
@@ -79,12 +80,12 @@ struct Signer{
 
 struct CryptoCreator{
   
-  char id[2];                                                     //TODO: wal, constants please
-  char* (*getId)(CryptoCreator_t*);                               // Fetch the id object above
-                                                                  // and return it.
-  Signer_t* (*newCryptoSignerInstance)(ByteArray_t* privateKey);  // Generate a new XyoCryptoSigner 
-                                                                  // object, which includes
-                                                                  // generating a new keypair.
+  char id[2];                                                       //TODO: wal, constants please
+  XYResult_t* (*getId)(CryptoCreator_t*);                           // Fetch the id object above
+                                                                    // and return it.
+  XYResult_t* (*newCryptoSignerInstance)(ByteArray_t* privateKey);  // Generate a new XyoCryptoSigner 
+                                                                    // object, which includes
+                                                                    // generating a new keypair.
 }; 
 
 /*
@@ -96,18 +97,18 @@ XYResult_t* newCryptoSignerInstance(ByteArray_t* privateKey);
 XYResult_t* newCryptoCreator(void);
 XYResult_t* getPublicKeyId(Signer_t* signer);
 XYResult_t* getSignatureId(Signer_t* signer);
-XYObject_t* XyoCryptoSigner (XYObject_t* privateKey);
+XYResult_t* XyoCryptoSigner (XYObject_t* privateKey);
 XYResult_t* getPublicKey(Signer_t* signer);
 XYResult_t* sign(Signer_t* signer, ByteArray_t* dataToSign);
 XYResult_t* verify(Signer_t* signer, ByteArray_t* signedData, XYObject_t* signature, XYObject_t* publicKey);
-XYObject_t* encrypt(Signer_t* signer, ByteArray_t* unEncrypedData);
-XYObject_t* decrypt(Signer_t* signer, ByteArray_t* encrypedData);
+XYResult_t* encrypt(Signer_t* signer, ByteArray_t* unEncrypedData);
+XYResult_t* decrypt(Signer_t* signer, ByteArray_t* encrypedData);
 XYResult_t* getPrivateKey(Signer_t* signer);
-
-
-char* cryptoGetId(CryptoCreator_t* object);
-keyPairStruct* generateKeyPair(void);
 XYResult_t* newPrivateKey(void);
+
+XYResult_t* cryptoGetId(CryptoCreator_t* object);
+XYResult_t* generateNewKeyPair(void);
+XYResult_t* newKeyPair(void);
 XYResult_t* newPublicKey(Signer_t* signer);
 
 #endif

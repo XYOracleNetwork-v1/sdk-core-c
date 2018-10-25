@@ -19,7 +19,18 @@
 #include <stdio.h>
 #include "BoundWitness.h"   // includes "xyobject.h", "hash.h", <stdint.h>
 
-XYResult_t* preallocated_result;
+/*
+ * GLOBALS
+ ****************************************************************************************
+ */
+
+XYResult_t preallocated_return_result;
+XYResult_t* preallocated_return_result_ptr;
+
+/*
+ * MAIN
+ ****************************************************************************************
+ */
 
 #ifdef BUILD_MAIN
 
@@ -27,7 +38,12 @@ int main(){
   
   preallocated_result = malloc(sizeof(XYResult_t*));    //TODO: wal, where is this freed?
 
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+  
   if(preallocated_result){
+  
     initTable();
 
     XYResult_t* lookup_result = tableLookup((char*)&BoundWitness_id);
@@ -39,6 +55,10 @@ int main(){
       BoundWitness* BoundWitness_raw = malloc(sizeof(BoundWitness));    //TODO: wal, where is this freed?
       XYObject_t* BoundWitness_object;
       
+      /********************************/
+      /* guard against malloc errors  */
+      /********************************/
+  
       if(BoundWitness_raw){
         
         XYResult_t* create_result = BoundWitness_creator->create((char*)&BoundWitness_id, BoundWitness_raw);
@@ -91,7 +111,13 @@ int main(){
           ShortStrongArray_t* keySet_raw = keyset_object->payload;
 
           ECDSA_secp256k1_uncompressed_t* publicKey = malloc(sizeof(ECDSA_secp256k1_uncompressed_t));   //TODO: wal, where is this freed?
-          //TODO: wal, should check for any malloc errors
+
+          /********************************/
+          /* guard against malloc errors  */
+          /********************************/
+  
+          if(!publicKey) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+
           //free(create_result);
           strcpy(publicKey->point_x, "Hello");
           strcpy(publicKey->point_y, "World!");
@@ -178,14 +204,26 @@ int main(){
           }
           
           Payload_t* user_payload = malloc(sizeof(Payload_t));    //TODO: wal, where is this freed?
-          //TODO: wal, should check for any malloc errors
+
+          /********************************/
+          /* guard against malloc errors  */
+          /********************************/
+  
+          if(!user_payload) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+
           user_payload->size = user_signedHeuristics->size + user_unsignedHeuristics->size + 4;
           user_payload->signedHeuristics = user_signedHeuristics;
           user_payload->unsignedHeuristics = user_unsignedHeuristics;
           newObject_result = newObject((char*)&Payload_id, user_payload);
           add_result = payload_raw->add(payload_raw, newObject_result->result);
           Payload_t* user_payload2 = malloc(sizeof(Payload_t));   //TODO: wal, where is this freed?
-          //TODO: wal, should check for any malloc errors
+
+          /********************************/
+          /* guard against malloc errors  */
+          /********************************/
+  
+          if(!user_payload2) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+
           user_payload2->size = user_signedHeuristics->size + user_unsignedHeuristics->size + 4;
           user_payload2->signedHeuristics = user_signedHeuristics;
           user_payload2->unsignedHeuristics = user_unsignedHeuristics;

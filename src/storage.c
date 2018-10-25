@@ -7,10 +7,7 @@
  *
  * @brief primary storage routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -34,24 +31,36 @@
  *      none
  *
  *  RETURNS
- *      store     [out]     StorageProvider*
- *
+ *      preallocated_return_result_ptr     [out]      XYResult_t*
+ *                                                    -----------------------
+ *              preallocated_return_result_ptr->error = OK (error code)
+ *              preallocated_return_result_ptr->result = aNewStorageProvider (StorageProvider_t*)
  *  NOTES
  *      will return a malloc error if there is insufficient memory to create a storage provider
  ****************************************************************************************
  */
- StorageProvider* newStorageProvider(){
+ XYResult_t* newStorageProvider(){
   
-  StorageProvider* store = malloc(sizeof(struct StorageProvider));
-  //TODO: wal, should check for any malloc errors
+  StorageProvider_t* aNewStorageProvider = malloc(sizeof(StorageProvider_t));
 
-  store->write = NULL;
-  store->read = NULL;
-  store->GetAllKeys = NULL;
-  store->delete = NULL;
-  store->contains = NULL;
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+  
+  if(!aNewStorageProvider) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+    
+  aNewStorageProvider->write = NULL;
+  aNewStorageProvider->read = NULL;
+  aNewStorageProvider->GetAllKeys = NULL;
+  aNewStorageProvider->delete = NULL;
+  aNewStorageProvider->contains = NULL;
    
-  return store;
+  preallocated_return_result_ptr = &preallocated_return_result;
+
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = aNewStorageProvider;   // a StorageProvider_t* 
+  
+  return preallocated_return_result_ptr;                          
 }
 
 // end of file storage.c

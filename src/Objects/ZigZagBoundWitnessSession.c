@@ -7,16 +7,12 @@
  *
  * @brief primary zig zag bound witness session routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
 
 #ifndef ZIGZAGBOUNDWITNESSSESSION_H
-//#define ZIGZAGBOUNDWITNESSSESSION_H
 
 #include <stdlib.h>
 #include "xyo.h"
@@ -52,6 +48,12 @@ XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* dat
 XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession_t* userSession, 
                                  ByteArray_t* boundWitnessData){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!userSession || !boundWitnessData) {RETURN_ERROR(ERR_BADDATA)};
+
   // Here we infer if the userSession bound witness is already completed or not.
   
   if(userSession->BoundWitness->dynamicPublicKeys->size == userSession->BoundWitness->dynamicSignatures->size && 
@@ -83,6 +85,10 @@ XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession_t* userSession,
   
   ByteArray_t* returnData = malloc(sizeof(ByteArray_t));
   
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+    
   if(returnData == NULL) {
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
@@ -138,6 +144,12 @@ XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession_t* userSession,
 *----------------------------------------------------------------------------*/
 XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* data){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!self || !data) {RETURN_ERROR(ERR_BADDATA)};
+
   if(data->size == 0 ) return 0;
   
   if(self->cycles == 0){
@@ -154,8 +166,8 @@ XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* dat
     BoundWitnessTransfer* transfer = transfer_result->result;
     self->BoundWitness->incomingData(self->BoundWitness, transfer, 1);
     
-    return 0;
-    
+    return 0;   //TODO: wal, booo, hisss.  this method has a XYResult_t* type
+                // returning a 0 is too crude. please return a proper XYResult_t*
   } else {
     
     self->cycles++;
@@ -167,3 +179,4 @@ XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* dat
 #endif
 
 // end of file zigzagboundwitnessession.c
+

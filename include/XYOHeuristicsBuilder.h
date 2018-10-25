@@ -7,10 +7,7 @@
  *
  * @brief primary XYOHeuristicsBuilder routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -24,6 +21,8 @@
  */
 
 #include "xyobject.h"
+
+extern XYResult_t preallocated_return_result;
 
 /*
  * FUNCTION DECLARATIONS

@@ -7,10 +7,7 @@
  *
  * @brief primary byte weak array routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -38,6 +35,12 @@
 XYResult_t* ByteWeakArray_add(ByteWeakArray_t* self_ByteWeakArray, 
                               XYObject_t* user_XYObject){ //TODO: consider changing self to XYObject
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!self_ByteWeakArray || user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
+
   // Lookup the ObjectProvider for the object so we can infer if the object has a default
   // size or a variable size per each element. We know every element in a single-type array
   // has the same type, but we don't know if they have uniform size. An array of Bound Witness
@@ -140,17 +143,13 @@ XYResult_t* ByteWeakArray_add(ByteWeakArray_t* self_ByteWeakArray,
         memcpy(object_payload+2, toBytes_result->result, object_size);
 
         self_ByteWeakArray->size = newSize;
-        XYResult_t* return_result = malloc(sizeof(XYResult_t));
-        if(return_result != NULL){
-          return_result->error = OK;
-          return_result->result = NULL;
-          return return_result;
-        }
-        else {
-          preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-          preallocated_result->result = NULL;
-          return preallocated_result;
-        }
+
+        preallocated_return_result_ptr = &preallocated_return_result;
+        
+        preallocated_return_result_ptr->error = OK;
+        preallocated_return_result_ptr->result = NULL;
+        
+        return preallocated_return_result_ptr;
       }
       else {
         RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
@@ -181,6 +180,12 @@ XYResult_t* ByteWeakArray_add(ByteWeakArray_t* self_ByteWeakArray,
 *----------------------------------------------------------------------------*/
 XYResult_t* ByteWeakArray_get(ByteWeakArray_t* self_ByteWeakArray, int index) {
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!self_ByteWeakArray) {RETURN_ERROR(ERR_BADDATA)};
+
   /* Here the program will iterate through each element. Getting each
    * element's size and iterating to the next element unless we are
    * at the user's specified index. Get pointer to start of array
@@ -219,13 +224,16 @@ XYResult_t* ByteWeakArray_get(ByteWeakArray_t* self_ByteWeakArray, int index) {
       }
       if(internal_index == index) {
         // Create an XYObject and return it to the user.
-        XYResult_t* return_result = malloc(sizeof(XYResult_t));
+
         XYResult_t* new_result = newObject(arrayPointer, arrayPointer+2);
 
-        if(return_result && new_result->error == OK){
-          return_result->error = OK;
-          return_result->result = new_result->result;
-          return return_result;
+        preallocated_return_result_ptr = &preallocated_return_result;
+
+        if(new_result->error == OK){
+          preallocated_return_result_ptr->error = OK;
+          preallocated_return_result_ptr->result = new_result->result;
+          
+          return preallocated_return_result_ptr;
         }
         else {
           RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
@@ -271,9 +279,19 @@ XYResult_t* ByteWeakArray_get(ByteWeakArray_t* self_ByteWeakArray, int index) {
 XYResult_t* ByteWeakArray_creator_create(char id[2], void* user_data){ 
                     // consider allowing someone to create array with one object
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_data) {RETURN_ERROR(ERR_BADDATA)};
+
   ByteWeakArray_t* ByteWeakArrayObject = malloc(sizeof(ByteWeakArray_t));
   char ByteWeakArrayID[2] = {0x01, 0x04};
   XYResult_t* newObject_result = newObject(ByteWeakArrayID, ByteWeakArrayObject);
+  
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
   
   if(newObject_result->error == OK && ByteWeakArrayObject != NULL){
     
@@ -281,16 +299,16 @@ XYResult_t* ByteWeakArray_creator_create(char id[2], void* user_data){
     ByteWeakArrayObject->add = &ByteWeakArray_add;
     ByteWeakArrayObject->get = &ByteWeakArray_get;
     ByteWeakArrayObject->payload = NULL;
-    XYResult_t* return_result = malloc(sizeof(XYResult_t));
-    if(return_result != NULL){
-      return_result->error = OK;
-      XYObject_t* return_object = newObject_result->result;
-      return_result->result = return_object;
-      return return_result;
-    }
-    else {
-      RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-    }
+
+    preallocated_return_result_ptr = &preallocated_return_result;
+
+    preallocated_return_result_ptr->error = OK;
+    
+    XYObject_t* return_object = newObject_result->result;
+    
+    preallocated_return_result_ptr->result = return_object;
+    
+    return preallocated_return_result_ptr;
   }
   else {
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
@@ -314,20 +332,37 @@ XYResult_t* ByteWeakArray_creator_create(char id[2], void* user_data){
 *----------------------------------------------------------------------------*/
 XYResult_t* ByteWeakArray_creator_fromBytes(char* data){
 
-  XYResult_t* return_result = malloc(sizeof(XYResult_t));
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!data) {RETURN_ERROR(ERR_BADDATA)};
+
+  preallocated_return_result_ptr = &preallocated_return_result;
+
   ByteWeakArray_t* return_array = malloc(sizeof(ByteWeakArray_t));
   
-  if(return_result && return_array){
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+  
+  if(return_array){
       return_array->add = &ByteWeakArray_add;
       return_array->remove = NULL;
       return_array->get = &ByteWeakArray_get;
       return_array->size = data[0]; // Size is one byte at the start of the (Byte)WeakArray.
       return_array->payload = malloc(sizeof(char)*(return_array->size-1));
+    
+      /********************************/
+      /* guard against malloc errors  */
+      /********************************/
+  
       if(return_array->payload != NULL){
         memcpy(return_array->payload, &data[2], (return_array->size-1));
-        return_result->error = OK;
-        return_result->result = return_array;
-        return return_result;
+        preallocated_return_result_ptr->error = OK;
+        preallocated_return_result_ptr->result = return_array;
+        
+        return preallocated_return_result_ptr;
       }
       else
       {
@@ -335,7 +370,6 @@ XYResult_t* ByteWeakArray_creator_fromBytes(char* data){
       }
   }
   else{
-    if(return_result) free(return_result);
     if(return_array) free(return_array);
     
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
@@ -358,8 +392,15 @@ XYResult_t* ByteWeakArray_creator_fromBytes(char* data){
 *----------------------------------------------------------------------------*/
 XYResult_t* ByteWeakArray_creator_toBytes(XYObject_t* user_XYObject){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
+
   if(user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x04){
-    ByteWeakArray_t* user_array = user_XYObject->GetPayload(user_XYObject);
+    
+    ByteWeakArray_t* user_array = (user_XYObject->GetPayload(user_XYObject))->result;
     uint8_t totalSize = user_array->size;
 
     /*
@@ -368,13 +409,20 @@ XYResult_t* ByteWeakArray_creator_toBytes(XYObject_t* user_XYObject){
      */
 
     char* byteBuffer = malloc(sizeof(char)*totalSize);
-    XYResult_t* return_result = malloc(sizeof(XYResult_t));
-    if(return_result != NULL && byteBuffer != NULL){
+    
+    preallocated_return_result_ptr = &preallocated_return_result;
+    
+    /********************************/
+    /* guard against malloc errors  */
+    /********************************/
+  
+    if(byteBuffer != NULL){
       memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 1);
       memcpy(byteBuffer+1, user_array->payload, sizeof(char)*(totalSize-1));
-      return_result->error = OK;
-      return_result->result = byteBuffer;
-      return return_result;
+      preallocated_return_result_ptr->error = OK;
+      preallocated_return_result_ptr->result = byteBuffer;
+      
+      return preallocated_return_result_ptr;
     }
     else {
       RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)

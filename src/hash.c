@@ -7,10 +7,7 @@
  *
  * @brief primary hashing routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -39,18 +36,31 @@
  *      this routine returns the id of the supplied HashProvider object  
  *
  *  PARAMETERS
- *      hashProviderObject  [in]      HashProvider_t*
+ *      hashProviderObject    [in]      HashProvider_t*
  *
  *  RETURNS
- *      id                  [out]     char*
- *
+ *      preallocated_return_result_ptr    [out]   XYResult_t*
+ *                                                --------------------
+ *                                                preallocated_return_result_ptr->error  (error code)
+ *                                                preallocated_return_result_ptr->result (hashProviderObject->id)
  *  NOTES
  *      the wiki on HackMD is out of date / incorrect
  ****************************************************************************************
  */
-char* getHashId(HashProvider_t* hashProviderObject){
+XYResult_t* getHashId(HashProvider_t* hashProviderObject){
   
-  return hashProviderObject->id;
+  /********************************/
+  /* some guards against bad data */
+  /********************************/
+  
+  if(!hashProviderObject) {RETURN_ERROR(ERR_BADDATA)};
+
+  preallocated_return_result_ptr = &preallocated_return_result;
+
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = hashProviderObject->id;
+
+  return preallocated_return_result_ptr;
 }
 
 /**
@@ -62,10 +72,13 @@ char* getHashId(HashProvider_t* hashProviderObject){
  *      this routine creates a hash of the data supplied  
  *
  *  PARAMETERS
- *      dataToHash        [in]      ByteArray_t*
+ *      dataToHash        [in]        ByteArray_t*
  *
  *  RETURNS
- *      return_result     [out]     XYResult_t*   (contains an error code and any hash created)
+ *      preallocated_return_result_ptr    [out]   XYResult_t*   (contains an error code and any hash created)
+ *                                                --------------------
+ *                                    preallocated_return_result_ptr->error  (error code)
+ *                                    preallocated_return_result_ptr->result (&sha256OutputBuffer)
  *
  *  NOTES
  *      SHA-256 is currently the only hash type implemented (to save runtime memory).
@@ -76,20 +89,17 @@ char* getHashId(HashProvider_t* hashProviderObject){
 XYResult_t* createHash(ByteArray_t* dataToHash){
   
   /********************************/
-  /* some guards against bad data */
+  /* guard against bad data       */
   /********************************/
   if(!dataToHash || 
      !dataToHash->payload || 
-     !dataToHash->size) 
-  {
-     RETURN_ERROR(ERR_BADDATA);   
-  }
+     !dataToHash->size) {RETURN_ERROR(ERR_BADDATA)};   
      
-  static byte sha256OutputBuffer[WC_SHA256_DIGEST_SIZE];    // currently 32 bytes
+  static byte sha256OutputBuffer[WC_SHA256_DIGEST_SIZE];      // currently 32 bytes
   
-  XMEMSET(sha256OutputBuffer, 0, WC_SHA256_DIGEST_SIZE);    // clear the output buffer 
+  XMEMSET(sha256OutputBuffer, 0, WC_SHA256_DIGEST_SIZE);      // clear the output buffer 
   
-  static XYResult_t return_result;
+  preallocated_return_result_ptr = &preallocated_return_result;
       
   /**************************************************/
   /* SHA-256 is currently the only hash implemented */
@@ -97,28 +107,27 @@ XYResult_t* createHash(ByteArray_t* dataToHash){
   
   wc_Sha256 sha256HashObject;                               
   
-  int wc_init_error = wc_InitSha256(&sha256HashObject);     // prepares the wolf crypto lib
+  int wc_init_error = wc_InitSha256(&sha256HashObject);       // prepares the wolf crypto lib
   
-  if (!wc_init_error) {                                     // no error = 0
+  if (wc_init_error) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)}; // did we get the newHasher?
       
-    /*********************************************************/
-    /* this can be called again and again to update the hash */
-    /*********************************************************/
-    wc_Sha256Update(&sha256HashObject, 
-                    (unsigned char*)dataToHash->payload, 
-                    dataToHash->size);  
+  /******************************************************************/
+  /* this wc call can be called again and again to update the hash  */
+  /******************************************************************/
+  wc_Sha256Update(&sha256HashObject, 
+                  (unsigned char*)dataToHash->payload, 
+                  dataToHash->size);  
 
-    wc_Sha256Final(&sha256HashObject, sha256OutputBuffer);  // sha256OutputBuffer now contains
-                                                            // the digest of the hashed data.
-    return_result.error = OK;
-    return_result.result = &sha256OutputBuffer;
+  wc_Sha256Final(&sha256HashObject, sha256OutputBuffer);  // sha256OutputBuffer now contains
+                                                          // the digest of the hashed data.
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = &sha256OutputBuffer;
     
-    wc_Sha256Free(&sha256HashObject);                       // releases the wc_sha256 object
+  wc_Sha256Free(&sha256HashObject);                       // releases the wc_sha256 object
     
-    int cleanupError = wolfCrypt_Cleanup();                 // clean up resources used by wolfCrypt
-  }
+  int cleanupError = wolfCrypt_Cleanup();                 // clean up resources used by wolfCrypt
     
-  return &return_result;
+  return preallocated_return_result_ptr;
 }
 
 /**
@@ -135,10 +144,12 @@ XYResult_t* createHash(ByteArray_t* dataToHash){
  *      hashForComparison   [in]      XYObject_t*
  *
  *  RETURNS
- *      return_result       [out]     XYResult_t*   return_result->error contains the 
- *                                                  bool result of this call. 
- *                                                  TRUE = hashes match
- *                                                  FALSE = hashes don't match
+ *      preallocated_return_result_ptr    [out]     XYResult_t*   preallocated_return_result_ptr->result 
+ *                                                                contains the 
+ *                                                                bool result of this call. 
+ *                                                                --------------------
+ *                                                                TRUE = hashes match
+ *                                                                FALSE = hashes don't match
  *  NOTES
  *      wc_ = wolf crypto library routine or data type
  ****************************************************************************************
@@ -151,45 +162,51 @@ XYResult_t* verifyHash(ByteArray_t* dataToBeHashed, XYObject_t* hashForCompariso
   if(!dataToBeHashed || 
      !dataToBeHashed->size || 
      !hashForComparison || 
-     !hashForComparison->payload) 
-  {
-    RETURN_ERROR(ERR_BADDATA);
-  }
+     !hashForComparison->payload) {RETURN_ERROR(ERR_BADDATA)};
+      
+  static bool hashesMatch;
   
-  static XYResult_t return_result;
-    
-  HashProvider_t* newHasher = newHashProvider();            //TODO: wal, make sure this is freed
+  preallocated_return_result_ptr = &preallocated_return_result;
 
+  preallocated_return_result_ptr = newHashProvider();       //TODO: wal, make sure this is freed
+
+  if(preallocated_return_result_ptr->error != OK) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+
+  HashProvider_t* newHasher  = (HashProvider_t*)preallocated_return_result_ptr->result;  
+  
   if(newHasher && newHasher->createHash) {                  // make sure we have a new hasher!
                                                             
-    XYResult_t* verify_Hash_return_result = newHasher->createHash(dataToBeHashed);   
-                                                            // make the hash. the hash is currently                                                            
-                                                            // returned in return_result.result
+    preallocated_return_result_ptr = newHasher->createHash(dataToBeHashed);   
+                                                            // make the hash. the hash is currently                                                         
+                                                            // returned in preallocated_return_result_ptr->result
                                                             // and the error code is returned in
-                                                            // return_result.error
-    return_result.error = verify_Hash_return_result->error;
-    return_result.result = verify_Hash_return_result->result;
-    
+                                                            // preallocated_return_result_ptr->error
     free(newHasher); 
     
-    if(!return_result.error) {
+    if(!preallocated_return_result_ptr->error) {            // any errors?
       
-      // compare the new hash created with the one supplied to us for comparison. 
+      /****************************************************************************/
+      /* compare the new hash created with the one supplied to us for comparison. */
+      /****************************************************************************/
       
-      return_result.error = FALSE;                          // presume hashes don't match
-
-      if(memcmp(return_result.result,                       // new hash
+      preallocated_return_result_ptr->error = ERR_INTERNAL_ERROR; // presume hashes don't match
+      hashesMatch = FALSE;
+      
+      if(memcmp(preallocated_return_result_ptr->result,     // new hash
          dataToBeHashed->payload,                           // supplied hash 
          WC_SHA256_DIGEST_SIZE))                            // currently 32 bytes 
       {    
-        return_result.error = TRUE;                         // success, hashes match
+        preallocated_return_result_ptr->error = OK;         // success, hashes match
+        hashesMatch = TRUE;
       }
+      
+      preallocated_return_result_ptr->result = &hashesMatch;                 
     }
     
     int cleanupError = wolfCrypt_Cleanup();                 // clean up resources used by wolfCrypt
   }
-      
-  return &return_result;                                    // return_result.error holds the boolean
+  
+  return preallocated_return_result_ptr;                    // preallocated_return_result_ptr->error holds the boolean
                                                             // result of this verify hash operation.
                                                             // TRUE = 1 = hashes match
                                                             // FALSE = 0 = hashes don't match
@@ -207,30 +224,41 @@ XYResult_t* verifyHash(ByteArray_t* dataToBeHashed, XYObject_t* hashForCompariso
  *      none
  *
  *  RETURNS
- *      newHasher      [out]     HashProvider_t*
- *
+ *      preallocated_return_result_ptr      [out]     XYResult_t*
+ *                                                    --------------------
+ *                                          preallocated_return_result_ptr->error  (error code)
+ *                                          preallocated_return_result_ptr->result ((HashProvider_t*)newHasher)
  *  NOTES
  *      will return a malloc error if malloc fails
  ****************************************************************************************
  */
-HashProvider_t* newHashProvider(){
+XYResult_t* newHashProvider(){
   
   HashProvider_t* newHasher = malloc(sizeof(HashProvider_t*));    //TODO: wal, make sure this is freed
   
-  if (newHasher) {
-    
-    newHasher->createHash = &createHash;
-    newHasher->verifyHash = &verifyHash;
-    newHasher->getHashId = &getHashId;
-    newHasher->id[0] = 0x00;             // major
-    newHasher->id[1] = 0x00;             // minor
-  }
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
   
-  return newHasher;
+  if (!newHasher) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};        // did we get the newHasher?
+    
+  newHasher->createHash = &createHash;
+  newHasher->verifyHash = &verifyHash;
+  newHasher->getHashId = &getHashId;
+  newHasher->id[0] = 0x00;             // major
+  newHasher->id[1] = 0x00;             // minor
+  
+  preallocated_return_result_ptr = &preallocated_return_result;
+
+  preallocated_return_result_ptr->error = OK;                         
+  preallocated_return_result_ptr->result = newHasher;                         
+  
+  return preallocated_return_result_ptr;
 }
 
-
+//////////////////////////////////////////////////
 /* type references
+//////////////////////////////////////////////////
 
 struct ByteArray{
   uint32_t size;

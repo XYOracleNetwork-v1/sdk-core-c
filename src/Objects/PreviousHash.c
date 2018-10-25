@@ -7,10 +7,7 @@
  *
  * @brief primary previous hash routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -36,6 +33,13 @@
 *      XYResult_t*           [out]      bool   Returns XYObject_t* of the PreviousHash type.
 *----------------------------------------------------------------------------*/
 XYResult_t* PreviousHash_creator_create(char id[2], void* user_data){
+
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_data) {RETURN_ERROR(ERR_BADDATA)};
+
   return newObject(id, user_data);
 }
 
@@ -55,6 +59,12 @@ XYResult_t* PreviousHash_creator_create(char id[2], void* user_data){
 *----------------------------------------------------------------------------*/
 XYResult_t* PreviousHash_creator_fromBytes(char* hash_data){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!hash_data) {RETURN_ERROR(ERR_BADDATA)};
+
   char id[2];
   memcpy(id, hash_data, 2);
   char hash_id[2];
@@ -63,7 +73,13 @@ XYResult_t* PreviousHash_creator_fromBytes(char* hash_data){
   XYResult_t* lookup_result2 = tableLookup(hash_id);
   PreviousHash_t* return_PH = malloc(sizeof(PreviousHash_t));
   
-  if(lookup_result->error == OK && lookup_result2->error == OK && return_PH){
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+    
+  if(lookup_result->error == OK && 
+     lookup_result2->error == OK && 
+     return_PH){
     
     ObjectProvider_t* PH_creator = lookup_result2->result;
     uint32_t element_size = 0;
@@ -94,6 +110,10 @@ XYResult_t* PreviousHash_creator_fromBytes(char* hash_data){
       RETURN_ERROR(ERR_CRITICAL);
     }
     
+    /********************************/
+    /* guard against malloc errors  */
+    /********************************/
+    
     if(return_PH->hash){
       memcpy(return_PH->id, &hash_id, 2);
       memcpy(return_PH->hash, hash_data+(sizeof(char)*4), (2 * sizeof(char))+(element_size*sizeof(char)));
@@ -103,17 +123,13 @@ XYResult_t* PreviousHash_creator_fromBytes(char* hash_data){
       RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
     }
     
-    XYResult_t* return_result = malloc(sizeof(XYResult_t));
+    preallocated_return_result_ptr = &preallocated_return_result;
     
-    if(return_result){
-      return_result->error = OK;
-      return_result->result = return_PH;
-      return return_result;
-    }
-    else
-    {
-      RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-    }
+    preallocated_return_result_ptr->error = OK;
+    preallocated_return_result_ptr->result = return_PH;
+    
+    return preallocated_return_result_ptr;
+    
   } else if(lookup_result->error == OK && lookup_result2->error == OK){
     if(lookup_result) free(lookup_result);
     if(lookup_result2) free(lookup_result2);
@@ -143,9 +159,15 @@ XYResult_t* PreviousHash_creator_fromBytes(char* hash_data){
 *----------------------------------------------------------------------------*/
 XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
+
   if(user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x06){   //TODO: wal, constants please
     
-    PreviousHash_t* user_PH = user_XYObject->GetPayload(user_XYObject);
+    PreviousHash_t* user_PH = (user_XYObject->GetPayload(user_XYObject))->result;
     char id[2];
     memcpy(&id, user_PH->id, 2);
     XYResult_t* lookup_result = tableLookup(id);
@@ -161,6 +183,8 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
         byteBuffer = malloc(2*sizeof(char) + (element_size*sizeof(char)));
         //TODO: wal, should check for any malloc errors
 
+        if(!byteBuffer) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+
         memcpy(byteBuffer, &id, 2);
         memcpy(byteBuffer+2, user_PH->hash, 2*sizeof(char) + (element_size*sizeof(char)));
       }
@@ -173,6 +197,8 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
             byteBuffer = malloc(2*sizeof(char) + (element_size*sizeof(char)));
             //TODO: wal, should check for any malloc errors
 
+            if(!byteBuffer) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+            
             memcpy(byteBuffer, &id, 2);
             memcpy(byteBuffer+2, user_PH->hash, 2*sizeof(char) + (element_size*sizeof(char)));
             break;
@@ -183,6 +209,8 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
             int mallocNumber = 2*sizeof(char) + (element_size*sizeof(char));
             byteBuffer = malloc(mallocNumber);
             //TODO: wal, should check for any malloc errors
+
+            if(!byteBuffer) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
 
             if(littleEndian()){
                encodedSize16 = to_uint16((char*)&element_size);
@@ -199,6 +227,8 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
             byteBuffer = malloc(2*sizeof(char) + (element_size*sizeof(char)));
             //TODO: wal, should check for any malloc errors
 
+            if(!byteBuffer) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+
             if(littleEndian()){
                encodedSize32 = to_uint32((char*)&element_size);
             }
@@ -212,17 +242,13 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
       {
         RETURN_ERROR(ERR_CRITICAL);
       }
-      XYResult_t* return_result = malloc(sizeof(XYResult_t));
-      if(return_result){
-        return_result->error = OK;
-        return_result->result = byteBuffer;
-        return return_result;
-      }
-      else
-      {
-        free(byteBuffer);
-        RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-      }
+
+      preallocated_return_result_ptr = &preallocated_return_result;
+
+      preallocated_return_result_ptr->error = OK;
+      preallocated_return_result_ptr->result = byteBuffer;
+      
+      return preallocated_return_result_ptr;
     }
     else
     {
@@ -236,3 +262,5 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
 }
 
 // end of file previoushash.c
+
+

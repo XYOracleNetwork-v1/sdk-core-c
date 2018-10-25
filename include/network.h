@@ -7,10 +7,7 @@
  *
  * @brief primary network routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -24,6 +21,7 @@
  */
 
 #include <stdint.h>
+#include "xyobject.h"
 
 /*
  * TYPE DEFINITIONS
@@ -39,7 +37,6 @@ typedef struct reactiveNetworkProvider reactiveNetworkProvider_t;
  */
 
 struct proactiveNetworkProvider{
-  //XYResult_t* (*find)(int flags);
   
   // temporary placeholders
   uint32_t requestConnection;
@@ -48,15 +45,14 @@ struct proactiveNetworkProvider{
 };
 
 struct reactiveNetworkProvider{
-  //XYResult_t* (*find)(int flags);
   
   // temporary placeholders
   uint32_t listen;
   uint32_t disconnect;
 };
 
-proactiveNetworkProvider_t* newProactiveNetworkProvider(void);
-reactiveNetworkProvider_t* newReactiveNetworkProvider(void);
+XYResult_t* newProactiveNetworkProvider(void);
+XYResult_t* newReactiveNetworkProvider(void);
 
 #endif
 

@@ -7,10 +7,7 @@
  *
  * @brief bound repository routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -57,3 +54,4 @@ struct OriginChainRepository {
 #endif
 
 // end of file repository.h
+

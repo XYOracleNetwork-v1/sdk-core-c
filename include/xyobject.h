@@ -7,10 +7,7 @@
  *
  * @brief primary xy object routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -36,11 +33,13 @@ struct XYResult{
   void* result;
 } ;
 
+typedef struct XYResult XYResult_t;
+
 struct XYObject{
   char id[2];
   void* payload;
-  char* (*GetXyobjectId)(struct XYObject*);  // Fetch the above id object and return it.
-  void* (*GetPayload)(struct XYObject*);     // Fetch the above payload pointer object and return it.
+  XYResult_t* (*GetXyobjectId)(struct XYObject*);  // Fetch the above id object and return it.
+  XYResult_t* (*GetPayload)(struct XYObject*);     // Fetch the above payload pointer object and return it.
 } ;
 
 /*
@@ -48,7 +47,6 @@ struct XYObject{
  ****************************************************************************************
  */
 
-typedef struct XYResult XYResult_t;
 typedef struct XYObject XYObject_t;
 typedef struct ByteStrongArray ByteStrongArray_t;
 typedef struct ShortStrongArray ShortStrongArray_t;
@@ -190,7 +188,8 @@ struct ObjectProvider {
    XYResult_t*  (*toBytes)(XYObject_t*);
 } ;
 
-extern XYResult_t* preallocated_result;
+extern XYResult_t* preallocated_return_result_ptr;
+
 extern void* typeTable[17][16];
 
 /*
@@ -235,11 +234,11 @@ XYResult_t* IntWeakArray_creator_create(char id[2], void* user_data);
 XYResult_t* IntWeakArray_creator_fromBytes(char* data);
 XYResult_t* IntWeakArray_creator_toBytes(XYObject_t* user_XYObject);
 
-char* getXyobjectId(XYObject_t* xyobject);
-void* getPayload(XYObject_t* xyobject);
+XYResult_t* getXyobjectId(XYObject_t* xyobject);
+XYResult_t* getPayload(XYObject_t* xyobject);
 XYResult_t* newObject(char id[2], void* payload);
 XYResult_t* initTable(void);
-void registerType(char id[2], void* creator);
+XYResult_t* registerType(char id[2], void* creator);
 XYResult_t* tableLookup(char id[2]);
 
 extern uint32_t to_uint32(char* data);

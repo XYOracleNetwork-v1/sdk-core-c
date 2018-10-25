@@ -7,10 +7,7 @@
  *
  * @brief primary bound witness routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -36,6 +33,12 @@
 *----------------------------------------------------------------------------*/
 XYResult_t* BoundWitness_getSigningData(void* user_BoundWitness){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_BoundWitness) {RETURN_ERROR(ERR_BADDATA)};  // return an error now
+
   uint32_t publicKeysSize = ((BoundWitness*)user_BoundWitness)->publicKeys->size;
   uint32_t firstHeuristicsSize;
   uint32_t secondHeuristicsSize;
@@ -63,6 +66,10 @@ XYResult_t* BoundWitness_getSigningData(void* user_BoundWitness){
    * into the byteBuffer and return.
    */
 
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+  
   if(byteBuffer){
     // Copy Public Keys in.
 
@@ -98,19 +105,23 @@ XYResult_t* BoundWitness_getSigningData(void* user_BoundWitness){
     memcpy(byteBuffer+(publicKeysSize+firstHeuristicsSize*sizeof(char)), user_secondPayload+(4*sizeof(char)), secondHeuristicsSize*sizeof(char));
 
     ByteArray_t* return_bytes = malloc(sizeof(ByteArray_t));
-    XYResult_t* return_result = malloc(sizeof(XYResult_t));
     
-    if(return_result && return_bytes){
+    preallocated_return_result_ptr = &preallocated_return_result;
+
+    /********************************/
+    /* guard against malloc errors  */
+    /********************************/
+  
+    if(return_bytes){
       return_bytes->size = totalSize;
       return_bytes->payload = byteBuffer;
-      return_result->error = OK;
-      return_result->result = return_bytes;
+      preallocated_return_result_ptr->error = OK;
+      preallocated_return_result_ptr->result = return_bytes;
       
-      return return_result;
+      return preallocated_return_result_ptr;
       
     } else {
       if(return_bytes) free(return_bytes);
-      if(return_result) free(return_result);
       
       RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
     }
@@ -129,13 +140,19 @@ XYResult_t* BoundWitness_getSigningData(void* user_BoundWitness){
 *      Retrieves the bound witness data hash so that it can be used.
 *
 *  PARAMETERS
-*     *user_BoundWitness                    [in]       BoundWitness*
+*     *user_BoundWitness    [in]       BoundWitness*
 *
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* with a byteBuffer as the result.
 *----------------------------------------------------------------------------*/
 XYResult_t* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider_t* user_HashProvider){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_BoundWitness || !user_HashProvider) {RETURN_ERROR(ERR_BADDATA)};  // return an error now
+
   XYResult_t* signingData_result = user_BoundWitness->getSigningData(user_BoundWitness);
   
   if(signingData_result->error != OK){
@@ -163,6 +180,12 @@ XYResult_t* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider_t
 *----------------------------------------------------------------------------*/
 XYResult_t* BoundWitnessTransfer_toBytes(XYObject_t* user_XYObject){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};  // return an error now
+
   BoundWitnessTransfer* user_BoundWitness = user_XYObject->payload;
   uint32_t totalSize = 4;
   uint32_t publicKeysSize = 0;
@@ -246,14 +269,13 @@ XYResult_t* BoundWitnessTransfer_toBytes(XYObject_t* user_XYObject){
     memcpy(return_bytes+offset, signaturesBytes_result->result, signaturesSize);
     offset+=signaturesSize;
   }
-  XYResult_t* return_result = malloc(sizeof(XYResult_t));
-  if(return_result){
-    return_result->error = OK;
-    return_result->result = return_bytes;
-    return return_result;
-  } else {
-    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-  }
+
+  preallocated_return_result_ptr = &preallocated_return_result;
+
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = return_bytes;
+  
+  return preallocated_return_result_ptr;
 }
 
 /*----------------------------------------------------------------------------*
@@ -265,16 +287,29 @@ XYResult_t* BoundWitnessTransfer_toBytes(XYObject_t* user_XYObject){
 *      Byte array with the XYO Bound Witness Transfer object type bytes.
 *
 *  PARAMETERS
-*     *user_BoundWitness                    [in]       BoundWitness*
+*     *user_BoundWitness  [in]       BoundWitness*
 *
 *  RETURNS
-*      XYResult*      [out]      bool   Returns XYResult* of the BoundWitnessTransfer type.
+*      XYResult*          [out]      bool   Returns XYResult* of the BoundWitnessTransfer type.
 *----------------------------------------------------------------------------*/
 XYResult_t* BoundWitnessTransfer_fromBytes(char* user_Transfer){
+  
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_Transfer) {RETURN_ERROR(ERR_BADDATA)};  // return an error now
+
   BoundWitnessTransfer* return_BoundWitness = malloc(sizeof(BoundWitnessTransfer));
-  //TODO: wal, should check for any malloc errors
+
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+  
+  if(!return_BoundWitness) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
 
   uint32_t BoundWitnessSize = to_uint32((char*)&user_Transfer);
+  
   if(littleEndian()){
     BoundWitnessSize = to_uint32((char*)&BoundWitnessSize);
   }
@@ -415,16 +450,13 @@ XYResult_t* BoundWitnessTransfer_fromBytes(char* user_Transfer){
   return_BoundWitness->publicKeys = publicKeysPtr;
   return_BoundWitness->payloads = payloadPtr;
   return_BoundWitness->signatures = signaturesPtr;
-  XYResult_t* return_result = malloc(sizeof(XYResult_t));
   
-  if(return_result){
-    return_result->error = OK;
-    return_result->result = return_BoundWitness;
-    return return_result;
-  } else {
-    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-  }
+  preallocated_return_result_ptr = &preallocated_return_result;
 
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = return_BoundWitness;
+  
+  return preallocated_return_result_ptr;
 }
 
 /*----------------------------------------------------------------------------*
@@ -442,6 +474,13 @@ XYResult_t* BoundWitnessTransfer_fromBytes(char* user_Transfer){
 *      XYResult*            [out]      bool   Returns XYObject* of the BoundWitness type.
 *----------------------------------------------------------------------------*/
 XYResult_t* BoundWitnessTransfer_creator_create(char id[2], void* user_data){
+
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_data) {RETURN_ERROR(ERR_BADDATA)};  // return an error now
+
   return newObject(id, user_data);
 }
 
@@ -460,6 +499,13 @@ XYResult_t* BoundWitnessTransfer_creator_create(char id[2], void* user_data){
 *      XYResult*            [out]      bool   Returns XYObject* of the BoundWitness type.
 *----------------------------------------------------------------------------*/
 XYResult_t* BoundWitness_creator_create(char id[2], void* user_data){
+
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_data) {RETURN_ERROR(ERR_BADDATA)};  // return an error now
+
   return newObject(id, user_data);
 }
 
@@ -472,15 +518,26 @@ XYResult_t* BoundWitness_creator_create(char id[2], void* user_data){
 *      include major and minor of array.
 *
 *  PARAMETERS
-*     *data                  [in]       char*
+*     *data       [in]       char*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYResult* of the BoundWitness type.
+*      XYResult*  [out]      bool   Returns XYResult* of the BoundWitness type.
 *----------------------------------------------------------------------------*/
 XYResult_t* BoundWitness_creator_fromBytes(char* data){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!data) {RETURN_ERROR(ERR_BADDATA)};  // return an error now
+
   BoundWitness* return_BoundWitness = malloc(sizeof(BoundWitness));
-  //TODO: wal, should check for any malloc errors
+
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+  
+  if(!return_BoundWitness) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
   
   uint32_t BoundWitnessSize = to_uint32(data);
   return_BoundWitness->size = BoundWitnessSize;
@@ -554,16 +611,13 @@ XYResult_t* BoundWitness_creator_fromBytes(char* data){
   return_BoundWitness->publicKeys = publicKeysPtr;
   return_BoundWitness->payloads = payloadPtr;
   return_BoundWitness->signatures = signaturesPtr;
-  XYResult_t* return_result = malloc(sizeof(XYResult_t));
-  
-  if(return_result){
-    return_result->error = OK;
-    return_result->result = return_BoundWitness;
-    return return_result;
-  } else {
-    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-  }
 
+  preallocated_return_result_ptr = &preallocated_return_result;
+  
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = return_BoundWitness;
+  
+  return preallocated_return_result_ptr;
 }
 
 /*----------------------------------------------------------------------------*
@@ -575,13 +629,19 @@ XYResult_t* BoundWitness_creator_fromBytes(char* data){
 *      the object and return a char* to the serialized bytes.
 *
 *  PARAMETERS
-*    *user_XYObject         [in]       XYObject*
+*    *user_XYObject     [in]       XYObject*
 *
 *  RETURNS
-*      XYResult_t*          [out]      bool   Returns char* to serialized bytes.
+*      XYResult_t*      [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
-XYResult_t* BoundWitness_creator_toBytes(struct XYObject* user_XYObject){
+XYResult_t* BoundWitness_creator_toBytes(XYObject_t* user_XYObject){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};  // return an error now
+
   BoundWitness* user_BoundWitness = user_XYObject->payload;
   XYResult_t* lookup_result = tableLookup((char*)&ShortStrongArray_id);
   ObjectProvider_t* SSA_Creator = lookup_result->result;
@@ -633,15 +693,12 @@ XYResult_t* BoundWitness_creator_toBytes(struct XYObject* user_XYObject){
      //free(toBytes_result);
     }
   }
-  XYResult_t* return_result = malloc(sizeof(XYResult_t));
-  if(return_result){
-    return_result->error = OK;
-    return_result->result = byteBuffer;
-    return return_result;
-  } else {
-    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-  }
+  
+  preallocated_return_result_ptr = &preallocated_return_result;
 
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = byteBuffer;
+  return preallocated_return_result_ptr;
 }
 
 // end of file boundwitness.c

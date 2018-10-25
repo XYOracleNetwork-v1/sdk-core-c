@@ -7,10 +7,7 @@
  *
  * @brief primary zig zag bound witness routines for the XY4 firmware.
  *
- * Copyright (C) 2017 XY - The Findables Company
- *
- * This computer program includes Confidential, Proprietary Information of XY. 
- * All Rights Reserved.
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -44,12 +41,25 @@ XYResult_t* incomingData(ZigZagBoundWitness_t* self,
                          BoundWitnessTransfer* boundWitness, 
                          int endpoint){
   
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!self || !boundWitness) {RETURN_ERROR(ERR_BADDATA)};
+
+  static int result_int;
+
+  preallocated_return_result_ptr = &preallocated_return_result;
+  
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = &result_int;
+
   if(boundWitness != NULL){
-    int success = self->addTransfer(self, boundWitness);
+    //int success = self->addTransfer(self, boundWitness);
+    preallocated_return_result_ptr = self->addTransfer(self, boundWitness);
     
-    if(!success){
-      RETURN_ERROR(ERR_BADDATA);
-    }
+    //if(!success) {RETURN_ERROR(ERR_BADDATA);}
+    if( !(int*)(preallocated_return_result_ptr->result)) {RETURN_ERROR(ERR_BADDATA);}
   }
 
   if(!self->hasSentKeysAndPayload){
@@ -67,9 +77,12 @@ XYResult_t* incomingData(ZigZagBoundWitness_t* self,
     free(signForSelf_result);
   }
   BoundWitnessTransfer* BoundWitness_raw = malloc(sizeof(BoundWitness));
-  if(BoundWitness_raw == NULL){
-    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-  }
+  
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+    
+  if(BoundWitness_raw == NULL) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
 
   BoundWitness_raw->size = self->dynamicPublicKeys->size + self->dynamicPayloads->size + self->dynamicSignatures->size +(4*sizeof(char));
   BoundWitness_raw->publicKeys = self->dynamicPublicKeys;
@@ -108,27 +121,65 @@ XYResult_t* incomingData(ZigZagBoundWitness_t* self,
 *  RETURNS
 *      int            [out]     Returns Bool True if it succeeded.
 *----------------------------------------------------------------------------*/
-int addTransfer(ZigZagBoundWitness_t* self, BoundWitnessTransfer* boundWitness){
+XYResult_t* addTransfer(ZigZagBoundWitness_t* self, BoundWitnessTransfer* boundWitness){
   
- if(!boundWitness){
-   return 1;          //TODO: wal, 1 what?  Perhaps a good place for a constant
- }
+  /********************************/
+  /* some guards against bad data */
+  /********************************/
+  
+  if(!self || !boundWitness) {RETURN_ERROR(ERR_BADDATA)};  // return the error now
+  
+  //TODO: wal, if this routine returns a bool, why is it declared as an int?
+  
+  static int result_int;
+  
+  preallocated_return_result_ptr = &preallocated_return_result;
+  
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = &result_int;
 
- if(boundWitness->publicKeys)
- {
-   int result = addIncomingKeys(self, boundWitness->publicKeys);
-   if(result) return result;
- } else if (boundWitness->payloads) {
-   int result = addIncomingPayload(self, boundWitness->payloads);
-   if(result) return result;
- } else if (boundWitness->signatures) {
-   int result = addIncomingSignatures(self, boundWitness->signatures);
-   if(result) return result;
- } else {
-   return 2;    //TODO: wal, why 2?  how 'bout a meaningful constant here?
- }
- return 0;      //TODO: wal, why 0?  how 'bout a meaningful constant here?
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!self || !boundWitness) {RETURN_ERROR(ERR_BADDATA)};
 
+  if(!boundWitness){
+    result_int = 1;       //TODO: wal, 1 what?  Perhaps a good place for a constant
+    return preallocated_return_result_ptr;          
+  }
+
+  if(boundWitness->publicKeys)
+  {
+    preallocated_return_result_ptr = addIncomingKeys(self, boundWitness->publicKeys);
+    
+    if( (int*)(preallocated_return_result_ptr->result) > 0) return preallocated_return_result_ptr;
+    
+    } else if (boundWitness->payloads) {
+      
+    //int result = addIncomingPayload(self, boundWitness->payloads);
+    preallocated_return_result_ptr = addIncomingPayload(self, boundWitness->payloads);
+      
+    if( (int*)(preallocated_return_result_ptr->result) > 0) return preallocated_return_result_ptr;
+      
+    } else if (boundWitness->signatures) {
+      
+    //int result = addIncomingSignatures(self, boundWitness->signatures);
+    preallocated_return_result_ptr = addIncomingSignatures(self, boundWitness->signatures);
+      
+    //if(result) return result;
+    if( (int*)(preallocated_return_result_ptr->result) > 0) return preallocated_return_result_ptr;
+      
+    } else {
+      
+    result_int = 2;
+    //return 2;   //TODO: wal, why 2?  how 'bout a meaningful constant here?
+    return preallocated_return_result_ptr;   
+    }
+    
+    result_int = 0;
+    //return 0;   //TODO: wal, why 0?  how 'bout a meaningful constant here?
+    return preallocated_return_result_ptr;   
 }
 
 /*----------------------------------------------------------------------------*
@@ -145,17 +196,40 @@ int addTransfer(ZigZagBoundWitness_t* self, BoundWitnessTransfer* boundWitness){
 *  RETURNS
 *      XYResult_t         [out]   bool        Returns Bool True if it succeeded.
 *----------------------------------------------------------------------------*/
-int addIncomingKeys(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingKeySets){
+XYResult_t* addIncomingKeys(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingKeySets){
   
+  /********************************/
+  /* some guards against bad data */
+  /********************************/
+  
+  if(!self || !incomingKeySets) {RETURN_ERROR(ERR_BADDATA)};  // return the error now
+  
+  static int result_int;
+
+  preallocated_return_result_ptr = &preallocated_return_result;
+  
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = &result_int;
+
   for(int i = 0; ; i++){
+    
     XYResult_t* get_result = incomingKeySets->get(incomingKeySets, i);
     XYObject_t* xyobject = get_result->result;
     
     if(xyobject->id[0] == 0x02 && xyobject->id[1] == 0x02){   //TODO: constants would be good here
+      
       XYResult_t* add_result = self->boundWitness->publicKeys->add(self->boundWitness->publicKeys, xyobject);
-      if(add_result->error != OK) return 1;
+      
+      result_int = 1;
+
+      if(add_result->error != OK) return preallocated_return_result_ptr;
+      
     } else {
-      return 2;   //TODO: wal, why 2?  how 'bout a meaningful constant here?
+      
+      result_int = 2;
+
+      //return 2;   //TODO: wal, why 2?  how 'bout a meaningful constant here?
+      return preallocated_return_result_ptr;   
     }
   }
 }
@@ -174,19 +248,40 @@ int addIncomingKeys(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingKeyS
 *  RETURNS
 *      XYResult_t         [out]   bool        Returns Bool True if it succeeded.
 *----------------------------------------------------------------------------*/
-int addIncomingPayload(ZigZagBoundWitness_t* self, IntStrongArray_t* incomingPayloads){
+XYResult_t* addIncomingPayload(ZigZagBoundWitness_t* self, IntStrongArray_t* incomingPayloads){
   
+  /********************************/
+  /* some guards against bad data */
+  /********************************/
+  
+  if(!self || !incomingPayloads) {RETURN_ERROR(ERR_BADDATA)};  // return the error now
+  
+  static int result_int;
+
+  preallocated_return_result_ptr = &preallocated_return_result;
+  
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = &result_int;
+
   for(int i = 0; ; i++){
+    
     XYResult_t* get_result = incomingPayloads->get(incomingPayloads, i);
     XYObject_t* xyobject = get_result->result;
     
     if(xyobject->id[0] == 0x02 && xyobject->id[1] == 0x02){   //TODO: constants would be good here
+      
       XYResult_t* add_result = self->boundWitness->payloads->add(self->boundWitness->payloads, xyobject);
       
-      if(add_result->error != OK) return 1;   //TODO: wal, why 1?  how 'bout a meaningful constant here?
+      result_int = 1;   //TODO: wal, why 1?  how 'bout a meaningful constant here?
+
+      if(add_result->error != OK) return preallocated_return_result_ptr;   
       
     } else {
-      return 2;   //TODO: wal, why 2?  how 'bout a meaningful constant here?
+      
+      result_int = 2;   //TODO: wal, why 2?  how 'bout a meaningful constant here?
+      
+      //return 2;   //TODO: wal, why 2?  how 'bout a meaningful constant here?
+      return preallocated_return_result_ptr;   
     }
   }
 }
@@ -205,17 +300,40 @@ int addIncomingPayload(ZigZagBoundWitness_t* self, IntStrongArray_t* incomingPay
 *  RETURNS
 *      XYResult_t         [out]   bool        Returns Bool True if it succeeded.
 *----------------------------------------------------------------------------*/
-int addIncomingSignatures(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingSignatures){
+XYResult_t* addIncomingSignatures(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingSignatures){
   
+  /********************************/
+  /* some guards against bad data */
+  /********************************/
+  
+  if(!self || !incomingSignatures) {RETURN_ERROR(ERR_BADDATA)};  // return the error now
+  
+  static int result_int;
+
+  preallocated_return_result_ptr = &preallocated_return_result;
+  
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = &result_int;
+
   for(int i = 0; ; i++){
+    
     XYResult_t* get_result = incomingSignatures->get(incomingSignatures, i);
     XYObject_t* xyobject = get_result->result;
+    
     if(xyobject->id[0] == 0x02 && xyobject->id[1] == 0x02){
+      
       XYResult_t* add_result = self->boundWitness->signatures->add(self->boundWitness->signatures, xyobject);
       
-      if(add_result->error != OK) return 1;   //TODO: wal, why 1?  how 'bout a meaningful constant here?
+      result_int = 1;   //TODO: wal, why 1?  how 'bout a meaningful constant here?
+
+      if(add_result->error != OK) return preallocated_return_result_ptr;  
+      
     } else {
-      return 2;   //TODO: wal, why 2?  how 'bout a meaningful constant here?
+      
+      result_int = 2;   //TODO: wal, why 2?  how 'bout a meaningful constant here?
+      
+      //return 2;   //TODO: wal, why 2?  how 'bout a meaningful constant here?
+      return preallocated_return_result_ptr;   
     }
   }
 }
@@ -231,9 +349,15 @@ int addIncomingSignatures(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomi
 *     self                [in]    ZigZagBoundWitness_t*   
 *
 *  RETURNS
-*      XYResult_t         [out]   bool        Returns Bool True if it succeeded.
+*     XYResult_t          [out]   bool        Returns Bool True if it succeeded.
 *----------------------------------------------------------------------------*/
 XYResult_t* makeSelfKeySet(ZigZagBoundWitness_t* self){
+  
+  /********************************/
+  /* some guards against bad data */
+  /********************************/
+  
+  if(!self) {RETURN_ERROR(ERR_BADDATA)};  // return the error now
   
   // Get a copy of the public key we are using currently
   XYResult_t* getPublicKey_result = self->signer->getPublicKey(self->signer);
@@ -260,16 +384,13 @@ XYResult_t* makeSelfKeySet(ZigZagBoundWitness_t* self){
     return add_result;
   }
   free(add_result);
-  XYResult_t* return_result = malloc(sizeof(XYResult_t));
-  if(return_result){
-    return_result->error = OK;
-    return_result->result = keysetObject;
+
+  preallocated_return_result_ptr = &preallocated_return_result;
+  
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = keysetObject;
     
-    return return_result;
-    
-  } else {
-    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-  }
+  return preallocated_return_result_ptr;
 }
 
 /*----------------------------------------------------------------------------*
@@ -288,6 +409,12 @@ XYResult_t* makeSelfKeySet(ZigZagBoundWitness_t* self){
 *                                                   
 *----------------------------------------------------------------------------*/
 XYResult_t* signForSelf(ZigZagBoundWitness_t* self){
+  
+  /********************************/
+  /* some guards against bad data */
+  /********************************/
+  
+  if(!self) {RETURN_ERROR(ERR_BADDATA)};  // return the error now
   
   // Get signing data and sign it
   XYResult_t* signingData_result = self->boundWitness->getSigningData(self->boundWitness);
