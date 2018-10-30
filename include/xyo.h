@@ -27,21 +27,21 @@
 
 #define return_error(ERR, __FILE__, __LINE__)               \
 if(ERR == ERR_INSUFFICIENT_MEMORY){                         \
-  printf(YEL "%s @ %s:%d\n" RESET, ErrorStrings[ERR-1], __FILE__, __LINE__);  \
+  printf(YEL "ERR_INSUFFICIENT_MEMORY @ %s:%d\n" RESET, __FILE__, __LINE__);  \
   preallocated_result->error = ERR_INSUFFICIENT_MEMORY;     \
   preallocated_result->result = 0;                          \
   return preallocated_result;                               \
 } else {                                                    \
   XYResult* return_status = malloc(sizeof(XYResult));       \
     if(return_status != NULL){                              \
-      if(ERR != OK)                                         \
-        printf(YEL "%s @ %s:%d\n" RESET, ErrorStrings[ERR-1], __FILE__, __LINE__);  \
+      if(ERR != OK && ERR != ERR_KEY_DOES_NOT_EXIST )        \
+        printf(YEL "%s @ %s:%d\n" RESET, ErrorStrings[ERR], __FILE__, __LINE__);  \
       return_status->error = ERR;                           \
       return_status->result = 0;                            \
       return return_status;                                 \
     }                                                       \
     else {                                                  \
-      printf(YEL "%s @ %s:%d\n" RESET, ErrorStrings[ERR-1], __FILE__, __LINE__); \
+      printf(YEL "ERR_INSUFFICIENT_MEMORY @ %s:%d\n" RESET, __FILE__, __LINE__); \
       preallocated_result->error = ERR_INSUFFICIENT_MEMORY; \
       preallocated_result->result = 0;                      \
       return preallocated_result;                           \

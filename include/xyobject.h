@@ -127,12 +127,12 @@ enum EXyoErrors{
   ERR_PEER_INCOMPATABLE,  // Returned if peer isn't capable of interfacing with us
   ERR_BOUNDWITNESS_FAILED // Returned if the Bound Witness failed unexpextedly
 };
-const static char *ErrorStrings[] =
+static char *ErrorStrings[] =
 {
     "OK",
     "ERR_CRITICAL", // Catastrophic failure.
     "ERR_NOID", // Returned when the core can't get the ID.
-    "ERR_CANT_GET_PAYLOAD," // Returned when the payload in inaccesible.
+    "ERR_CANT_GET_PAYLOAD", // Returned when the payload in inaccesible.
     "ERR_NOSIGNER", // Returned when the core can't create a signer.
     "ERR_ADDRESS_UNAVAILABLE", // Could not bind to address provided.
     "ERR_NETWORK_UNAVAILABLE", // Core network services are unavailable.
