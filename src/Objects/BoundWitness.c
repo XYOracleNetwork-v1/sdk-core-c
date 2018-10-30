@@ -429,7 +429,6 @@ XYResult* BoundWitnessTransfer_fromBytes(char* user_Transfer){
       return lookup_result;
     }
   } else {
-    breakpoint();
     free(return_BoundWitness);
     RETURN_ERROR(ERR_BADDATA);
   }

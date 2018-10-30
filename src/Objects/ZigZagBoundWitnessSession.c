@@ -48,7 +48,6 @@ XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray
 
   BoundWitnessTransfer* boundWitness = NULL;
   if(boundWitnessData != NULL){
-      breakpoint();
       XYResult* lookup_result = lookup((const char*)&BoundWitnessTransfer_id);
       if(lookup_result->error != OK) return lookup_result;
       ObjectProvider* BoundWitnessTransfer_creator = lookup_result->result;

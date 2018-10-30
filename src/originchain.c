@@ -161,7 +161,6 @@ XYResult* addBoundWitness(OriginChainNavigator* self_OriginChainNavigator, Bound
      if(self_OriginChainNavigator->bridgeQueue == NULL){ RETURN_ERROR(ERR_CRITICAL); }
 
      uint32_t queueLen = self_OriginChainNavigator->queueLen+1;
-     breakpoint();
      if(queueLen == 1){
        //printf("Realloc size: %lu\n", (sizeof(ByteArray**)*(queueLen+1)));
        self_OriginChainNavigator->bridgeQueue = malloc(sizeof(ByteArray**)*(queueLen+1));

@@ -208,7 +208,6 @@ XYObject* getSignedBridge(void* self){
     return NULL;
   }
   for(uint32_t i=0; i<=((NodeBase*)self)->originChainNavigator->queueLen-1; i++){
-    breakpoint();
     ByteArray* bridgeHash = ((NodeBase*)self)->originChainNavigator->bridgeQueue[i];
     XYResult* freeme = newObject((const char*)&Sha256_id, bridgeHash->payload);
     XYObject* hashObj = freeme->result;
@@ -316,7 +315,6 @@ void onBoundWitnessEndSuccess(NodeBase* self, BoundWitness* boundWitness){
       XYResult* contains_result = self->originChainNavigator->containsOriginBlock(self->originChainNavigator, boundWitness);
       if(contains_result->error != OK ){
         //TODO: De-onion and sort bridge blocks
-        //breakpoint();
         self->originChainNavigator->addBoundWitness(self->originChainNavigator, boundWitness);
         notifyListeners(self, boundWitness);
         return;
@@ -538,7 +536,6 @@ XYResult* doBoundWitness(NodeBase* self, ByteArray* startingData, NetworkPipe* p
       RETURN_ERROR(ERR_CRITICAL);
     }
     uint8_t choice = self->getChoice((uint8_t*)role_result->result);
-    breakpoint();
     self->flag = choice;
     self->session = malloc(sizeof(ZigZagBoundWitnessSession));
     if(self->session == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
