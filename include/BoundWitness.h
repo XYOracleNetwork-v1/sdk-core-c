@@ -43,11 +43,11 @@ struct BoundWitnessTransfer {
   uint8_t  choice;
 } ;
 
-XYResult* BoundWitnessTransfer_create(char id[2], void* user_data);
+XYResult* BoundWitnessTransfer_create(const char id[2], void* user_data);
 XYResult* BoundWitnessTransfer_fromBytes(char* user_Transfer);
 XYResult* BoundWitnessTransfer_toBytes(XYObject* user_XYObject);
 
-XYResult* BoundWitness_creator_create(char id[2], void* user_data);
+XYResult* BoundWitness_creator_create(const char id[2], void* user_data);
 XYResult* BoundWitness_creator_fromBytes(char* BoundWitness_data);
 XYResult* BoundWitness_creator_toBytes(struct XYObject* user_XYObject);
 XYResult* BoundWitness_getSigningData(void* user_BoundWitness);

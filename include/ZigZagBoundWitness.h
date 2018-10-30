@@ -52,7 +52,7 @@ struct ZigZagBoundWitness {
    XYResult* (*makeSelfKeySet)(ZigZagBoundWitness* self);
    XYResult* (*signForSelf)(ZigZagBoundWitness* self);
    Signer* signer;
-   XYObject payload[0];
+   XYObject payload[];
 };
 
 XYResult* incomingData(ZigZagBoundWitness* self, BoundWitnessTransfer* boundWitness, int endpoint);

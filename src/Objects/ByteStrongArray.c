@@ -240,7 +240,7 @@ XYResult* ByteStrongArray_get(ByteStrongArray* self_ByteStrongArray, int index) 
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* of the ByteStrongArray type.
 *----------------------------------------------------------------------------*/
-XYResult* ByteStrongArray_creator_create(char id[2], void* user_data){ // consider allowing someone to create array with one object
+XYResult* ByteStrongArray_creator_create(const char id[2], void* user_data){ // consider allowing someone to create array with one object
   ByteStrongArray* ByteStrongArrayObject = malloc(sizeof(ByteStrongArray));
   char byteStrongArrayID[2] = {0x01, 0x01};
   XYResult* newObject_result = newObject(byteStrongArrayID, ByteStrongArrayObject);

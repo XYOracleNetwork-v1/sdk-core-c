@@ -97,7 +97,7 @@ XYResult* ShortStrongArray_add(ShortStrongArray* self_ShortStrongArray, XYObject
        char* user_object_payload = user_array->payload;
        char id[2];
        memcpy(id, user_object_payload, 2);
-       lookup_result = lookup((char*)&id);
+       lookup_result = lookup((const char*)&id);
        if(lookup_result->error == OK){
          ObjectProvider* deeper_ObjectProvider = lookup_result->result;
          if(deeper_ObjectProvider->defaultSize != 0){
@@ -140,7 +140,7 @@ XYResult* ShortStrongArray_add(ShortStrongArray* self_ShortStrongArray, XYObject
         } else {
           XYResult* toBytes_result = user_ObjectProvider->toBytes(user_XYObject);
           memcpy(object_payload, toBytes_result->result, object_size);
-          free(toBytes_result->result);
+          //free(toBytes_result->result);
           free(toBytes_result);
         }
         self_ShortStrongArray->size = newSize;
@@ -204,7 +204,7 @@ XYResult* ShortStrongArray_get(ShortStrongArray* self_ShortStrongArray, int inde
       char* array_elements = self_ShortStrongArray->payload;
       uint16_t array_offset = 0;
       for(int i = 0; i<=index; i++){
-        if(array_offset>totalSize-4){
+        if(array_offset>=totalSize-4){
           RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);
         }
         char* element_size = malloc(element_creator->sizeIdentifierSize);
@@ -246,7 +246,7 @@ XYResult* ShortStrongArray_get(ShortStrongArray* self_ShortStrongArray, int inde
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* of the ShortStrongArray type.
 *----------------------------------------------------------------------------*/
-XYResult* ShortStrongArray_creator_create(char id[2], void* user_data){ // consider allowing someone to create array with one object
+XYResult* ShortStrongArray_creator_create(const char id[2], void* user_data){ // consider allowing someone to create array with one object
   ShortStrongArray* ShortStrongArrayObject = malloc(sizeof(ShortStrongArray));
   if(ShortStrongArrayObject == NULL){
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
@@ -305,11 +305,15 @@ XYResult* ShortStrongArray_creator_fromBytes(char* data){
       return_array->remove = NULL;
       return_array->get = &ShortStrongArray_get;
       return_array->size = to_uint16((unsigned char*)data);
+      /*
       char array_id[3];
       array_id[0] = data[2];
       array_id[1] = data[3];
       array_id[2] = '\00';
       strcpy(return_array->id, array_id);
+      */
+      return_array->id[0] = data[2];
+      return_array->id[1] = data[3];
       return_array->payload = malloc(sizeof(char)*(return_array->size-4));
       if(return_array->payload != NULL){
         memcpy(return_array->payload, &data[4], (return_array->size-4));

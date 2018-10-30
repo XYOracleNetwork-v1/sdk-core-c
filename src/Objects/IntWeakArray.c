@@ -244,7 +244,7 @@ XYResult* IntWeakArray_get(IntWeakArray* self_IntWeakArray, int index) {
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* of the IntWeakArray type.
 *----------------------------------------------------------------------------*/
-XYResult* IntWeakArray_creator_create(char id[2], void* user_data){ // consider allowing someone to create array with one object
+XYResult* IntWeakArray_creator_create(const char id[2], void* user_data){ // consider allowing someone to create array with one object
   IntWeakArray* IntWeakArrayObject = malloc(sizeof(IntWeakArray));
   if(IntWeakArrayObject == NULL){
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);

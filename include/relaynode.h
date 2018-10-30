@@ -41,7 +41,7 @@ XYResult* initRelayNode(RelayNode* self, OriginChainProvider* repository, HashPr
   /**
     * Gets the choice of a catalog from another party.
     *
-    * @param catalog The catalog of the other party.
+    * @param theirCatalog The catalog of the other party.
     * @return The choice to preform in the bound witness.
     */
 

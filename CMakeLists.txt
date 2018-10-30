@@ -34,8 +34,12 @@ set(CMAKE_BUILD_TYPE Debug)
 #endif()
 
 # add options for warnings
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything -O3")
-
+if(UNIX AND NOT APPLE)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Weverything -fsanitize=address -fsanitize=leak -Wno-padded -Wno-zero-length-array -Wno-unused-parameter")
+endif()
+if(APPLE)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Weverything")
+endif()
 # add the executable
 #add_executable(sdk ${SOURCES})
 

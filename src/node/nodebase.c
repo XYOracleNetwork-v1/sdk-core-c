@@ -52,7 +52,12 @@ XYResult* initNode(NodeBase** self, OriginChainProvider* repository, HashProvide
   (*self)->originChainNavigator->containsOriginBlock = containsOriginBlock;
   (*self)->originChainNavigator->Hash = hashingProvider;
   (*self)->originChainNavigator->addBoundWitness = addBoundWitness;
-  XYResult* result = IntStrongArray_creator_create((char*)&BoundWitness_id, NULL);
+  (*self)->originChainNavigator->queueLen = 0;
+  //(*self)->originChainNavigator->bridgeQueue = //malloc(sizeof(ByteArray*)*MIN_QUEUE);
+  //(*self)->originChainNavigator->bridgeQueue[0] = NULL;
+  //(*self)->originChainNavigator->bridgeQueue[1] = NULL;
+
+  XYResult* result = IntStrongArray_creator_create((const char*)&BoundWitness_id, NULL);
   XYObject* repoArray_object = result->result;
   IntStrongArray* repoArray = repoArray_object->payload;
   (*self)->originChainNavigator->originChainRepository = malloc(sizeof(OriginChainProvider));
@@ -71,6 +76,7 @@ XYResult* initNode(NodeBase** self, OriginChainProvider* repository, HashProvide
   (*self)->originChainState->addSigner = addSigner;
   (*self)->originChainState->newOriginBlock = newOriginBlock;
   (*self)->originChainState->getSigners = getSigners;
+  (*self)->originChainState->index = 0;
   if((*self)->originChainState == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY) }
 
   (*self)->session = NULL;
@@ -82,13 +88,15 @@ XYResult* initNode(NodeBase** self, OriginChainProvider* repository, HashProvide
   (*self)->getUnSignedPayloads = getUnSignedPayloads;
   (*self)->getSignedPayloads = getSignedPayloads;
   (*self)->notifyListeners = notifyListeners;
-  (*self)->getBridgedBlocks = getBridgedBlocks;
+  //(*self)->getBridgedBlocks = getBridgedBlocks;
   (*self)->doBoundWitness = doBoundWitness;
   (*self)->updateOriginState = updateOriginState;
   (*self)->makePayload = makePayload;
   (*self)->onBoundWitnessStart = onBoundWitnessStart;
   (*self)->onBoundWitnessEndSuccess = onBoundWitnessEndSuccess;
   (*self)->onBoundWitnessEndFailure = onBoundWitnessEndFailure;
+  (*self)->flag = NODE_MODE;
+
 
   BoundWitnessOption* option1 = malloc(sizeof(BoundWitnessOption));
   option1->flag = BOUND_WITNESS_OPTION; //TODO: hard wired
@@ -100,8 +108,14 @@ XYResult* initNode(NodeBase** self, OriginChainProvider* repository, HashProvide
   option2->getSignedPayload = getSignedHash;
   option2->getUnsignedPayload = getUnSignedHash;
 
+  BoundWitnessOption* option3 = malloc(sizeof(BoundWitnessOption));
+  option3->flag = GIVE_ORIGIN_CHAIN_OPTION; //TODO: hard wired
+  option3->getSignedPayload = getSignedBridge;
+  option3->getUnsignedPayload = getUnSignedBridge;
+
   (*self)->boundWitnessOptions[0] = option1;
   (*self)->boundWitnessOptions[1] = option2;
+  (*self)->boundWitnessOptions[2] = option3;
 
 
   XYResult* return_result = malloc(sizeof(XYResult));
@@ -113,6 +127,119 @@ XYResult* initNode(NodeBase** self, OriginChainProvider* repository, HashProvide
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
 }
+
+XYObject* getSignedHash(void* self){
+  PreviousHash* return_PH = malloc(sizeof(PreviousHash));
+  if(return_PH){
+    return_PH->hash = malloc(sizeof(char)*34);
+    strncpy(return_PH->id, (const char*)&Sha256_id, 2);
+    NodeBase* nodebase = (NodeBase*)self;
+    if(nodebase->originChainNavigator->queueLen < 1){
+        memset(return_PH->hash, 0x00, 32);
+        XYResult* newObject_result = newObject((const char*)&PreviousHash_id, return_PH);
+        if(newObject_result->error != OK){
+          if(return_PH) free(return_PH);
+          free(newObject_result);
+          return NULL;
+        }
+        //printf("Linking to: NULL\n");
+        return newObject_result->result;
+    }
+
+    ByteArray* lastHash = nodebase->originChainNavigator->bridgeQueue[nodebase->originChainNavigator->queueLen-1];
+
+    memcpy(return_PH->hash, lastHash->payload, 32);
+    XYResult* newObject_result = newObject((const char*)&PreviousHash_id, return_PH);
+    if(newObject_result->error != OK){
+      if(return_PH) free(return_PH);
+      free(newObject_result);
+      return NULL;
+    }
+    /*
+    printf("Bridge Queue: [");
+    for(int j = 0; j< nodebase->originChainNavigator->queueLen-2; j++){
+      ByteArray* lHash = nodebase->originChainNavigator->bridgeQueue[j];
+      for(int i = 0; i<32; i++){
+        printf("%1x", (unsigned)(unsigned char)lHash->payload[i]);
+      }
+      printf(", ");
+    }
+    printf("]\n");
+    */
+    /*
+    printf("Linking to block: ");
+    for(int i = 0; i<32; i++){
+      printf("%1x", (unsigned)(unsigned char)lastHash->payload[i]);
+    }
+    printf("\n");
+    */
+
+    return newObject_result->result;
+  } else {
+    return NULL;
+  }
+}
+
+XYObject* getUnSignedHash(void* self){
+  return NULL;
+}
+
+XYObject* getSignedIndex(void* self){
+  XYResult* newObject_result = newObject((const char*)&Index_id, &((NodeBase*)self)->originChainState->index);
+  XYObject* return_object = newObject_result->result;
+  free(newObject_result);
+  return return_object;
+}
+
+XYObject* getUnSignedIndex(void* self){
+  return NULL;
+}
+
+XYObject* getSignedBridge(void* self){
+  XYResult* arrayResult = lookup((const char*)&ShortWeakArray_id);
+  if(arrayResult->error != OK){
+    return NULL;
+  }
+  ObjectProvider* arrayCreator = arrayResult->result;
+  XYResult* create_result = arrayCreator->create((const char*)&BridgeHashSet_id, NULL);
+  XYObject* arrayObject = create_result->result;
+  ShortWeakArray* arrayRaw = arrayObject->payload;
+  if(((NodeBase*)self)->originChainNavigator->queueLen<1){
+    return NULL;
+  }
+  for(uint32_t i=0; i<=((NodeBase*)self)->originChainNavigator->queueLen-1; i++){
+    breakpoint();
+    ByteArray* bridgeHash = ((NodeBase*)self)->originChainNavigator->bridgeQueue[i];
+    XYResult* freeme = newObject((const char*)&Sha256_id, bridgeHash->payload);
+    XYObject* hashObj = freeme->result;
+    XYResult* addResult = arrayRaw->add(arrayRaw, hashObj);
+    if(addResult->error != OK){
+      printf("Couldn't add hash to bridge hash set. \n");
+      free(freeme);
+      free(addResult);
+      free(hashObj);
+      return NULL;
+    }
+    free(freeme);
+  }
+  free(arrayResult);
+  return arrayObject;
+
+  return NULL;
+}
+
+XYObject* getUnSignedBridge(void* self){
+  if(((NodeBase*)self)->originChainNavigator->queueLen<1){
+    return NULL;
+  }
+  NodeBase* node = (NodeBase*)self;
+  OriginChainProvider* provider = node->originChainNavigator->originChainRepository;
+  XYResult* newObject_result = newObject((const char*)&BridgeBlockSet_id, provider->repository);
+  if(newObject_result->error != OK) { free(newObject_result); return NULL; }
+  return newObject_result->result;
+
+}
+
 
 /**
  ****************************************************************************************
@@ -133,11 +260,11 @@ XYResult* initNode(NodeBase** self, OriginChainProvider* repository, HashProvide
  ****************************************************************************************
  */
 
-uint8_t addHeuristic(NodeBase* self, uint key, XYObject* heuristic){
+uint8_t addHeuristic(NodeBase* self, uint16_t key, XYObject* heuristic){
   if(key > self->heuristicCount) { return FALSE;; }
   XYObject* heuristicsArray = (XYObject*)self->heuristics;
   heuristicsArray = heuristicsArray + key;
-  XYResult* lookup_result = lookup((char*)heuristicsArray);
+  XYResult* lookup_result = lookup((const char*)heuristicsArray->id);
   if(lookup_result->error != OK){
     free(lookup_result);
     heuristicsArray = heuristic;
@@ -155,7 +282,7 @@ uint8_t addHeuristic(NodeBase* self, uint key, XYObject* heuristic){
 /*
 * Removes a heuristic from the current heuristic pool.
 */
-uint8_t removeHeuristic(NodeBase* self, uint key){
+uint8_t removeHeuristic(NodeBase* self, uint16_t key){
   if(key > self->heuristicCount) { return FALSE;; }
   XYObject* heuristicsArray = (XYObject*)self->heuristics;
   heuristicsArray = heuristicsArray + key;
@@ -178,16 +305,18 @@ void onBoundWitnessEndSuccess(NodeBase* self, BoundWitness* boundWitness){
       #ifndef HEADLESS
       XYObject* hash_object = hash_result->result;
       ByteArray* hash = hash_object->payload;
-      printf("New block found:  ");
-      for(int i = 0; i<hash->size; i++){
+      printf(GRN "New block found:  " RESET);
+      for(uint32_t i = 0; i<hash->size; i++){
         printf("%1x", (unsigned)(unsigned char)hash->payload[i]);
       }
       printf("\n");
+
       #endif
 
       XYResult* contains_result = self->originChainNavigator->containsOriginBlock(self->originChainNavigator, boundWitness);
       if(contains_result->error != OK ){
         //TODO: De-onion and sort bridge blocks
+        //breakpoint();
         self->originChainNavigator->addBoundWitness(self->originChainNavigator, boundWitness);
         notifyListeners(self, boundWitness);
         return;
@@ -205,8 +334,8 @@ void onBoundWitnessEndSuccess(NodeBase* self, BoundWitness* boundWitness){
 /*
  * Called When a bound witness has failed to be added.
  */
-void onBoundWitnessEndFailure(enum EXyoErrors error){
-  return;
+void onBoundWitnessEndFailure( void ){
+  printf(RED "Bound witness failed!\n" RESET);
 }
 
 /*
@@ -216,104 +345,10 @@ void onBoundWitnessStart(){
   return;
 }
 
-XYObject* getSignedHash(void* self){
-  PreviousHash* return_PH = malloc(sizeof(PreviousHash));
-  if(return_PH){
-    return_PH->hash = malloc(sizeof(char)*34);
-    strncpy(return_PH->id, (char*)&Sha256_id, 2);
-    NodeBase* nodebase = (NodeBase*)self;
-    if(nodebase->originChainNavigator->queueLen <= 1){
-        memset(return_PH->hash, 0x00, 32);
-        XYResult* newObject_result = newObject((char*)&PreviousHash_id, return_PH);
-        if(newObject_result->error != OK){
-          if(return_PH) free(return_PH);
-          free(newObject_result);
-          return NULL;
-        }
-        printf("Linking to: NULL\n");
-        return newObject_result->result;
-    }
-    //breakpoint();
-    ByteArray* lastHash = nodebase->originChainNavigator->bridgeQueue[nodebase->originChainNavigator->queueLen-2];
-
-    memcpy(return_PH->hash+2, lastHash->payload, 32);
-    XYResult* newObject_result = newObject((char*)&PreviousHash_id, return_PH);
-    if(newObject_result->error != OK){
-      if(return_PH) free(return_PH);
-      free(newObject_result);
-      return NULL;
-    }
-    /*
-    printf("Bridge Queue: [");
-    for(int j = 0; j< nodebase->originChainNavigator->queueLen-2; j++){
-      ByteArray* lHash = nodebase->originChainNavigator->bridgeQueue[j];
-      for(int i = 0; i<32; i++){
-        printf("%1x", (unsigned)(unsigned char)lHash->payload[i]);
-      }
-      printf(", ");
-    }
-    printf("]\n");
-    */
-    printf("Linking to block: ");
-    for(int i = 0; i<32; i++){
-      printf("%1x", (unsigned)(unsigned char)lastHash->payload[i]);
-    }
-    printf("\n");
-    return newObject_result->result;
-  } else {
-    return NULL;
-  }
-}
-
-XYObject* getUnSignedHash(void* self){
-  PreviousHash* return_PH = malloc(sizeof(PreviousHash));
-  if(return_PH){
-    return_PH->hash = malloc(sizeof(char)*34);
-    strncpy(return_PH->id, (char*)&Sha256_id, 2);
-    NodeBase* nodebase = (NodeBase*)self;
-    if(nodebase->originChainNavigator->queueLen <= 1){
-        memset(return_PH->hash, 0x00, 32);
-        XYResult* newObject_result = newObject((char*)&PreviousHash_id, return_PH);
-        if(newObject_result->error != OK){
-          if(return_PH) free(return_PH);
-          free(newObject_result);
-          return NULL;
-        }
-        return newObject_result->result;
-    }
-    ByteArray* lastHash = nodebase->originChainNavigator->bridgeQueue[nodebase->originChainNavigator->queueLen-2];
-
-    memcpy(return_PH->hash+2, lastHash->payload, 32);
-    XYResult* newObject_result = newObject((char*)&PreviousHash_id, return_PH);
-    if(newObject_result->error != OK){
-      if(return_PH) free(return_PH);
-      free(newObject_result);
-      return NULL;
-    }
-    return newObject_result->result;
-  } else {
-    return NULL;
-  }
-}
-
-XYObject* getSignedIndex(void* self){
-  XYResult* newObject_result = newObject((char*)&Index_id, &gState->index);
-  XYObject* return_object = newObject_result->result;
-  free(newObject_result);
-  return return_object;
-}
-
-XYObject* getUnSignedIndex(void* self){
-  XYResult* newObject_result = newObject((char*)&Index_id, &gState->index);
-  XYObject* return_object = newObject_result->result;
-  free(newObject_result);
-  return return_object;
-}
-
 /*
 * Self signs an origin block to the devices origin chain.
 */
-uint8_t selfSignOriginChain(NodeBase* self, uint flag){
+uint8_t selfSignOriginChain(NodeBase* self){
   ZigZagBoundWitness* boundWitness = malloc(sizeof(ZigZagBoundWitness) + (2*sizeof(XYObject)));
   if(boundWitness){
     boundWitness->boundWitness = malloc(sizeof(BoundWitnessTransfer));
@@ -329,24 +364,24 @@ uint8_t selfSignOriginChain(NodeBase* self, uint flag){
     boundWitness->addIncomingSignatures = addIncomingSignatures;
     boundWitness->makeSelfKeySet = makeSelfKeySet;
     boundWitness->signForSelf = signForSelf;
-    boundWitness->heuristicCount = 2;
+    boundWitness->heuristicCount = 3;
 
-    XYResult* lookup_result = lookup((char*)ShortStrongArray_id);
+    XYResult* lookup_result = lookup(ShortStrongArray_id);
     ObjectProvider* SSA_Creator = lookup_result->result;
     free(lookup_result);
-    lookup_result = lookup((char*)IntStrongArray_id);
+    lookup_result = lookup(IntStrongArray_id);
     ObjectProvider* ISA_Creator = lookup_result->result;
     free(lookup_result);
 
-    XYResult* SSA_result = SSA_Creator->create((char*)&ECDSASecp256k1_id, NULL);
+    XYResult* SSA_result = SSA_Creator->create((const char*)&ECDSASecp256k1_id, NULL);
     XYObject* pubkeyArray_object = SSA_result->result;
     ShortStrongArray* pubkeyArray = pubkeyArray_object->payload;
     free(SSA_result);
-    SSA_result = SSA_Creator->create((char*)SignatureSet_id, NULL);
+    SSA_result = SSA_Creator->create(SignatureSet_id, NULL);
     XYObject* signatureArray_object = SSA_result->result;
     ShortStrongArray* signatureArray = signatureArray_object->payload;
     free(SSA_result);
-    XYResult* ISA_result = ISA_Creator->create((char*)Payload_id, NULL);
+    XYResult* ISA_result = ISA_Creator->create(Payload_id, NULL);
     XYObject* payloadsArray_object = ISA_result->result;
     IntStrongArray* payloadsArray = payloadsArray_object->payload;
     boundWitness->dynamicPublicKeys = pubkeyArray;
@@ -355,7 +390,7 @@ uint8_t selfSignOriginChain(NodeBase* self, uint flag){
 
     XYObject* objects = (XYObject*)&boundWitness->payload;
 
-    XYResult* newObject_result = newObject((char*)Sha256_id, ((ByteArray*)self->originChainState->latestHash->payload));
+    XYResult* newObject_result = newObject(Sha256_id, (self->originChainState->latestHash->payload));
     if(newObject_result->error != OK) {
       free(boundWitness->boundWitness);
       free(boundWitness);
@@ -365,7 +400,7 @@ uint8_t selfSignOriginChain(NodeBase* self, uint flag){
     objects[0] = *(XYObject*)newObject_result->result;
 
     free(newObject_result);
-    newObject_result = newObject((char*)&Index_id, &(self->originChainState->index));
+    newObject_result = newObject((const char*)&Index_id, &(self->originChainState->index));
     if(newObject_result->error != OK) {
       free(boundWitness->boundWitness);
       free(boundWitness);
@@ -381,7 +416,7 @@ uint8_t selfSignOriginChain(NodeBase* self, uint flag){
     }
     char* transferBytes = incomingData_result->result;
     free(incomingData_result);
-    lookup_result = lookup((char*)BoundWitness_id);
+    lookup_result = lookup(BoundWitness_id);
     if(lookup_result->error != OK){
       free(boundWitness->boundWitness);
       free(boundWitness);
@@ -408,12 +443,14 @@ uint8_t selfSignOriginChain(NodeBase* self, uint flag){
     return FALSE;;
   }
 }
+
 /*
 * Gets all of the unsigned payloads for a given flag.
 */
-XYObject* getUnSignedPayloads(NodeBase* self, uint bitFlag){
-  int count = 0;
-  for(int i = 0; i < BOUNDWITNESS_OPTIONS; i++){
+uint8_t gunsignedHeuristicCount = 0;
+XYObject* getUnSignedPayloads(NodeBase* self){
+  uint32_t count = 0;
+  for(uint32_t i = 0; i < BOUNDWITNESS_OPTIONS; i++){
     if(self->boundWitnessOptions[i] != NULL){
       count = count + 1;
     } else {
@@ -422,12 +459,17 @@ XYObject* getUnSignedPayloads(NodeBase* self, uint bitFlag){
   }
   XYObject* unsignedPayloads = malloc(sizeof(XYObject)*count);
   XYObject* unsignedPayloadItr = unsignedPayloads;
-  for(int i = 0; i< count; i++){
+  for(uint32_t i = 0; i< count; i++){
     BoundWitnessOption* option = self->boundWitnessOptions[i];
-    XYObject* result = option->getUnsignedPayload(self);
-    if(result){
-      *unsignedPayloadItr = *result;
-      unsignedPayloadItr = unsignedPayloadItr+1;
+    if(option->flag & self->flag){
+      XYObject* result = option->getUnsignedPayload(self);
+      if(result){
+        *unsignedPayloadItr = *result;
+        unsignedPayloadItr = unsignedPayloadItr+1;
+        gunsignedHeuristicCount += 1;
+      } else {
+        continue;
+      }
     } else {
       continue;
     }
@@ -437,9 +479,10 @@ XYObject* getUnSignedPayloads(NodeBase* self, uint bitFlag){
 /*
 * Gets all of the signed payloads for a given flag.
 */
-XYObject* getSignedPayloads(NodeBase* self, uint bitFlag){
-  int count = 0;
-  for(int i = 0; i < BOUNDWITNESS_OPTIONS; i++){
+uint8_t gsignedHeuristicCount = 0;
+XYObject* getSignedPayloads(NodeBase* self){
+  uint32_t count = 0;
+  for(uint32_t i = 0; i < BOUNDWITNESS_OPTIONS; i++){
     if(self->boundWitnessOptions[i] != NULL){
       count = count + 1;
     } else {
@@ -448,23 +491,30 @@ XYObject* getSignedPayloads(NodeBase* self, uint bitFlag){
   }
   XYObject* SignedPayloads = malloc(sizeof(XYObject)*count);
   XYObject* SignedPayloadItr = SignedPayloads;
-  for(int i = 0; i< count; i++){
+  for(uint32_t i = 0; i< count; i++){
     BoundWitnessOption* option = self->boundWitnessOptions[i];
-    XYObject* result = option->getSignedPayload((void*)self);
-    if(result){
-      *SignedPayloadItr = *result;
-      SignedPayloadItr = SignedPayloadItr+1;
+    if(option->flag & self->flag){
+      XYObject* result = option->getSignedPayload((void*)self);
+      if(result){
+        *SignedPayloadItr = *result;
+        SignedPayloadItr = SignedPayloadItr+1;
+        gsignedHeuristicCount += 1;
+      } else {
+        continue;
+      }
     } else {
       continue;
     }
+
   }
   return SignedPayloads;
 }
+
 /*
 * Call the listener for each block in a bound witness.
 */
 void notifyListeners(NodeBase* self, BoundWitness* boundWitness){
-  for(int i = 0; i < MAX_ALLOCATED_LISTENERS; i++){
+  for(uint32_t i = 0; i < MAX_ALLOCATED_LISTENERS; i++){
     if(self->listeners[i] != NULL){
       self->listeners[i]->onBoundWitnessDiscovered((void*)boundWitness);
     } else {
@@ -472,13 +522,6 @@ void notifyListeners(NodeBase* self, BoundWitness* boundWitness){
     }
   }
   return;
-}
-
-/*
- * Get blocks to bridge
- */
-XYResult* getBridgedBlocks(NodeBase* self){
-  return NULL;
 }
 
 /*
@@ -495,12 +538,14 @@ XYResult* doBoundWitness(NodeBase* self, ByteArray* startingData, NetworkPipe* p
       RETURN_ERROR(ERR_CRITICAL);
     }
     uint8_t choice = self->getChoice((uint8_t*)role_result->result);
+    breakpoint();
+    self->flag = choice;
     self->session = malloc(sizeof(ZigZagBoundWitnessSession));
     if(self->session == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
     self->session->boundWitness = malloc(sizeof(ZigZagBoundWitness));
     if(self->session->boundWitness == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
     self->session->NetworkPipe = pipe;
-    XYResult* payload_result = self->makePayload(self, self->flag);
+    XYResult* payload_result = self->makePayload(self);
     if(payload_result->error != OK){ RETURN_ERROR(ERR_CRITICAL); }
     self->session->boundWitness->dynamicPayloads = payload_result->result;
     XYResult* getSigner_result = self->originChainState->getSigners(self->originChainState);
@@ -518,26 +563,28 @@ XYResult* doBoundWitness(NodeBase* self, ByteArray* startingData, NetworkPipe* p
     self->session->boundWitness->makeSelfKeySet = makeSelfKeySet;
     self->session->boundWitness->signForSelf = signForSelf;
 
-    XYResult* lookup_result = lookup((char*)ShortStrongArray_id);
+    XYResult* lookup_result = lookup(ShortStrongArray_id);
     ObjectProvider* SSA_Creator = lookup_result->result;
     free(lookup_result);
 
-    XYResult* SSA_result = SSA_Creator->create((char*)&KeySet_id, NULL);
+    XYResult* SSA_result = SSA_Creator->create((const char*)&KeySet_id, NULL);
     XYObject* pubkeyArray_object = SSA_result->result;
     ShortStrongArray* pubkeyArray = pubkeyArray_object->payload;
     free(SSA_result);
-    SSA_result = SSA_Creator->create((char*)SignatureSet_id, NULL);
+    SSA_result = SSA_Creator->create(SignatureSet_id, NULL);
     XYObject* signatureArray_object = SSA_result->result;
     ShortStrongArray* signatureArray = signatureArray_object->payload;
     free(SSA_result);
 
     self->session->boundWitness->dynamicPublicKeys = pubkeyArray;
     self->session->boundWitness->dynamicSignatures = signatureArray;
-
+    self->session->cycles = 0;
+    self->session->boundWitness->hasSentKeysAndPayload = 0;
     XYResult* completeBoundWitness_result = self->session->completeBoundWitness(self->session, startingData);
+    self->session->cycles = 0;
     pipe->close(self->session);
     if(completeBoundWitness_result->error != OK){
-      self->onBoundWitnessEndFailure(completeBoundWitness_result->error);
+      self->onBoundWitnessEndFailure();
       self->session = NULL;
       RETURN_ERROR(ERR_BOUNDWITNESS_FAILED);
     } else {
@@ -566,24 +613,24 @@ uint8_t updateOriginState(NodeBase* self, BoundWitness* boundWitness){
 /*
 * Make a Payload* which can be used in a bound witness.
 */
-XYResult* makePayload(NodeBase* self, uint bitFlag){
+XYResult* makePayload(NodeBase* self){
   // Set up Payload Array
-  XYResult* lookup_result = lookup((char*)&IntStrongArray_id);
+  XYResult* lookup_result = lookup((const char*)&IntStrongArray_id);
   if(lookup_result->error!=OK){ RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);}
   ObjectProvider* ISA_Creator = lookup_result->result;
   free(lookup_result);
-  XYResult* create_result = ISA_Creator->create((char*)&IntStrongArray_id, NULL); // payload_id?
+  XYResult* create_result = ISA_Creator->create((const char*)&IntStrongArray_id, NULL); // payload_id?
   if(create_result->error != OK){
     return create_result;
   }
   XYObject* payloads_object = create_result->result;
   IntStrongArray* payloads_raw = payloads_object->payload;
 
-  lookup_result = lookup((char*)&Payload_id);
+  lookup_result = lookup((const char*)&Payload_id);
   if(lookup_result->error!=OK){ RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);}
   ObjectProvider* Payload_Creator = lookup_result->result;
   free(lookup_result);
-  create_result = Payload_Creator->create((char*)&Payload_id, NULL); // payload_id?
+  create_result = Payload_Creator->create((const char*)&Payload_id, NULL); // payload_id?
   if(create_result->error != OK){
     return create_result;
   }
@@ -591,7 +638,7 @@ XYResult* makePayload(NodeBase* self, uint bitFlag){
   Payload* payload_raw = payload_object->payload;
   /*
   //free(create_result);
-  lookup_result = lookup((char*)&IntWeakArray_id);
+  lookup_result = lookup((const char*)&IntWeakArray_id);
   if(lookup_result->error != OK){
     return lookup_result;
   }
@@ -617,41 +664,38 @@ XYResult* makePayload(NodeBase* self, uint bitFlag){
   if(user_payload == NULL){
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
-
-  /* Here we collect the correct heuristics given the bitFlag */
-  XYObject* signedPayloads = getSignedPayloads(self, bitFlag);
-  XYObject* unsignedPayloads = getUnSignedPayloads(self, bitFlag);
-
-  /* get the number of signed and unsigned heuristics */
-  uint8_t bool1 = 2; //TODO HARD CODED
-  uint8_t bool2 = 2;
-  /*
-  for(int i = 0; i<MAX_ALLOCATED_HEURISTICS; i++){
-    lookup_result = lookup((char*)&signedPayloads[i].id);
-    if(lookup_result->error != OK && bool1 == 255){
-      bool1 = i;
-    }
-    lookup_result = lookup((char*)&unsignedPayloads[i].id);
-    if(lookup_result->error != OK && bool2 == 255){
-      bool2 = i;
-    }
-    if( (bool1 == i && bool2 >=0) || (bool2 == i && bool1 >=0) ){
-      break;
-    }
-  }
   */
-  /* Add each heuristic to its corresponding array */
-  for(uint8_t i = 0; i < bool1; i++){
-    payload_raw->signedHeuristics->add(payload_raw->signedHeuristics, &signedPayloads[i]);
 
-  }
-  for(uint8_t i = 0; i < bool2; i++){
-    payload_raw->unsignedHeuristics->add(payload_raw->unsignedHeuristics, &unsignedPayloads[i]);
-  }
+  /*
+    Here we collect the correct heuristics given the bitFlag
+  */
+  XYObject* signedPayloads = getSignedPayloads(self);
+  XYObject* unsignedPayloads = getUnSignedPayloads(self);
+
+  /* Add each heuristic to its corresponding array */
+  for(uint8_t i = 0; i < gsignedHeuristicCount; i++){
+     XYResult* inner_lookup_result = lookup((const char*)&signedPayloads[i]);
+     if(inner_lookup_result->error == OK){
+       payload_raw->signedHeuristics->add(payload_raw->signedHeuristics, &signedPayloads[i]);
+
+     }
+     free(inner_lookup_result);
+   }
+   for(uint8_t i = 0; i < gunsignedHeuristicCount; i++){
+
+     XYResult* inner_lookup_result = lookup((const char*)&unsignedPayloads[i]);
+     if(inner_lookup_result->error == OK){
+       payload_raw->unsignedHeuristics->add(payload_raw->unsignedHeuristics, &unsignedPayloads[i]);
+     }
+     free(inner_lookup_result);
+   }
+   //printf("unsignedHueristics size: %d\n", payload_raw->unsignedHeuristics->size);
+   gunsignedHeuristicCount = 0;
+   gsignedHeuristicCount = 0;
 
 
   payload_raw->size = payload_raw->signedHeuristics->size + payload_raw->unsignedHeuristics->size + 4;
-  XYResult* newObject_result = newObject((char*)&Payload_id, payload_raw);
+  XYResult* newObject_result = newObject((const char*)&Payload_id, payload_raw);
   if(newObject_result->error != OK) { RETURN_ERROR(ERR_CRITICAL); }
   XYResult* add_result = payloads_raw->add(payloads_raw, newObject_result->result);
   if(add_result->error != OK){ RETURN_ERROR(ERR_CRITICAL); }

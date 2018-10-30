@@ -210,7 +210,7 @@ XYResult* IntStrongArray_get(IntStrongArray* self_IntStrongArray, int index) {
       char* array_elements = self_IntStrongArray->payload;
       uint32_t array_offset = 0;
       for(int i = 0; i<=index; i++){
-        if(array_offset>totalSize-4){
+        if(array_offset>=totalSize-4){
           RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);
         }
         char* element_size = malloc(element_creator->sizeIdentifierSize);
@@ -252,7 +252,7 @@ XYResult* IntStrongArray_get(IntStrongArray* self_IntStrongArray, int index) {
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* of the IntStrongArray type.
 *----------------------------------------------------------------------------*/
-XYResult* IntStrongArray_creator_create(char id[2], void* user_data){ // consider allowing someone to create array with one object
+XYResult* IntStrongArray_creator_create(const char id[2], void* user_data){ // consider allowing someone to create array with one object
   IntStrongArray* IntStrongArrayObject = malloc(sizeof(IntStrongArray));
   if(IntStrongArrayObject == NULL){
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
@@ -313,8 +313,10 @@ XYResult* IntStrongArray_creator_fromBytes(char* data){
       array_id[1] = data[5];
       array_id[2] = '\00';
       strcpy(return_array->id, array_id);
+      return_array->id[0] = data[4];
+      return_array->id[1] = data[5];
       int flipped = 0;
-      if(return_array->size > 5000){ /* return array size is big endian) */
+      if(return_array->size > CAUSES_BUGS){ /* return array size is big endian) */
         return_array->size = to_uint32((unsigned char*)&return_array->size);
         flipped = 1;
       }
@@ -354,7 +356,7 @@ XYResult* IntStrongArray_creator_fromBytes(char* data){
 *      XYResult*            [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
 XYResult* IntStrongArray_creator_toBytes(struct XYObject* user_XYObject){
-  if((user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x03) || (user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x04)){
+  if((user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x03) || (user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x04) || (user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x09)){
     IntStrongArray* user_array = user_XYObject->GetPayload(user_XYObject);
     uint32_t totalSize = user_array->size;
     char* byteBuffer = malloc(sizeof(char)*totalSize);
@@ -372,14 +374,61 @@ XYResult* IntStrongArray_creator_toBytes(struct XYObject* user_XYObject){
       }
 
       memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 6);
-      if(user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x04){
+      if((user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x04)){ //|| (user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x03)){
+        //uint32_t correctedSize = to_uint32(user_XYObject->GetPayload(user_XYObject));
+        //memcpy(byteBuffer, &correctedSize, 4);
         memcpy(byteBuffer+4, (char*)&Payload_id , 2);
       }
+      /* TODO: totalSize is rogue here. 10K is unlikely  */
+      if(totalSize > CAUSES_BUGS){
+        memcpy(byteBuffer, &totalSize, 4);
+        totalSize = to_uint32((unsigned char*)&totalSize);
+        memcpy(byteBuffer+6, user_array->payload, sizeof(char)*(totalSize-6));
+      } else {
+        memcpy(byteBuffer+6, user_array->payload, sizeof(char)*(totalSize-6));
+      }
 
-      memcpy(byteBuffer+6, user_array->payload, sizeof(char)*(totalSize-6));
       if(littleEndian()){
         user_array->size = to_uint32((unsigned char*)(uintptr_t)&user_array->size);
       }
+      return_result->error = OK;
+      return_result->result = byteBuffer;
+      return return_result;
+    } else {
+      if(byteBuffer) free(byteBuffer);
+      if(return_result) free(return_result);
+      RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)
+    }
+  }
+  else {
+    RETURN_ERROR(ERR_BADDATA)
+  }
+
+}
+
+XYResult* BlockSet_creator_toBytes(struct XYObject* user_XYObject){
+  if((user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x09)){
+    IntStrongArray* user_array = user_XYObject->GetPayload(user_XYObject);
+    uint32_t totalSize = user_array->size;
+    char* byteBuffer = malloc(sizeof(char)*totalSize);
+    XYResult* return_result = malloc(sizeof(XYResult));
+    if(return_result != NULL && byteBuffer != NULL){
+
+      /*
+       * Use the to_uint32 function to converter endian to Big Endian
+       * if the host architecture isn't already Big Endian.
+       * This switch happens so that when it's copied into a buffer we
+       * are in the network byte order.
+       */
+
+      uint32_t encodedSize = totalSize;
+      if(littleEndian()){
+        encodedSize = to_uint32((unsigned char*)&encodedSize);
+      }
+      memcpy(byteBuffer, &encodedSize, 4);
+      memcpy(byteBuffer+4, user_XYObject->payload+4, 2);
+
+      memcpy(byteBuffer+6, user_array->payload, sizeof(char)*(totalSize-6));
       return_result->error = OK;
       return_result->result = byteBuffer;
       return return_result;

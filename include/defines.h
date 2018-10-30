@@ -103,7 +103,7 @@
  */
 #define MAX_ALLOCATED_OPTIONS                   0x03
 #define MAX_ALLOCATED_HEURISTICS                0x03
-#define MAX_ALLOCATED_LISTENERS                 0x03
+#define MAX_ALLOCATED_LISTENERS                 0x00
 #define BOUNDWITNESS_OPTIONS                    0x03
 
 /*
@@ -127,7 +127,7 @@
  */
 #define PARENT_RECV_BUFF_SIZE                  2048
 #define CHILD_RECV_BUFF_SIZE                    512
-#define XYO_NETWORK_PORT                       3779
+#define XYO_NETWORK_PORT                       2421
 #define ERROR_SOCKET_FAILED                     -20
 #define ERROR_SETSOCKOPT_FAILED                 -21
 #define ERROR_BIND_FAILED                       -22
@@ -140,3 +140,18 @@
 #define CATALOG_BUFFER_SIZE                       9
 #define CATALOG_SIZE                              4
 #define DEFAULT_NUM_PEERS                         1
+
+#define CAUSES_BUGS                          100000
+/*
+ * Configs
+ */
+#define NODE_MODE BOUND_WITNESS_OPTION+GIVE_ORIGIN_CHAIN_OPTION
+
+#define RED   "\x1B[31m"
+#define GRN   "\x1B[32m"
+#define YEL   "\x1B[33m"
+#define BLU   "\x1B[34m"
+#define MAG   "\x1B[35m"
+#define CYN   "\x1B[36m"
+#define WHT   "\x1B[37m"
+#define RESET "\x1B[0m"

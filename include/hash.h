@@ -29,10 +29,13 @@ struct HashProvider{
    * Given a cryptographic hash and a piece of data, verify the given hash == hash(data).
    */
   int (*VerifyHash)(ByteArray* hash, ByteArray* data);
-  char* (*GetId)(); // Fetch the above id object and return it.
+  char* (*GetId)(HashProvider* self ); // Fetch the above id object and return it.
 };
 
-HashProvider* newHashProvider();
+HashProvider* newHashProvider( void );
+XYResult* hash(ByteArray* user);
+int verify(ByteArray* hash, ByteArray* data);
+char* hashGetId(HashProvider* object);
 
 #define HASH_H
 #endif

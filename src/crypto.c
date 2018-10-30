@@ -71,7 +71,7 @@ XYResult* getPublicKey(Signer* signer){
 
   if(return_result == NULL) return NULL;
   return_result->error = OK;
-  XYResult* newObject_result = newObject((char*)ECDSASecp256k1_id, signer->publicKey->payload);
+  XYResult* newObject_result = newObject(ECDSASecp256k1_id, signer->publicKey->payload);
   if(newObject_result->error != OK){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
   return_result->result = newObject_result->result;
 
@@ -126,10 +126,10 @@ XYResult* sign(Signer* signer, ByteArray* givenArray){
   if(return_signature == NULL){
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
-  XYResult* newObject_result = newObject((char*)&ECDSASecp256k1Sig_id, return_signature);
+  XYResult* newObject_result = newObject((const char*)&ECDSASecp256k1Sig_id, return_signature);
   XYObject* return_object = newObject_result->result;
-  XYResult* result_result = lookup((char*)&SignatureSet_id);
-  ObjectProvider* arrayCreator = result_result->result;
+  //XYResult* result_result = lookup((const char*)&SignatureSet_id);
+  //ObjectProvider* arrayCreator = result_result->result;
   return_object->payload = return_signature;
   return_signature->size = 69;
   return_signature->signature = malloc(sizeof(char)*67);

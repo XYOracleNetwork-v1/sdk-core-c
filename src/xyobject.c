@@ -26,7 +26,7 @@ void* GetPayload(struct XYObject* object){
   return object->payload;
 }
 
-XYResult* newObject(char id[2], void* payload){
+XYResult* newObject(const char id[2], void* payload){
   struct XYObject* new_object = malloc(sizeof(XYObject));
   if(new_object != NULL){
     if(payload != 0){
@@ -286,6 +286,38 @@ XYResult* initTable(void){
     return preallocated_result;
   }
 
+  // Initialize Bridge Hash Set Creator
+  struct ObjectProvider* HASHSET_creator = malloc(sizeof(ObjectProvider));
+  if(NPK_creator != NULL){
+    HASHSET_creator->sizeIdentifierSize = 2;
+    HASHSET_creator->defaultSize = 0;
+    HASHSET_creator->create = &ShortWeakArray_creator_create;
+    HASHSET_creator->fromBytes = &ShortWeakArray_creator_fromBytes;
+    HASHSET_creator->toBytes = &ShortWeakArray_creator_toBytes;
+    typeTable[MAJOR_CORE][MINOR_OC_HASH_SET] = HASHSET_creator;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
+  // Initialize Bridge Block Set
+  struct ObjectProvider* BBS_creator = malloc(sizeof(ObjectProvider));
+  if(BBS_creator != NULL){
+    BBS_creator->sizeIdentifierSize = 4;
+    BBS_creator->defaultSize = 0;
+    BBS_creator->create = &IntStrongArray_creator_create;
+    BBS_creator->fromBytes = &IntStrongArray_creator_fromBytes;
+    BBS_creator->toBytes = &BlockSet_creator_toBytes;
+    typeTable[MAJOR_CORE][MINOR_OC_SET] = BBS_creator;
+  }
+  else {
+    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
+    preallocated_result->result = 0;
+    return preallocated_result;
+  }
+
   // Initialize SHA256 Hash Creator
   struct ObjectProvider* SHA256_creator = malloc(sizeof(ObjectProvider));
   if(SHA256_creator != NULL){
@@ -321,8 +353,8 @@ XYResult* initTable(void){
   // Initialize SECP256k1 Signature type
   struct ObjectProvider* secp256k1sig_creator = malloc(sizeof(ObjectProvider));
   if(secp256k1sig_creator != NULL){
-    secp256k1sig_creator->sizeIdentifierSize = 0;
-    secp256k1sig_creator->defaultSize = 69;
+    secp256k1sig_creator->sizeIdentifierSize = 1;
+    secp256k1sig_creator->defaultSize = 0;
     secp256k1sig_creator->create = &ECDSA_secp256k1Sig_creator_create;
     secp256k1sig_creator->fromBytes = &ECDSA_secp256k1Sig_creator_fromBytes;
     secp256k1sig_creator->toBytes = &ECDSA_secp256k1Sig_creator_toBytes;
@@ -395,7 +427,7 @@ XYResult* initTable(void){
   }
 }
 
-XYResult* lookup(char id[2]){
+XYResult* lookup(const char id[2]){
   void* tableValue = typeTable[(unsigned)id[0]][(unsigned)id[1]];
   XYResult* return_result = malloc(sizeof(XYResult));
   if(return_result != NULL){

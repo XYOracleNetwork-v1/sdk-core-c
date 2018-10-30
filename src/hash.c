@@ -35,14 +35,14 @@ XYResult* hash(ByteArray* user){
     return_array->size = 32;
     return_array->payload = malloc(sizeof(char)*32);
     if(return_array->payload){
-      srand(time(NULL));
+      srand((uint32_t)time(NULL));
       for(int i = 0; i<32; i++){
         memset(return_array->payload+i, ((uint8_t)rand())%255, 1);
       }
 
       XYResult* return_result = malloc(sizeof(XYResult));
       if(return_result){
-        return newObject((char*)&Sha256_id, return_array);
+        return newObject((const char*)&Sha256_id, return_array);
       } else {
         free(return_array->payload);
         free(return_array);

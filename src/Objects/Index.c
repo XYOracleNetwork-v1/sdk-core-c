@@ -37,7 +37,7 @@
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* of the Index type.
 *----------------------------------------------------------------------------*/
-XYResult* Index_creator_create(char id[2], void* user_data){
+XYResult* Index_creator_create(const char id[2], void* user_data){
   return newObject(id, user_data);
 }
 

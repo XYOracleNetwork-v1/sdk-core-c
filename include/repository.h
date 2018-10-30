@@ -24,17 +24,17 @@
 
 typedef struct RepositoryProviderT{
   void* repository;
-  uint logicalEnd;
-  XYResult* (*write)(struct RepositoryProviderT* self, ByteArray* value, uint offset, uint timeout);
-  XYResult* (*read)(struct RepositoryProviderT* self, uint offset, uint timeout);
-  XYResult* (*readRows)(struct RepositoryProviderT* self, uint beginning, uint end, uint timeout);
-  XYResult* (*delete)(struct RepositoryProviderT* self, uint offset, uint timeout);
-  XYResult* (*deleteRows)(struct RepositoryProviderT* self, uint beginning, uint end, uint timeout);
+  uint16_t logicalEnd;
+  XYResult* (*write)(struct RepositoryProviderT* self, ByteArray* value, uint16_t offset, uint16_t timeout);
+  XYResult* (*read)(struct RepositoryProviderT* self, uint16_t offset, uint16_t timeout);
+  XYResult* (*readRows)(struct RepositoryProviderT* self, uint16_t beginning, uint16_t end, uint16_t timeout);
+  XYResult* (*delete)(struct RepositoryProviderT* self, uint16_t offset, uint16_t timeout);
+  XYResult* (*deleteRows)(struct RepositoryProviderT* self, uint16_t beginning, uint16_t end, uint16_t timeout);
 } RepositoryProvider;
 
 typedef struct OriginChainProviderT {
   void* repository;
-  XYResult* (*append)(struct OriginChainProviderT* self, ByteArray* value, uint timeout);
+  XYResult* (*append)(struct OriginChainProviderT* self, ByteArray* value, uint16_t timeout);
   XYResult* (*getChain)(struct OriginChainProviderT* self);
   XYResult* (*deleteChain)(struct OriginChainProviderT* self);
 
@@ -44,12 +44,12 @@ typedef struct OriginChainProviderT {
   XYResult* (*saveChain)(struct OriginChainProviderT* self);
   XYResult* (*reconstructChain)(struct OriginChainProviderT* self);
   char optionalBits[ORIGINCHAIN_EXTRA_BITS];
-  uint logicalEnd;
+  uint16_t logicalEnd;
 
 } OriginChainProvider;
 
-OriginChainProvider* initOriginChainProvider();
-XYResult* append(OriginChainProvider* self, ByteArray* value, uint timeout);
+OriginChainProvider* initOriginChainProvider( void );
+XYResult* append(OriginChainProvider* self, ByteArray* value, uint16_t timeout);
 XYResult* getChain(OriginChainProvider* self);
 XYResult* deleteChain(OriginChainProvider* self);
 

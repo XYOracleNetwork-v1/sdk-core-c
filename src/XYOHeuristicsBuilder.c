@@ -23,7 +23,7 @@
  #include "XYOHeuristicsBuilder.h"
  #include <stdio.h>
 
-void breakpoint(void){};
+void breakpoint(void){}
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -67,7 +67,7 @@ int littleEndian(void){
   return (*((uint8_t*)(&i))) == 0x67;
 }
 
-XYResult* Heuristic_RSSI_Creator_create(char id[2], void* rssi){
+XYResult* Heuristic_RSSI_Creator_create(const char id[2], void* rssi){
   return newObject(id, rssi);
 }
 
@@ -96,7 +96,7 @@ XYResult* Heuristic_RSSI_Creator_toBytes(struct XYObject* user_XYObject){
   }
 }
 
-XYResult* Heuristic_Text_Creator_create(char id[2], void* text){
+XYResult* Heuristic_Text_Creator_create(const char id[2], void* text){
   return newObject(id, text);
 }
 
@@ -114,7 +114,7 @@ XYResult* Heuristic_Text_Creator_toBytes(struct XYObject* user_XYObject){
   uint16_t size = to_uint16((unsigned char*)text);
   uint16_t encodedSize = size;
   if(littleEndian()){
-    uint16_t encodedSize = to_uint16((unsigned char*)&encodedSize);
+    encodedSize = to_uint16((unsigned char*)&encodedSize);
   }
   char* encoded_bytes = malloc(sizeof(char)*size);
   if(encoded_bytes == NULL) {
@@ -137,7 +137,7 @@ XYResult* Heuristic_Text_Creator_toBytes(struct XYObject* user_XYObject){
   }
 }
 
-XYResult* ECDSA_secp256k1Uncompressed_creator_create(char id[2], void* text){
+XYResult* ECDSA_secp256k1Uncompressed_creator_create(const char id[2], void* text){
   return newObject(id, text);
 }
 
@@ -175,14 +175,14 @@ XYResult* ECDSA_secp256k1Uncompressed_creator_toBytes(struct XYObject* user_XYOb
   }
 }
 
-XYResult* ECDSA_secp256k1Sig_creator_create(char id[2], void* text){
+XYResult* ECDSA_secp256k1Sig_creator_create(const char id[2], void* text){
   return newObject(id, text);
 }
 
 XYResult* ECDSA_secp256k1Sig_creator_fromBytes(char* heuristic_data){
   char id[2];
   memcpy(id, heuristic_data, 2);
-  uint8_t size = heuristic_data[3];
+  uint8_t size = (uint8_t)heuristic_data[3];
   char* payload_bytes = malloc(size-(1*sizeof(char)));
   memcpy(payload_bytes, &heuristic_data[2], size);
   secp256k1Signature* return_signature = malloc(sizeof(secp256k1Signature));
@@ -199,7 +199,6 @@ XYResult* ECDSA_secp256k1Sig_creator_toBytes(struct XYObject* user_XYObject){
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
   secp256k1Signature* user_sig = user_XYObject->payload;
-
   uint16_t size = user_sig->size;
   size = to_uint16((unsigned char*)&size);
   memcpy(encoded_bytes, &size, 2);
@@ -207,7 +206,7 @@ XYResult* ECDSA_secp256k1Sig_creator_toBytes(struct XYObject* user_XYObject){
   memcpy(encoded_bytes+2, user_sig->signature, (sizeof(char)*user_sig->size-2));
   encoded_bytes[2] = 0x05;
   encoded_bytes[3] = 0x01;
-  encoded_bytes[4] = 65;
+  encoded_bytes[4] = user_sig->size-4;
 
   struct XYResult* return_result = malloc(sizeof(struct XYResult));
   if(return_result != NULL){
@@ -222,7 +221,7 @@ XYResult* ECDSA_secp256k1Sig_creator_toBytes(struct XYObject* user_XYObject){
   }
 }
 
-XYResult* Heuristic_sha256_Creator_create(char id[2], void* sha256){
+XYResult* Heuristic_sha256_Creator_create(const char id[2], void* sha256){
   return newObject(id, sha256);
 }
 
@@ -237,9 +236,9 @@ XYResult* Heuristic_sha256_Creator_fromBytes(char* heuristic_data){
 XYResult* Heuristic_sha256_Creator_toBytes(struct XYObject* user_XYObject){
   XYResult* return_result = malloc(sizeof(XYResult));
   if(return_result){
-    char* return_buffer = malloc(sizeof(char)*34);
-    memcpy(return_buffer, ((PreviousHash*)user_XYObject->payload)->id, 2);
-    memcpy(return_buffer, ((PreviousHash*)user_XYObject->payload)->hash, 32);
+    char* return_buffer = malloc(sizeof(char)*32);
+    //memcpy(return_buffer, user_XYObject->id, 2);
+    memcpy(return_buffer, user_XYObject->payload, 32);
     return_result->error = OK;
     return_result->result = return_buffer;
     return return_result;

@@ -74,11 +74,29 @@ XYResult* initRelayNode(RelayNode* self, OriginChainProvider* repository, HashPr
  ****************************************************************************************
  */
  uint8_t Relay_getChoice(uint8_t* theirCatalog){
-   if(*theirCatalog & BOUND_WITNESS_OPTION){
-     return BOUND_WITNESS_OPTION;
+   if(*theirCatalog - BOUND_WITNESS_OPTION != 0){
+     return GIVE_ORIGIN_CHAIN_OPTION + BOUND_WITNESS_OPTION;
    } else {
-     return -1;
+     if(*theirCatalog & BOUND_WITNESS_OPTION){
+       return BOUND_WITNESS_OPTION;
+     } else {
+       return 0;
+     }
    }
+   return 0;
+   /*
+     if((*theirCatalog - BOUND_WITNESS_OPTION) & TAKE_ORIGIN_CHAIN_OPTION){
+       return GIVE_ORIGIN_CHAIN_OPTION + BOUND_WITNESS_OPTION;
+     }
+   } else {
+     if(*theirCatalog & BOUND_WITNESS_OPTION){
+       return BOUND_WITNESS_OPTION;
+     } else {
+       return 0;
+     }
+   }
+   return 0;
+   */
 }
 
 /**

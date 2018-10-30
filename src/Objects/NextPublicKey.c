@@ -37,7 +37,7 @@
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* of the NextPublicKey type.
 *----------------------------------------------------------------------------*/
-XYResult* NextPublicKey_creator_create(char id[2], void* user_data){
+XYResult* NextPublicKey_creator_create(const char id[2], void* user_data){
   return newObject(id, user_data);
 }
 

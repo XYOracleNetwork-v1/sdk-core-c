@@ -102,7 +102,6 @@ struct IntWeakArray {
   XYResult* (*get)(struct IntWeakArray* self_IntWeakArray, int index);
   void* payload;
 } ; //0x06
-
 enum EXyoErrors{
   OK,
   ERR_CRITICAL, // Catastrophic failure.
@@ -127,6 +126,32 @@ enum EXyoErrors{
   ERR_KEY_DOES_NOT_EXIST, // Returned if key isn't found in map.
   ERR_PEER_INCOMPATABLE,  // Returned if peer isn't capable of interfacing with us
   ERR_BOUNDWITNESS_FAILED // Returned if the Bound Witness failed unexpextedly
+};
+const static char *ErrorStrings[] =
+{
+    "OK",
+    "ERR_CRITICAL", // Catastrophic failure.
+    "ERR_NOID", // Returned when the core can't get the ID.
+    "ERR_CANT_GET_PAYLOAD," // Returned when the payload in inaccesible.
+    "ERR_NOSIGNER", // Returned when the core can't create a signer.
+    "ERR_ADDRESS_UNAVAILABLE", // Could not bind to address provided.
+    "ERR_NETWORK_UNAVAILABLE", // Core network services are unavailable.
+    "ERR_RECEIVER_REFUSED_CONNECTION", // Returned when The receiver refused connection.
+    "ERR_BUSY", // Returned when a core service is busy.
+    "ERR_NOKEYS", // Returned by when no keypair has been generated.
+    "ERR_BADDATA", // Returned if data is malformed e.g. too big.
+    "ERR_BADPUBKEY", // Returned if the public key is invalid.
+    "ERR_BADSIG", // Returned if the signature encoding is improper.
+    "ERR_CORRUPTDATA", // Returned if data is improperly encrypdefaultSize = ted.
+    "ERR_KEY_ALREADY_EXISTS", // Returned if can't insert because key is already mapped.
+    "ERR_INSUFFICIENT_MEMORY", // Returned if there wasn't enough memory to store.
+    "ERR_INTERNAL_ERROR", // Returned if there was a hardware error.
+    "ERR_TIMEOUT", // Returned if the disk timed out on read/write.
+    "ERR_COULD_NOT_DELETE", // Returned if delete failed.
+    "ERR_PERMISSION", // Returned if permissions are improper.
+    "ERR_KEY_DOES_NOT_EXIST", // Returned if key isn't found in map.
+    "ERR_PEER_INCOMPATABLE",  // Returned if peer isn't capable of interfacing with us
+    "ERR_BOUNDWITNESS_FAILED" // Returned if the Bound Witness failed unexpextedly
 };
 
 struct XYResult{
@@ -185,8 +210,12 @@ struct XYObject{
 extern struct XYResult* preallocated_result;
 extern void* typeTable[TYPE_TABLE_MAJOR_MAX][TYPE_TABLE_MINOR_MAX];
 
-struct XYResult* newObject(char id[2], void* payload);
-struct XYResult* lookup(char id[2]);
+void* GetPayload(struct XYObject* object);
+char* GetId(struct XYObject* object);
+struct XYResult* newObject(const char id[2], void* payload);
+
+
+struct XYResult* lookup(const char id[2]);
 struct XYResult* initTable(void);
 uint16_t to_uint16(unsigned char* data);
 uint32_t to_uint32(unsigned char* data);
@@ -206,6 +235,8 @@ static const char Payload_id[2]               = { 0x02, 0x04 };
 static const char Index_id[2]                 = { 0x02, 0x05 };
 static const char PreviousHash_id[2]          = { 0x02, 0x06 };
 static const char NextPublicKey_id[2]         = { 0x02, 0x07 };
+static const char BridgeHashSet_id[2]         = { 0x02, 0x08 };
+static const char BridgeBlockSet_id[2]        = { 0x02, 0x09 };
 static const char BoundWitnessTransfer_id[2]  = { 0x02, 0x0a };
 
 static const char Sha256_id[2]                = { 0x03, 0x05 };
@@ -216,9 +247,9 @@ static const char Rssi_id[2]                  = { 0x08, 0x01 };
 typedef struct ObjectProvider ObjectProvider;
 
  struct ObjectProvider {
-   int        sizeIdentifierSize;
-   int        defaultSize;
-   struct XYResult*  (*create)(char[2], void*);
+   uint8_t        sizeIdentifierSize;
+   uint32_t        defaultSize;
+   struct XYResult*  (*create)(const char[2], void*);
    struct XYResult*  (*fromBytes)(char*);
    struct XYResult*  (*toBytes)(struct XYObject*);
  };

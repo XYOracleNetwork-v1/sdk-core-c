@@ -37,14 +37,14 @@
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* of the Payload type.
 *----------------------------------------------------------------------------*/
-XYResult* Payload_creator_create(char id[2], void* payload_data){
+XYResult* Payload_creator_create(const char id[2], void* payload_data){
   if(payload_data == NULL){
     Payload* user_payload = malloc(sizeof(Payload));
-    XYResult* lookup_result = lookup((char*)&IntWeakArray_id);
+    XYResult* lookup_result = lookup((const char*)&IntWeakArray_id);
     ObjectProvider* array_creator = lookup_result->result;
-    XYResult* arrayCreate_result = array_creator->create((char*)&IntWeakArray_id, NULL);
+    XYResult* arrayCreate_result = array_creator->create((const char*)&IntWeakArray_id, NULL);
     user_payload->signedHeuristics = ((XYObject*)arrayCreate_result->result)->payload;
-    arrayCreate_result = array_creator->create((char*)&IntWeakArray_id, NULL);
+    arrayCreate_result = array_creator->create((const char*)&IntWeakArray_id, NULL);
     user_payload->unsignedHeuristics = ((XYObject*)arrayCreate_result->result)->payload;
     user_payload->size = user_payload->signedHeuristics->size + user_payload->unsignedHeuristics->size + 4;
     return newObject(id, user_payload);

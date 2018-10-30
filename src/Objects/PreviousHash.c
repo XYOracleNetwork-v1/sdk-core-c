@@ -36,7 +36,7 @@
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* of the PreviousHash type.
 *----------------------------------------------------------------------------*/
-XYResult* PreviousHash_creator_create(char id[2], void* user_data){
+XYResult* PreviousHash_creator_create(const char id[2], void* user_data){
   return newObject(id, user_data);
 }
 
@@ -165,7 +165,7 @@ XYResult* PreviousHash_creator_toBytes(XYObject* user_XYObject){
           case 2:
           {
             element_size = to_uint16((unsigned char*)&casted_PH[0]);
-            uint16_t encodedSize16 = element_size;
+            uint16_t encodedSize16 = (uint16_t)element_size;
             encodedSize16 = (element_size*sizeof(char));
             byteBuffer = malloc(element_size);
             if(littleEndian()){

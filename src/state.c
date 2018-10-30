@@ -69,6 +69,7 @@ XYResult* addSigner(OriginChainState* self_OriginChainState, Signer* user_Signer
   } else {
     self_OriginChainState->currentSigner = user_Signer;
   }
+  self_OriginChainState->currentSigner = user_Signer; //TODO: hard coded cause clang sanatizer
   XYResult* return_result = malloc(sizeof(XYResult));
   if(return_result){
     return_result->error = OK;

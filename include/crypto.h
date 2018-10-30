@@ -81,6 +81,9 @@ char* cryptoGetId(CryptoCreator* object);
 struct XYResult* getPublicKey(Signer* signer);
 Signer* newInstance(ByteArray* user_PrivateKey);
 CryptoCreator* newCryptoCreator(void);
+XYResult* sign(Signer* signer, ByteArray* givenArray);
+uint8_t verify_sig(Signer* signer, ByteArray* signedData, ByteArray* signature, ByteArray* publicKey);
+
 
 #endif
 

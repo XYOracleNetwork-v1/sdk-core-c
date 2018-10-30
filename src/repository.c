@@ -34,12 +34,12 @@
 *      XYResult*                              [out]      bool   Returns OK if success
 *----------------------------------------------------------------------------*/
 OriginChainProvider* initOriginChainProvider(){
-  XYResult* lookup_result = lookup((char*)IntStrongArray_id);
+  XYResult* lookup_result = lookup(IntStrongArray_id);
   if(lookup_result->error != OK) { return NULL; }
   ObjectProvider* ISA_Creator = lookup_result->result;
   free(lookup_result);
 
-  XYResult* create_result = ISA_Creator->create((char*)IntStrongArray_id, NULL);
+  XYResult* create_result = ISA_Creator->create(IntStrongArray_id, NULL);
   if(create_result->error != OK){ return NULL; }
 
   OriginChainProvider* provider = malloc(sizeof(OriginChainProvider));
@@ -72,19 +72,19 @@ OriginChainProvider* initOriginChainProvider(){
 *      XYResult*                              [out]      bool   Returns OK if success
 *----------------------------------------------------------------------------*/
 /*
-XYResult* write(OriginChainProvider* self, ByteArray* value, uint offset, uint timeout) {
+XYResult* write(OriginChainProvider* self, ByteArray* value, uint16_t offset, uint16_t timeout) {
   // First we check if Storage Provider has been initialized
   if( self->repository == NULL ){
-    XYResult* lookup_result = lookup((char*)IntStrongArray_id);
+    XYResult* lookup_result = lookup(IntStrongArray_id);
     if(lookup_result->error != OK) { RETURN_ERROR(ERR_CRITICAL); }
     ObjectProvider* ISA_Creator = lookup_result->result;
 
-    XYResult* create_result = ISA_Creator->create((char*)IntStrongArray_id, NULL);
+    XYResult* create_result = ISA_Creator->create(IntStrongArray_id, NULL);
     if(create_result->error != OK){ RETURN_ERROR(ERR_CRITICAL); }
 
     IntStrongArray* repo = create_result->result;
     free(lookup_result);
-    lookup_result = lookup((char*)BoundWitness_id);
+    lookup_result = lookup(BoundWitness_id);
     if(lookup_result->error != OK){ RETURN_ERROR(ERR_CRITICAL);}
     char* boundWitnessBytes = value->payload;
     ObjectProvider* boundWitness_Creator = lookup_result->result;
@@ -92,17 +92,17 @@ XYResult* write(OriginChainProvider* self, ByteArray* value, uint offset, uint t
     if(fromBytes_result->error != OK) { RETURN_ERROR(ERR_CRITICAL); }
 
     BoundWitness* boundWitness_raw = fromBytes_result->result;
-    XYResult* newObject_result = newObject((char*)BoundWitness_id, boundWitness_raw);
+    XYResult* newObject_result = newObject(BoundWitness_id, boundWitness_raw);
     if(newObject_result->error != OK) { RETURN_ERROR(ERR_CRITICAL); }
     self->logicalEnd = 1;
     return repo->add(repo, newObject_result->result);
   } else {
     for(int i = 0; i<=offset; i++){
-      XYResult* lookup_result = lookup(&self->repository[i]);
+      XYResult* lookup_result = lookup((const char*)&self->repository[i]);
       if(lookup_result->error == OK){
         continue;
       } else {
-        lookup_result = lookup((char*)BoundWitness_id);
+        lookup_result = lookup(BoundWitness_id);
 
         if(lookup_result->error != OK){ RETURN_ERROR(ERR_CRITICAL); }
 
@@ -114,7 +114,7 @@ XYResult* write(OriginChainProvider* self, ByteArray* value, uint offset, uint t
 
         BoundWitness* boundWitness_raw = fromBytes_result->result;
 
-        XYResult* newObject_result = newObject((char*)BoundWitness_id, boundWitness_raw);
+        XYResult* newObject_result = newObject(BoundWitness_id, boundWitness_raw);
         if(newObject_result->error != OK) { RETURN_ERROR(ERR_CRITICAL); }
         self->logicalEnd = i+1;
         return ((IntStrongArray*)self->repository)->add((IntStrongArray*)self->repository, newObject_result->result);
@@ -140,7 +140,7 @@ XYResult* write(OriginChainProvider* self, ByteArray* value, uint offset, uint t
 *      XYResult*                              [out]      bool   Returns OK if success
 *----------------------------------------------------------------------------*/
 /*
-XYResult* read(RepositoryProvider* self, uint offset, uint timeout){
+XYResult* read(RepositoryProvider* self, uint16_t offset, uint16_t timeout){
   return ((IntStrongArray*)self->repository)->get(self->repository, offset);
 }
 */
@@ -159,8 +159,9 @@ XYResult* read(RepositoryProvider* self, uint offset, uint timeout){
 *  RETURNS
 *      XYResult*                              [out]      bool   Returns OK if success
 *----------------------------------------------------------------------------*/
-XYResult* append(OriginChainProvider* self, ByteArray* value, uint timeout){
-  XYResult* lookup_result = lookup((char*)BoundWitness_id);
+XYResult* append(OriginChainProvider* self, ByteArray* value, uint16_t timeout){
+  if(timeout){ /* unimplemented */ }
+  XYResult* lookup_result = lookup(BoundWitness_id);
 
   ObjectProvider* BoundWitness_Creator = lookup_result->result;
   free(lookup_result);
@@ -171,9 +172,12 @@ XYResult* append(OriginChainProvider* self, ByteArray* value, uint timeout){
   }
   BoundWitness* boundWitness = fromBytes_result->result;
   //XYObject* boundWitnessObject = fromBytes_result->result;
-  XYResult* newObject_result = newObject((char*)&BoundWitness_id, boundWitness);
+  XYResult* newObject_result = newObject((const char*)&BoundWitness_id, boundWitness);
   XYObject* boundWitnessObject = newObject_result->result;
+  //boundWitness->size = to_uint32((unsigned char*)(uintptr_t)&boundWitness->size);
+  self->logicalEnd = self->logicalEnd +1;
   return ((IntStrongArray*)self->repository)->add(self->repository, boundWitnessObject);
+
 }
 
 /*----------------------------------------------------------------------------*
@@ -190,11 +194,11 @@ XYResult* append(OriginChainProvider* self, ByteArray* value, uint timeout){
 *      XYResult*                              [out]      XYObject*   IntStrongArray
 *----------------------------------------------------------------------------*/
 XYResult* getChain(OriginChainProvider* self){
-  XYResult* lookup_result = lookup((char*)IntStrongArray_id);
+  XYResult* lookup_result = lookup(IntStrongArray_id);
   if(lookup_result->error != OK) { RETURN_ERROR(ERR_CRITICAL); }
   ObjectProvider* ISA_Creator = lookup_result->result;
 
-  XYResult* newObject_result = newObject((char*)IntStrongArray_id, self->repository);
+  XYResult* newObject_result = newObject(IntStrongArray_id, self->repository);
   if(newObject_result->error != OK) { RETURN_ERROR(ERR_CRITICAL); }
 
   XYResult* toBytes_result = ISA_Creator->toBytes(newObject_result->result);
@@ -236,11 +240,11 @@ XYResult* deleteChain(OriginChainProvider* self){
 
   /* Create new IntStrongArray */
 
-  XYResult* lookup_result = lookup((char*)IntStrongArray_id);
+  XYResult* lookup_result = lookup(IntStrongArray_id);
   if(lookup_result->error != OK) { RETURN_ERROR(ERR_CRITICAL); }
 
   ObjectProvider* ISA_Creator = lookup_result->result;
-  XYResult* create_result = ISA_Creator->create((char*)IntStrongArray_id, NULL);
+  XYResult* create_result = ISA_Creator->create(IntStrongArray_id, NULL);
   if(create_result->error != OK){ RETURN_ERROR(ERR_CRITICAL); }
   IntStrongArray* repo = create_result->result;
   self->repository = repo;

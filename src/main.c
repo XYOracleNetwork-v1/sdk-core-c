@@ -35,14 +35,14 @@ int main(){
   if(preallocated_result){
     initTable();
 
-    XYResult* lookup_result = lookup((char*)&BoundWitness_id);
+    XYResult* lookup_result = lookup((const char*)&BoundWitness_id);
     if(lookup_result->error == OK){
       ObjectProvider* BoundWitness_creator = lookup_result->result;
       //free(lookup_result);
       BoundWitness* BoundWitness_raw = malloc(sizeof(BoundWitness));
       XYObject* BoundWitness_object;
       if(BoundWitness_raw){
-        XYResult* create_result = BoundWitness_creator->create((char*)&BoundWitness_id, BoundWitness_raw);
+        XYResult* create_result = BoundWitness_creator->create((const char*)&BoundWitness_id, BoundWitness_raw);
         if(create_result->error != OK){
           return create_result->error;
         }
@@ -50,15 +50,15 @@ int main(){
       } else {
         return 1;
       }
-      lookup_result = lookup((char*)&ShortStrongArray_id);
+      lookup_result = lookup((const char*)&ShortStrongArray_id);
       if(lookup_result->error == OK){
         ObjectProvider* SSA_Creator = lookup_result->result;
         //free(lookup_result);
-        lookup_result = lookup((char*)&IntStrongArray_id);
+        lookup_result = lookup((const char*)&IntStrongArray_id);
         if(lookup_result->error == OK){
           ObjectProvider* ISA_Creator = lookup_result->result;
           //free(lookup_result);
-          XYResult* create_result = SSA_Creator->create((char*)&KeySet_id, NULL);
+          XYResult* create_result = SSA_Creator->create((const char*)&KeySet_id, NULL);
           if(create_result->error != OK){
             return create_result->error;
           }
@@ -66,12 +66,12 @@ int main(){
           XYObject*  publicKeys_object = create_result->result;
           ShortStrongArray* publicKeys_raw = publicKeys_object->payload;
 
-          lookup_result = lookup((char*)&ShortWeakArray_id);
+          lookup_result = lookup((const char*)&ShortWeakArray_id);
           if(lookup_result->error != OK){
             return lookup_result->error;
           }
           ObjectProvider* SWA_Creator = lookup_result->result;
-          create_result = SWA_Creator->create((char*)&ShortWeakArray_id, NULL);
+          create_result = SWA_Creator->create((const char*)&ShortWeakArray_id, NULL);
           if(create_result->error != OK){
             return create_result->error;
           }
@@ -83,7 +83,7 @@ int main(){
           //free(create_result);
           strcpy(publicKey->point_x, "Hello");
           strcpy(publicKey->point_y, "World!");
-          XYResult* newObject_result = newObject((char*)&ECDSASecp256k1_id, publicKey);
+          XYResult* newObject_result = newObject((const char*)&ECDSASecp256k1_id, publicKey);
           if(newObject_result->error != OK){
             return newObject_result->error;
           }
@@ -98,14 +98,14 @@ int main(){
           //free(newObject_result);
 
           // Set up Payload Array
-          create_result = ISA_Creator->create((char*)&Payload_id, NULL);
+          create_result = ISA_Creator->create((const char*)&Payload_id, NULL);
           if(create_result->error != OK){
             return create_result->error;
           }
           XYObject* payload_object = create_result->result;
           IntStrongArray* payload_raw = payload_object->payload;
           //free(create_result);
-          lookup_result = lookup((char*)&IntWeakArray_id);
+          lookup_result = lookup((const char*)&IntWeakArray_id);
           if(lookup_result->error != OK){
             return lookup_result->error;
           }
@@ -128,13 +128,13 @@ int main(){
           //free(create_result);
 
           // Add RSSI Heuristics to unsigned and signed payload
-          lookup_result = lookup((char*)&Rssi_id);
+          lookup_result = lookup((const char*)&Rssi_id);
           if(lookup_result->error != OK){
             return lookup_result->error;
           }
           ObjectProvider* Rssi_Creator = lookup_result->result;
           char rssi_val = 0xC4;
-          create_result = Rssi_Creator->create((char*)&Rssi_id, &rssi_val);
+          create_result = Rssi_Creator->create((const char*)&Rssi_id, &rssi_val);
           if(create_result->error != OK){
             return create_result->error;
           }
@@ -151,19 +151,19 @@ int main(){
           user_payload->size = user_signedHeuristics->size + user_unsignedHeuristics->size + 4;
           user_payload->signedHeuristics = user_signedHeuristics;
           user_payload->unsignedHeuristics = user_unsignedHeuristics;
-          newObject_result = newObject((char*)&Payload_id, user_payload);
+          newObject_result = newObject((const char*)&Payload_id, user_payload);
           add_result = payload_raw->add(payload_raw, newObject_result->result);
           Payload* user_payload2 = malloc(sizeof(Payload));
           user_payload2->size = user_signedHeuristics->size + user_unsignedHeuristics->size + 4;
           user_payload2->signedHeuristics = user_signedHeuristics;
           user_payload2->unsignedHeuristics = user_unsignedHeuristics;
-          newObject_result = newObject((char*)&Payload_id, user_payload2);
+          newObject_result = newObject((const char*)&Payload_id, user_payload2);
           add_result = payload_raw->add(payload_raw, newObject_result->result);
           //free(add_result);
           //free(create_result);
           //free(Rssi_Creator);
           // Set up Signatures Array
-          create_result = SSA_Creator->create((char*)&SignatureSet_id, NULL);
+          create_result = SSA_Creator->create((const char*)&SignatureSet_id, NULL);
           if(create_result->error != OK){
             return create_result->error;
           }
@@ -185,14 +185,14 @@ int main(){
           ShortWeakArray* user_signatures = user_signatures_object->payload;
 
           char rssi_val2 = 0x44;
-          create_result = Rssi_Creator->create((char*)&Rssi_id, &rssi_val2);
+          create_result = Rssi_Creator->create((const char*)&Rssi_id, &rssi_val2);
           if(create_result->error != OK){
             return create_result->error;
           }
 
           add_result = user_signatures->add(user_signatures, create_result->result);
           //free(create_result);
-          newObject_result = newObject((char*)&ShortWeakArray_id, user_signatures);
+          newObject_result = newObject((const char*)&ShortWeakArray_id, user_signatures);
           if(newObject_result->error != OK){
             return newObject_result->error;
           }

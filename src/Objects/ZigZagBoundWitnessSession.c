@@ -35,13 +35,21 @@
 *----------------------------------------------------------------------------*/
 XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray* boundWitnessData){
   // Here we infer if the userSession bound witness is already completed or not.
+  /*
   if(userSession->boundWitness->dynamicPublicKeys->size == userSession->boundWitness->dynamicSignatures->size && userSession->boundWitness->dynamicPublicKeys->size != 4){
       RETURN_ERROR(ERR_INTERNAL_ERROR);
   }
+  */
+  if(boundWitnessData->payload == NULL){
+    RETURN_ERROR(ERR_PEER_INCOMPATABLE);
+  }
+
+  //printf("completeBoundWitness>> user cycles %d\n", userSession->cycles);
 
   BoundWitnessTransfer* boundWitness = NULL;
   if(boundWitnessData != NULL){
-      XYResult* lookup_result = lookup((char*)&BoundWitnessTransfer_id);
+      breakpoint();
+      XYResult* lookup_result = lookup((const char*)&BoundWitnessTransfer_id);
       if(lookup_result->error != OK) return lookup_result;
       ObjectProvider* BoundWitnessTransfer_creator = lookup_result->result;
       //free(lookup_result);
@@ -52,7 +60,9 @@ XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray
   }
 
   XYResult* incomingData_result = userSession->boundWitness->incomingData(userSession->boundWitness, boundWitness, boundWitnessData != NULL);
-
+  if(userSession->cycles>1){
+    RETURN_ERROR(OK);
+  }
   if(incomingData_result->error != OK){
     return incomingData_result;
   } else if(incomingData_result->error == OK && incomingData_result->result == (void*)1){
@@ -112,9 +122,8 @@ XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray
 *      XYResult  [out]      bool       Returns XYResult<ByteArray*> the data to send to the other party.
 *----------------------------------------------------------------------------*/
 XYResult* receiverCallback(void* self, ByteArray* data){
-  if(data->size == 0 ) { free(data); RETURN_ERROR(OK); };
-  if(((ZigZagBoundWitnessSession*)self)->cycles == 0){
-    XYResult* lookup_result = lookup((char*)&BoundWitnessTransfer_id);
+  if( (((ZigZagBoundWitnessSession*)self)->cycles == 0) && data->size == 0 ){
+    XYResult* lookup_result = lookup((const char*)&BoundWitnessTransfer_id);
     if(lookup_result->error != OK) return lookup_result;
     ObjectProvider* BWT_creator = lookup_result->result;
     XYResult* transfer_result = BWT_creator->fromBytes(data->payload);
@@ -123,6 +132,7 @@ XYResult* receiverCallback(void* self, ByteArray* data){
     ((ZigZagBoundWitnessSession*)self)->boundWitness->incomingData(((ZigZagBoundWitnessSession*)self)->boundWitness, transfer, 1);
     RETURN_ERROR(OK);
   } else {
+    //printf("receiverCallback>> user cycles %d\n", ((ZigZagBoundWitnessSession*)self)->cycles);
     ((ZigZagBoundWitnessSession*)self)->cycles++;
     return ((ZigZagBoundWitnessSession*)self)->completeBoundWitness(self, data);
 

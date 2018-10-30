@@ -263,7 +263,7 @@ XYResult* ByteWeakArray_get(ByteWeakArray* self_ByteWeakArray, int index) {
 *  RETURNS
 *      XYResult*            [out]      bool   Returns XYObject* of the ByteWeakArray type.
 *----------------------------------------------------------------------------*/
-XYResult* ByteWeakArray_creator_create(char id[2], void* user_data){ // consider allowing someone to create array with one object
+XYResult* ByteWeakArray_creator_create(const char id[2], void* user_data){ // consider allowing someone to create array with one object
   ByteWeakArray* ByteWeakArrayObject = malloc(sizeof(ByteWeakArray));
   char ByteWeakArrayID[2] = {0x01, 0x04};
   XYResult* newObject_result = newObject(ByteWeakArrayID, ByteWeakArrayObject);

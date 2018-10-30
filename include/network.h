@@ -50,8 +50,8 @@ struct NetworkProvider {
    */
    struct sockaddr_in* *peers;
    ProcedureCatalogue* procedureCatalogue;
-   int port;
-   int peerCount;
+   uint16_t port;
+   uint8_t peerCount;
 };
 
 struct ProcedureCatalogue {
