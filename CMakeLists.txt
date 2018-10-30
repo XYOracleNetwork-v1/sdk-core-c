@@ -35,7 +35,10 @@ set(CMAKE_BUILD_TYPE Debug)
 
 # add options for warnings
 if(UNIX AND NOT APPLE)
-	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Weverything -fsanitize=address -fsanitize=leak -Wno-padded -Wno-zero-length-array -Wno-unused-parameter -Weverything")
+	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Weverything -fsanitize=address -fsanitize=leak -Wno-padded -Wno-zero-length-array -Wno-unused-parameter")
+
+	endif()
 endif()
 # add the executable
 #add_executable(sdk ${SOURCES})
