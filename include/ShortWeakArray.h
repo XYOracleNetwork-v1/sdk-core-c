@@ -1,55 +1,57 @@
 /**
  ****************************************************************************************
  *
- * @file state.h
+ * @file shortweakarray.h
  *
- * @XYO Core library source code.
+ * @XY4 project source code.
  *
- * @brief primary crypto routines for the XYO Core.
+ * @brief primary shortweakarray routines for the XY4 firmware.
  *
  * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
 
+#ifndef SHORTWEAKARRAY_H
+#define SHORTWEAKARRAY_H
+
 /*
  * INCLUDES
  ****************************************************************************************
  */
 
-#ifndef STATE_H
-#include <stdint.h>
-#include "xyobject.h"
-#include "crypto.h"
 #include "xyo.h"
+#include "XYOHeuristicsBuilder.h"
+
+/*
+ * DEFINES
+ ****************************************************************************************
+ */
+
 
 /*
  * TYPE DEFINITIONS
  ****************************************************************************************
  */
 
-typedef struct OriginChainState OriginChainState;
 
 /*
  * STRUCTURES
  ****************************************************************************************
  */
- 
-struct OriginChainState {
-  XYResult_t* (*newOriginBlock)(OriginChainState* self_OriginChainState, ByteArray_t* newHash);
-  XYResult_t* (*addSigner)(OriginChainState* self_OriginChainState, Signer_t* newSigner);
-  Signer_t* currentSigner;
-  Signer_t* nextSigner;
-  ByteArray_t* latestHash;
-  uint32_t index;
-};
+
 
 /*
  * FUNCTION DECLARATIONS
  ****************************************************************************************
  */
 
-XYResult_t* newOriginBlock(OriginChainState* self_OriginChainState, ByteArray_t* originBlockHash);
-XYResult_t* addSigner(OriginChainState* self_OriginChainState, Signer_t* user_Signer);
+XYResult_t* ShortStrongArray_add(ShortStrongArray_t* self_ShortStrongArray, XYObject_t* user_XYObject);
+
 
 #endif
+
+// end of file shortweakarray.h
+                                
+                                
+

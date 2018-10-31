@@ -27,20 +27,24 @@
 
 #ifndef ORIGINCHAIN_H
 #define ORIGINCHAIN_H
-//typedef struct OriginChainNavigator OriginChainNavigator;
-//typedef struct OriginChainProvider  OriginChainProvider;
 
+/*
+ * TYPE DEFINITIONS
+ ****************************************************************************************
+ */
 
-typedef struct OriginChainNavigatorT {
-  XYResult* (*addBoundWitness)(struct OriginChainNavigatorT* self, BoundWitness*);
-  XYResult* (*containsOriginBlock)(struct OriginChainNavigatorT* self_OriginChainNavigator, BoundWitness* user_BoundWitness);
+typedef struct OriginChainNavigator OriginChainNavigator;
+
+typedef struct OriginChainNavigator {
+  XYResult_t* (*addBoundWitness)(struct OriginChainNavigatorT* self, BoundWitness*);
+  XYResult_t* (*containsOriginBlock)(struct OriginChainNavigatorT* self_OriginChainNavigator, BoundWitness* user_BoundWitness);
   OriginChainProvider* originChainRepository;
-  HashProvider* Hash;
-  ByteArray* *bridgeQueue;
+  HashProvider_t* Hash;
+  ByteArray_t* *bridgeQueue;
   uint32_t queueLen;
   char lastHash[32];
 
-} OriginChainNavigator;
+};
 #endif
 
 

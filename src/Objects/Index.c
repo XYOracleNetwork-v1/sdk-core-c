@@ -1,13 +1,13 @@
 /**
  ****************************************************************************************
  *
- * @file crypto.c
+ * @file index.c
  *
  * @XYO Core library source code.
  *
- * @brief primary crypto routines for the XYO Core.
+ * @brief primary indexing routines for the XYO Core.
  *
- * Copyright (C) 2018 XY - The Findables Company
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -31,13 +31,20 @@
 *      Create an empty Bound Witness Object
 *
 *  PARAMETERS
-*     *id                    [in]       char*
-*     *user_data             [in]       void*
+*     *id                         [in]       char*
+*     *user_data                  [in]       void*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYObject* of the Index type.
+*      newObject(id, user_data)   [out]      bool   Returns XYObject_t* of the Index type.
 *----------------------------------------------------------------------------*/
-XYResult* Index_creator_create(const char id[2], void* user_data){
+XYResult_t* Index_creator_create(char id[2], void* user_data){
+  
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_data) {RETURN_ERROR(ERR_BADDATA)};
+
   return newObject(id, user_data);
 }
 
@@ -50,12 +57,19 @@ XYResult* Index_creator_create(const char id[2], void* user_data){
 *      include major and minor of array.
 *
 *  PARAMETERS
-*     *data                  [in]       char*
+*     index_data              [in]       char*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYResult* of the Index type.
+*     newObject(id, &index)   [out]      XYResult_t*   Returns XYResult* of the Index type.
 *----------------------------------------------------------------------------*/
-XYResult* Index_creator_fromBytes(char* index_data){
+XYResult_t* Index_creator_fromBytes(char* index_data){
+  
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!index_data) {RETURN_ERROR(ERR_BADDATA)};
+
   char id[2];
   memcpy(id, index_data, 2);
   uint32_t* index = malloc(sizeof(uint32_t));
@@ -73,29 +87,35 @@ XYResult* Index_creator_fromBytes(char* index_data){
 *      the object and return a char* to the serialized bytes.
 *
 *  PARAMETERS
-*    *user_XYObject         [in]       XYObject*
+*    *user_XYObject         [in]       XYObject_t*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns char* to serialized bytes.
+*      XYResult_t*          [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
-XYResult* Index_creator_toBytes(struct XYObject* user_XYObject){
+XYResult_t* Index_creator_toBytes(XYObject_t* user_XYObject){
+  
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
+
   uint32_t encoded_bytes;
   char* index = (char*)user_XYObject->payload;
-  encoded_bytes = to_uint32((unsigned char*)&index[0]);
+  
+  encoded_bytes = to_uint32(&index[0]);
+  
   if(!littleEndian()){
-    encoded_bytes = to_uint32((unsigned char*)&encoded_bytes);
+    encoded_bytes = to_uint32((char*)&encoded_bytes);
   }
 
-
-  struct XYResult* return_result = malloc(sizeof(struct XYResult));
-  if(return_result != NULL){
-    return_result->error = OK;
-    return_result->result = &encoded_bytes;
-    return return_result;
-  }
-  else {
-    preallocated_result->error = ERR_INSUFFICIENT_MEMORY;
-    preallocated_result->result = NULL;
-    return preallocated_result;
-  }
+  preallocated_return_result_ptr = &preallocated_return_result;
+  
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = &encoded_bytes;
+    
+  return preallocated_return_result_ptr;
 }
+
+// end of file index.c
+

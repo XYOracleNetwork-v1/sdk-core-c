@@ -7,10 +7,13 @@
  *
  * @brief primary crypto routines for the XYO Core.
  *
- * Copyright (C) 2018 XY - The Findables Company
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
+
+#ifndef NETWORK_H
+#define NETWORK_H
 
 /*
  * INCLUDES

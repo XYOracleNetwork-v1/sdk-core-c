@@ -5,9 +5,9 @@
  *
  * @XYO Core library source code.
  *
- * @brief primary crypto routines for the XYO Core.
+ * @brief primary repository routines for the XYO Core.
  *
- * Copyright (C) 2018 XY - The Findables Company
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -17,20 +17,21 @@
  ****************************************************************************************
  */
 
+#include <stdint.h>
 #include "xyobject.h"
-#include "xyo.h"
-#include "defines.h"
-#ifndef REPOSITORY_H
 
-typedef struct RepositoryProviderT{
-  void* repository;
-  uint16_t logicalEnd;
-  XYResult* (*write)(struct RepositoryProviderT* self, ByteArray* value, uint16_t offset, uint16_t timeout);
-  XYResult* (*read)(struct RepositoryProviderT* self, uint16_t offset, uint16_t timeout);
-  XYResult* (*readRows)(struct RepositoryProviderT* self, uint16_t beginning, uint16_t end, uint16_t timeout);
-  XYResult* (*delete)(struct RepositoryProviderT* self, uint16_t offset, uint16_t timeout);
-  XYResult* (*deleteRows)(struct RepositoryProviderT* self, uint16_t beginning, uint16_t end, uint16_t timeout);
-} RepositoryProvider;
+#ifndef REPOSITORY_H
+#define REPOSITORY_H
+
+/*
+ * TYPE DEFINITIONS
+ ****************************************************************************************
+ */
+
+/*
+ * STRUCTURES
+ ****************************************************************************************
+ */
 
 typedef struct OriginChainProviderT {
   void* repository;
@@ -46,12 +47,23 @@ typedef struct OriginChainProviderT {
   char optionalBits[ORIGINCHAIN_EXTRA_BITS];
   uint16_t logicalEnd;
 
-} OriginChainProvider;
+struct RepositoryProvider{
+  uint32_t repository;
+  uint32_t logicalEnd;
+  XYResult_t* (*write)(ByteArray_t* value, uint32_t offset, uint32_t timeout);
+  XYResult_t* (*read)(uint32_t offset, uint32_t timeout);
+  XYResult_t* (*readRows)(uint32_t beginning, uint32_t end, uint32_t timeout);
+  XYResult_t* (*delete)(uint32_t offset, uint32_t timeout);
+  XYResult_t* (*deleteRows)(uint32_t beginning, uint32_t end, uint32_t timeout);
+};
 
-OriginChainProvider* initOriginChainProvider( void );
-XYResult* append(OriginChainProvider* self, ByteArray* value, uint16_t timeout);
-XYResult* getChain(OriginChainProvider* self);
-XYResult* deleteChain(OriginChainProvider* self);
+struct OriginChainRepository {
+  XYResult* (*append)(ByteArray* value, uint timeout);
+  RepositoryProvider* repo;
+};
 
 #define REPOSITORY_H
 #endif
+
+// end of file repository.h
+

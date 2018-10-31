@@ -3,25 +3,30 @@
  *
  * @file xyo.h
  *
- * @XYO Core library source code.
+ * @XY4 project source code.
  *
- * @brief primary crypto routines for the XYO Core.
+ * @brief primary xyo routines for the XY4 firmware.  note that there currently is no xyo.c
  *
- * Copyright (C) 2018 XY - The Findables Company
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
 
+#ifndef XYO_H
+#define XYO_H
 /*
  * INCLUDES
  ****************************************************************************************
  */
 
-#ifndef XYO_H
 #include <stddef.h>
 #include <stdint.h>
 #include "xyobject.h"
-#include "defines.h"
+
+/*
+ * DEFINES
+ ****************************************************************************************
+ */
 
 #define RETURN_ERROR(ERR) return_error(ERR, __FILE__, __LINE__);
 
@@ -48,7 +53,14 @@ if(ERR == ERR_INSUFFICIENT_MEMORY){                         \
     }                                                       \
 }
 
+/*
+ * FUNCTION DECLARATIONS
+ ****************************************************************************************
+ */
+
 int littleEndian(void);
 
-#define XYO_H
 #endif
+
+// end of file xyo.h
+

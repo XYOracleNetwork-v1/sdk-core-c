@@ -3,39 +3,71 @@
  *
  * @file hash.h
  *
- * @XYO Core library source code.
+ * @XY4 project source code.
  *
- * @brief primary crypto routines for the XYO Core.
+ * @brief primary hash routines for the XY4 firmware.
  *
- * Copyright (C) 2018 XY - The Findables Company
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
+
+#ifndef HASH_H
+#define HASH_H
 
 /*
  * INCLUDES
  ****************************************************************************************
  */
 
-#ifndef HASH_H
-#include "xyo.h"
+#include "xyobject.h"
+#include "wc_sha256.h"                      // wc_ = wolf crypto library routine (SHA-256)
 
-typedef struct HashProvider HashProvider;
+extern XYResult_t preallocated_return_result;
+
+/*
+ * DEFINES
+ ****************************************************************************************
+ */
+
+/*
+ * TYPE DEFINITIONS
+ ****************************************************************************************
+ */
+
+typedef struct HashProvider HashProvider_t;
+typedef unsigned char  byte;
+
+/*
+ * STRUCTURES
+ ****************************************************************************************
+ */
 
 struct HashProvider{
-  char id[2];
-  struct XYResult* (*Hash)(ByteArray*); // Given just a null terminated char* return a cryptographic hash for it
+  
+  char id[2];                               // 2 bytes representing major and minor
+  XYResult_t* (*createHash)(ByteArray_t*);  // Given just a null terminated char* return a 
+                                            // cryptographic hash for it
   /*
    * Given a cryptographic hash and a piece of data, verify the given hash == hash(data).
    */
-  int (*VerifyHash)(ByteArray* hash, ByteArray* data);
-  char* (*GetId)(HashProvider* self ); // Fetch the above id object and return it.
+  
+  XYResult_t* (*verifyHash)(ByteArray_t* dataHashed, XYObject_t* hash);
+  XYResult_t* (*getHashId)(HashProvider_t* hashProviderObject);   // Fetch the above id object 
+                                                                  // and return it.
 };
 
-HashProvider* newHashProvider( void );
-XYResult* hash(ByteArray* user);
-int verify(ByteArray* hash, ByteArray* data);
-char* hashGetId(HashProvider* object);
+/*
+ * FUNCTION DECLARATIONS
+ ****************************************************************************************
+ */
 
-#define HASH_H
+XYResult_t* newHashProvider(void);
+XYResult_t* hashGetId(HashProvider_t* hashProviderObject);
+XYResult_t* createHash(ByteArray_t* dataToHash);
+XYResult_t* verifyHash(ByteArray_t* dataHashed, XYObject_t* hash);
+
 #endif
+
+// end of file hash.h
+

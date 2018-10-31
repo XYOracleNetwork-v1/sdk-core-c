@@ -7,36 +7,67 @@
  *
  * @brief primary crypto routines for the XYO Core.
  *
- * Copyright (C) 2018 XY - The Findables Company
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
+
+#ifndef ZIGZAGBOUNDWITNESSSESSION_H
+#define ZIGZAGBOUNDWITNESSSESSION_H
 
 /*
  * INCLUDES
  ****************************************************************************************
  */
 
-#ifndef ZIGZAGBOUNDWITNESSSESSION_H
-#include <stdint.h>
-#include "xyo.h"
-#include "ZigZagBoundWitness.h"
-#include "network.h"
+#include "network.h"                // includes <stdint.h>
+#include "ZigZagBoundWitness.h"     // "crypto.h", "BoundWitness.h", "xyobject.h", "hash.h"
 
-typedef struct ZigZagBoundWitnessSession ZigZagBoundWitnessSession;
+/*
+ * TYPE DEFINITIONS
+ ****************************************************************************************
+ */
+
+typedef struct ZigZagBoundWitnessSession ZigZagBoundWitnessSession_t;
 typedef struct NetworkPipe NetworkPipe;
 typedef struct NetworkPeer NetworkPeer;
 
+/*
+ * STRUCTURES
+ ****************************************************************************************
+ */
+
 struct ZigZagBoundWitnessSession {
-  XYResult* (*completeBoundWitness)(ZigZagBoundWitnessSession* userSession, ByteArray* bwData);
+  XYResult_t*(*completeBoundWitness)(ZigZagBoundWitnessSession_t* userSession, 
+              ByteArray_t* bwData);
   NetworkPipe* NetworkPipe;
-  ZigZagBoundWitness* boundWitness;
+  ZigZagBoundWitness_t* BoundWitness;
   uint8_t cycles;
-  uint8_t choice;
+  ByteArray_t* choice;
 };
 
-struct XYResult* receiverCallback(void* self, ByteArray* data);
-struct XYResult* completeBoundWitness(ZigZagBoundWitnessSession* userSession, ByteArray* boundWitnessData);
+struct NetworkPipe{
+  NetworkPeer* peer;
+  proactiveNetworkProvider_t* Provider;   //TODO: wal, this doesn't seem to get used here?
+  ByteArray_t* initializationData;
+  XYResult_t*(*send)(ZigZagBoundWitnessSession_t* self, 
+              ByteArray_t* data, 
+              XYResult_t* (*callback)(ZigZagBoundWitnessSession_t* self, 
+              ByteArray_t* data));
+  XYResult_t* (*close)();
+};
 
-#define ZIGZAGBOUNDWITNESSSESSION_H
+struct NetworkPeer{
+  XYResult_t* (*getRole)(NetworkPipe* pipe);
+};
+
+/*
+ * FUNCTION DECLARATIONS
+ ****************************************************************************************
+ */
+
+XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* data);
+XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession_t* userSession, 
+                                 ByteArray_t* boundWitnessData);
+
 #endif

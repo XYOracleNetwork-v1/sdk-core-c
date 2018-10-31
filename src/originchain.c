@@ -1,13 +1,13 @@
 /**
  ****************************************************************************************
  *
- * @file crypto.c
+ * @file originchain.c
  *
  * @XYO Core library source code.
  *
- * @brief primary crypto routines for the XYO Core.
+ * @brief primary origin chain routines for the XYO Core.
  *
- * Copyright (C) 2018 XY - The Findables Company
+ * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
  */
@@ -26,27 +26,33 @@
 *      Retrieves a Origin Block object given a block hash.
 *
 *  PARAMETERS
-*     *OriginChainNavigator                    [in]       self_OriginChainNavigator*
-*     *ByteArray                               [in]       originBlockHash*
+*     *OriginChainNavigator     [in]       self_OriginChainNavigator*
+*     *ByteArray                [in]       originBlockHash*
 *
 *  RETURNS
-*      XYResult*                              [out]      XYObject*   Returns XYObject of Boound Witness type
+*      XYResult_t*              [out]      XYObject*   Returns XYObject 
+*                                          of Boound Witness type
 *----------------------------------------------------------------------------*/
 /*
-XYResult* getOriginBlockByBlockHash(OriginChainNavigator* self_OriginChainNavigator, ByteArray* originBlockHash) {
-  XYResult* read_return = self_OriginChainNavigator->Repository->read(originBlockHash);
+XYResult_t* getOriginBlockByBlockHash(OriginChainNavigator* self_OriginChainNavigator, 
+                                      ByteArray_t* originBlockHash) {
+  
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!self_OriginChainNavigator || !originBlockHash) {RETURN_ERROR(ERR_BADDATA)};
 
-  ByteArray* return_array = read_return->result;
+  XYResult_t* read_return = self_OriginChainNavigator->Repository->read(originBlockHash);
+  ByteArray_t* return_array = read_return->result;
   free(read_return);
-  XYResult* lookup_result = lookup(BoundWitness_id);
+  XYResult_t* lookup_result = tableLookup((char*)BoundWitness_id);
   if(lookup_result->error != OK){
     return lookup_result;
   }
-  ObjectProvider* BoundWitness_creator = lookup_result->result;
+  ObjectProvider_t* BoundWitness_creator = lookup_result->result;
   free(lookup_result);
   return BoundWitness_creator->fromBytes(return_array->payload);
-
-  //TODO Implement getOriginBlockByBlockHash;
 }
 */
 /*----------------------------------------------------------------------------*
@@ -57,17 +63,24 @@ XYResult* getOriginBlockByBlockHash(OriginChainNavigator* self_OriginChainNaviga
 *      Retrieves a Origin Block object given a block hash.
 *
 *  PARAMETERS
-*     *OriginChainNavigator                    [in]       self_OriginChainNavigator*
-*     *ByteArray                               [in]       originBlockHash*
+*     *OriginChainNavigator     [in]       self_OriginChainNavigator*
+*     *ByteArray                [in]       originBlockHash*
 *
 *  RETURNS
-*      XYResult*                               [out]      success   Returns boolean 0 if remove succeeded.
+*      XYResult_t*              [out]      success   Returns boolean 0 if remove 
+*                                                    succeeded.
 *----------------------------------------------------------------------------*/
 /*
-XYResult* removeOriginBlock(OriginChainNavigator* self_OriginChainNavigator, ByteArray* originBlockHash) {
-  return self_OriginChainNavigator->repository->delete(self_OriginChainNavigator, originBlockHash);
+XYResult_t* removeOriginBlock(OriginChainNavigator* self_OriginChainNavigator, ByteArray_t* originBlockHash) {
+
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!self_OriginChainNavigator || !originBlockHash) {RETURN_ERROR(ERR_BADDATA)};
+
+  return self_OriginChainNavigator->repository->delete(originBlockHash);
 }
-TODO: Implement removeOriginBlock
 */
 
 /*----------------------------------------------------------------------------*
@@ -75,18 +88,28 @@ TODO: Implement removeOriginBlock
 *      getOriginBlockByPreviousHash
 *
 *  DESCRIPTION
-*      Retrieves a Origin Block that has the given hash in one of it's Payloads as the previous hash.
+*      Retrieves a Origin Block that has the given hash in one of it's Payloads 
+*      as the previous hash.
 *
 *  PARAMETERS
-*     *OriginChainNavigator                    [in]       self_OriginChainNavigator*
-*     *ByteArray                               [in]       originBlockHash*
+*     *OriginChainNavigator     [in]       self_OriginChainNavigator*
+*     *ByteArray                [in]       originBlockHash*
 *
 *  RETURNS
-*      XYResult*                              [out]      XYObject*   Returns XYObject of Boound Witness type
+*      XYResult*                [out]      XYObject*   Returns XYObject of Boound 
+*                                                      Witness type
 *----------------------------------------------------------------------------*/
 /*
-XYResult* getOriginBlockByPreviousHash(OriginChainNavigator* self_OriginChainNavigator, ByteArray* originBlockHash) {
-  ByteArray* formattedHash = malloc(sizeof(ByteArray));
+XYResult_t* getOriginBlockByPreviousHash(OriginChainNavigator* self_OriginChainNavigator, 
+                                         ByteArray_t* originBlockHash) {
+  
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!self_OriginChainNavigator || !originBlockHash) {RETURN_ERROR(ERR_BADDATA)};
+
+  ByteArray_t* formattedHash = malloc(sizeof(ByteArray_t));
   char* payload = malloc(originBlockHash->size + 1*sizeof(char));
   if(formattedHash && payload){
     memset(payload, 0xff, sizeof(char));
@@ -95,56 +118,73 @@ XYResult* getOriginBlockByPreviousHash(OriginChainNavigator* self_OriginChainNav
     formattedHash->payload = payload;
     char nullBits[2] = { 0, 0 };
     memcpy(formattedHash->reserved, nullBits, sizeof(nullBits));
-
-    XYResult* read_return = self_OriginChainNavigator->Repository->read(formattedHash);
+    XYResult_t* read_return = self_OriginChainNavigator->Repository>read(formattedHash);
     free(formattedHash);
     free(payload);
+    
     if(read_return->error != OK){
       return read_return;
     }
-    ByteArray* parentHash = read_return->result;
+    
+    ByteArray_t* parentHash = read_return->result;
     free(read_return);
+    
     return getOriginBlockByBlockHash(self_OriginChainNavigator, parentHash);
-    return preallocated_result;
+    
   } else {
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
 }
-TODO: Implement getOriginBlockByPreviousHash
 */
 
 /*----------------------------------------------------------------------------*
 *  NAME
-*      addBoundWitness
+*       addBoundWitness
 *
 *  DESCRIPTION
-*      Will add a bound witness to the origin chain and update the OriginChainNavigator's currentHash.
+*       Will add a bound witness to the origin chain and update the OriginChainNavigator's 
+*       currentHash.
 *
 *  PARAMETERS
-*     *OriginChainNavigator                    [in]       self_OriginChainNavigator*
-*     *ByteArray                               [in]       originBlockHash*
+*       *OriginChainNavigator     [in]       self_OriginChainNavigator*
+*       *ByteArray                [in]       originBlockHash*
 *
 *  RETURNS
-*      XYResult*                              [out]      XYObject*   Returns XYObject of Boound Witness type
+*       XYResult_t*               [out]      XYObject*  Returns XYObject of 
+*                                                       Boound Witness type
 *----------------------------------------------------------------------------*/
-XYResult* addBoundWitness(OriginChainNavigator* self_OriginChainNavigator, BoundWitness* user_BoundWitness) {
-  XYResult* lookup_result = lookup(BoundWitness_id);
-  ObjectProvider* BoundWitness_creator = lookup_result->result;
-  XYResult* boundWitness_result = newObject((const char*)&BoundWitness_id, user_BoundWitness);
-  XYObject* boundWitness_object = boundWitness_result->result;
-  XYResult* toBytes_result = BoundWitness_creator->toBytes(boundWitness_object);
+XYResult_t* addBoundWitness(OriginChainNavigator* self_OriginChainNavigator, 
+                            BoundWitness* user_BoundWitness) {
+  
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!self_OriginChainNavigator || !user_BoundWitness) {RETURN_ERROR(ERR_BADDATA)};
+
+  XYResult_t* lookup_result = tableLookup((char*)BoundWitness_id);
+  ObjectProvider_t* BoundWitness_creator = lookup_result->result;
+  XYResult_t* boundWitness_result = newObject((const char*)&BoundWitness_id, user_BoundWitness);
+  XYObject_t* boundWitness_object = boundWitness_result->result;
+  XYResult_t* toBytes_result = BoundWitness_creator->toBytes((XYObject_t*)user_BoundWitness);
   char* boundWitnessBytes = toBytes_result->result;
   //free(lookup_result);
   //free(toBytes_result);
-  XYResult* blockHash_result = user_BoundWitness->getHash(user_BoundWitness, self_OriginChainNavigator->Hash);
-  XYObject* blockHashObject = blockHash_result->result;
-  ByteArray* blockHashValue = blockHashObject->payload;
+  XYResult_t* blockHash_result = user_BoundWitness->getHash(user_BoundWitness, self_OriginChainNavigator->Hash);
+  XYObject_t* blockHashObject = blockHash_result->result;
+  ByteArray_t* blockHashValue = blockHashObject->payload;
   //XYResult* previousBlock_result = getMostRecentOriginBlock(self_OriginChainNavigator);
   //BoundWitness* previousBlock = previousBlock_result->result;
   //XYResult* prevBlockHash_result = user_BoundWitness->getHash(previousBlock, self_OriginChainNavigator->Hash);
   //ByteArray* prevBlockHashValue = prevBlockHash_result->result;
   //char* payload = malloc(blockHashValue->size + 1*sizeof(char));
-  ByteArray* write_ByteArray = malloc(sizeof(ByteArray));;
+
+  ByteArray_t* write_ByteArray = malloc(sizeof(ByteArray));;
+
+  /********************************/
+  /* guard against malloc errors  */
+  /********************************/
+
   if(write_ByteArray){
     //memset(payload, 0xff, sizeof(char));
     //memcpy(payload+sizeof(char), prevBlockHashValue->payload, blockHashValue->size+(1*sizeof(char)));
@@ -188,14 +228,13 @@ XYResult* addBoundWitness(OriginChainNavigator* self_OriginChainNavigator, Bound
     }
     */
 
-    XYResult* return_result = malloc(sizeof(XYResult));
-    if(return_result){
-      return_result->error = OK;
-      return_result->result = 0;
-      return return_result;
-    } else {
-      RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-    }
+    preallocated_return_result_ptr = &preallocated_return_result;
+    
+    preallocated_return_result_ptr->error = OK;
+    preallocated_return_result_ptr->result = 0;
+      
+    return preallocated_return_result_ptr;
+    
   } else {
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
@@ -203,64 +242,63 @@ XYResult* addBoundWitness(OriginChainNavigator* self_OriginChainNavigator, Bound
 
 /*----------------------------------------------------------------------------*
 *  NAME
-*      getMostRecentOriginBlock
-*
-*  DESCRIPTION
-*     Will return the most recently appended block to the origin chain.
-*
-*  PARAMETERS
-*     *OriginChainNavigator                    [in]       self_OriginChainNavigator*
-*     *ByteArray                               [in]       originBlockHash*
-*
-*  RETURNS
-*      XYResult*                              [out]      XYObject*   Returns XYObject of Boound Witness type
-*----------------------------------------------------------------------------*/
-XYResult* getMostRecentOriginBlock(OriginChainNavigator* self_OriginChainNavigator) {
-  return ((IntStrongArray*)self_OriginChainNavigator->originChainRepository->repository)->get(self_OriginChainNavigator->originChainRepository->repository, self_OriginChainNavigator->originChainRepository->logicalEnd-1);
-}
-
-/*----------------------------------------------------------------------------*
-*  NAME
 *      findPreviousBlocks
 *
 *  DESCRIPTION
-*      Will returns a parent block to a given bound witness
+*      Will returns a block that
 *
 *  PARAMETERS
-*     *OriginChainNavigator                    [in]       self_OriginChainNavigator*
-*     *ByteArray                               [in]       originBlockHash*
+*     *OriginChainNavigator     [in]       self_OriginChainNavigator*
+*     *ByteArray                [in]       originBlockHash*
 *
 *  RETURNS
-*      XYResult*                              [out]      XYObject*   Returns XYObject of Boound Witness type
+*      XYResult_t*              [out]      XYObject*  Returns XYObject of Boound 
+*                                                     Witness type
 *----------------------------------------------------------------------------*/
 /*
-XYResult* findPreviousBlocks(OriginChainNavigator* self_OriginChainNavigator, BoundWitness* user_BoundWitness){
+XYResult_t* findPreviousBlocks(OriginChainNavigator* self_OriginChainNavigator, 
+                               BoundWitness* user_BoundWitness){
+  
+  /********************************/
+  /* guard against bad input data */
+  /********************************/
+  
+  if(!self_OriginChainNavigator || !user_BoundWitness) {RETURN_ERROR(ERR_BADDATA)};
+
   if(user_BoundWitness->payloads){
-    IntStrongArray* user_payloads = user_BoundWitness->payloads;
+    
+    IntStrongArray_t* user_payloads = user_BoundWitness->payloads;
     int stop = 0;
     for(int i = 0; stop == 0;i++){
-      XYResult* get_result = user_payloads->get(user_payloads, i);
+      XYResult_t* get_result = user_payloads->get(user_payloads, i);
       if(get_result->error==ERR_KEY_DOES_NOT_EXIST){
        stop = 1;
      } else {
-        Payload* potential_payload = get_result->result;
+        Payload_t* potential_payload = get_result->result;
         int breakout = 0;
         for(int j = 0; breakout==0; ){
-          XYResult* payloadGet_result = potential_payload->signedHeuristics->get(potential_payload->signedHeuristics, j);
+          XYResult_t* payloadGet_result = potential_payload->signedHeuristics->get(potential_payload->signedHeuristics, j);
           if(payloadGet_result->error!=ERR_KEY_DOES_NOT_EXIST){
-            XYObject* payload_obj = payloadGet_result->result;
+            XYObject_t* payload_obj = payloadGet_result->result;
             if(payload_obj->id[0] == 0x02 && payload_obj->id[1] == 0x06){
-              PreviousHash* previous_hash = payload_obj->payload;
-              XYResult* lookup_result = lookup(previous_hash->hash);
+              PreviousHash_t* previous_hash = payload_obj->payload;
+              XYResult_t* lookup_result = tableLookup((char*)previous_hash->hash);
               if(lookup_result->error != OK){
                 continue;
               }
-              ObjectProvider* previousHash_creator = lookup_result->result;
+              ObjectProvider_t* previousHash_creator = lookup_result->result;
               free(lookup_result);
-              ByteArray* blockHash = malloc(sizeof(ByteArray));
+              ByteArray_t* blockHash = malloc(sizeof(ByteArray_t));
+
+              /********************************/
+              /* guard against malloc errors  */
+              /********************************/
+  
+              if(!blockHash) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+  
               blockHash->payload = previous_hash->hash;
               blockHash->size = previousHash_creator->defaultSize-2;
-              XYResult* foundParent = self_OriginChainNavigator->getOriginBlockByBlockHash(self_OriginChainNavigator, blockHash);
+              XYResult_t* foundParent = self_OriginChainNavigator->getOriginBlockByBlockHash(self_OriginChainNavigator, blockHash);
               free(blockHash);
               if(foundParent->error!=OK){
                 free(foundParent);
@@ -367,3 +405,5 @@ OriginChainNavigator* initOriginChainProvider( OriginChainNavigator** self, char
   return (*self);
 }
 */
+
+// end of file originchain.h
