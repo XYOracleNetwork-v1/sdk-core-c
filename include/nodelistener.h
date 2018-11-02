@@ -36,7 +36,7 @@ struct NodeListener {
   /**
    * This function will be called on evey time a bound witness ended successfully.
    */
-  void (*onBoundWitnessDiscovered)(BoundWitness* boundWitness);
+  void (*onBoundWitnessDiscovered)(BoundWitness_t* boundWitness);
 
   /**
    * This function will be called on evey time a bound witness did not end successfully.

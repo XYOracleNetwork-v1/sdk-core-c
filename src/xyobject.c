@@ -20,8 +20,8 @@
 #include <stdlib.h>
 #include "xyo.h"
 #include "xyobject.h"
-#include "boundwitness.h"
-#include "xyoheuristicsbuilder.h"
+#include "BoundWitness.h"
+#include "XYOHeuristicsBuilder.h"
 
 /*
  * STRUCTURES
@@ -35,16 +35,16 @@
  *      getXyobjectId
  *
  *  DESCRIPTION
- *      this routine returns the id of the supplied xyo object 
+ *      this routine returns the id of the supplied xyo object
  *
  *  PARAMETERS
- *      object    [in]      XYObject*
+ *      object    [in]      XYObject_t*
  *
  *  RETURNS
  *      id        [out]     XYResult_t*
  *
  *  NOTES
- *      
+ *
  ****************************************************************************************
  */
 XYResult_t* getXyobjectId(XYObject_t* xyobject){
@@ -52,11 +52,11 @@ XYResult_t* getXyobjectId(XYObject_t* xyobject){
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!xyobject) {RETURN_ERROR(ERR_BADDATA)};
+
+  if(!xyobject) {RETURN_ERROR(ERR_BADDATA);}
 
   preallocated_return_result_ptr = &preallocated_return_result;
-  
+
   preallocated_return_result_ptr->error = OK;
   preallocated_return_result_ptr->result = &xyobject->id;
 
@@ -69,36 +69,36 @@ XYResult_t* getXyobjectId(XYObject_t* xyobject){
  *      getPayload
  *
  *  DESCRIPTION
- *      this routine returns the payload of the supplied xyo object 
+ *      this routine returns the payload of the supplied xyo object
  *
  *  PARAMETERS
- *      object      [in]      XYObject*
+ *      object      [in]      XYObject_t*
  *
  *  RETURNS
  *      preallocated_return_result_ptr     [out]     XYResult_t*
  *
  *  NOTES
- *      
+ *
  ****************************************************************************************
  */
 XYResult_t* getPayload(XYObject_t* xyobject){
-  
+
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!xyobject) {RETURN_ERROR(ERR_BADDATA)};
+
+  if(!xyobject) {RETURN_ERROR(ERR_BADDATA);}
 
   preallocated_return_result_ptr = &preallocated_return_result;
-  
+
   preallocated_return_result_ptr->error = OK;
   preallocated_return_result_ptr->result = &xyobject->payload;
 
   return preallocated_return_result_ptr;
 }
 
-XYResult* newObject(char id[2], void* payload){
-  struct XYObject* new_object = malloc(sizeof(XYObject));
+XYResult_t* newObject(const char id[2], void* payload){
+  XYObject_t* new_object = malloc(sizeof(XYObject_t));
   if(new_object != NULL){
     if(payload != 0){
       new_object->payload = payload;
@@ -109,10 +109,10 @@ XYResult* newObject(char id[2], void* payload){
     strncpy(new_object->id, id, 2);
     new_object->GetXyobjectId = &getXyobjectId;
     new_object->GetPayload = &getPayload;
-        
+
     preallocated_return_result_ptr->error = OK;
     preallocated_return_result_ptr->result = new_object;
-      
+
     return preallocated_return_result_ptr;
   }
   else {
@@ -136,26 +136,26 @@ void* typeTable[TYPE_TABLE_MAJOR_MAX][TYPE_TABLE_MINOR_MAX];
  *      none
  *
  *  RETURNS
- *      preallocated_result     [out]     XYResult*
+ *      preallocated_result     [out]     XYResult_t*
  *
  *  NOTES
- *      
+ *
  ****************************************************************************************
  */
 XYResult_t* initTable(){
-  
+  preallocated_return_result_ptr = &preallocated_result;
   int x,y;
   for(x = 0; x < TYPE_TABLE_MAJOR_MAX; x ++) {
       for(y = 0; y < TYPE_TABLE_MINOR_MAX; y ++) typeTable[x][y] = 0;
   }
 
   // Initialize Byte Strong Array Creator
-  struct ObjectProvider* ByteStrongArray_creator = malloc(sizeof(ObjectProvider_t));
-  
+  ObjectProvider_t* ByteStrongArray_creator = malloc(sizeof(ObjectProvider_t));
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
+
   if(ByteStrongArray_creator != NULL){
     ByteStrongArray_creator->sizeIdentifierSize = 1;
     ByteStrongArray_creator->defaultSize = 0;
@@ -167,17 +167,17 @@ XYResult_t* initTable(){
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 
   // Initialize Short Strong Array Creator
-  struct ObjectProvider* ShortStrongArray_creator = malloc(sizeof(ObjectProvider_t));
-  
+  ObjectProvider_t* ShortStrongArray_creator = malloc(sizeof(ObjectProvider_t));
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
+
   if(ShortStrongArray_creator != NULL){
     ShortStrongArray_creator->sizeIdentifierSize = 2;
     ShortStrongArray_creator->defaultSize = 0;
@@ -189,17 +189,17 @@ XYResult_t* initTable(){
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 
   // Initialize Int Strong Array Creator
-  struct ObjectProvider* IntStrongArray_creator = malloc(sizeof(ObjectProvider_t));
-  
+  ObjectProvider_t* IntStrongArray_creator = malloc(sizeof(ObjectProvider_t));
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
+
   if(IntStrongArray_creator != NULL){
     IntStrongArray_creator->sizeIdentifierSize = 4;
     IntStrongArray_creator->defaultSize = 0;
@@ -211,17 +211,17 @@ XYResult_t* initTable(){
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 
   // Initialize Byte Weak Array Creator
   ObjectProvider_t* ByteWeakArray_creator = malloc(sizeof(ObjectProvider_t));
-  
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
+
   if(ByteWeakArray_creator != NULL){
     ByteWeakArray_creator->sizeIdentifierSize = 1;
     ByteWeakArray_creator->defaultSize = 0;
@@ -233,17 +233,17 @@ XYResult_t* initTable(){
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 
   // Initialize Short Weak Array Creator
   ObjectProvider_t* ShortWeakArray_creator = malloc(sizeof(ObjectProvider_t));
-  
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
+
   if(ShortWeakArray_creator != NULL){
     ShortWeakArray_creator->sizeIdentifierSize = 2;
     ShortWeakArray_creator->defaultSize = 0;
@@ -255,17 +255,17 @@ XYResult_t* initTable(){
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 
   // Initialize Int Weak Array Creator
   ObjectProvider_t* IntWeakArray_creator = malloc(sizeof(ObjectProvider_t));
-  
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
+
   if(IntWeakArray_creator != NULL){
     IntWeakArray_creator->sizeIdentifierSize = 4;
     IntWeakArray_creator->defaultSize = 0;
@@ -277,17 +277,17 @@ XYResult_t* initTable(){
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 
   // Initialize Bound Witness Creator
   ObjectProvider_t* BoundWitness_creator = malloc(sizeof(ObjectProvider_t));
-  
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
+
   if(BoundWitness_creator != NULL){
     BoundWitness_creator->sizeIdentifierSize = 4;
     BoundWitness_creator->defaultSize = 0;
@@ -299,17 +299,17 @@ XYResult_t* initTable(){
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 
   // Initialize Keyset
   ObjectProvider_t* KeySet_creator = malloc(sizeof(ObjectProvider_t));
-  
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
+
   if(KeySet_creator != NULL){
     KeySet_creator->sizeIdentifierSize = 2;
     KeySet_creator->defaultSize = 0;
@@ -321,12 +321,12 @@ XYResult_t* initTable(){
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 
   // Initialize Signature Set Creator
-  struct ObjectProvider* SS_creator = malloc(sizeof(ObjectProvider));
+  ObjectProvider_t* SS_creator = malloc(sizeof(ObjectProvider_t));
   if(SS_creator != NULL){
     SS_creator->sizeIdentifierSize = 2;
     SS_creator->defaultSize = 0;
@@ -343,11 +343,11 @@ XYResult_t* initTable(){
 
   // Initialize Payload Creator
   ObjectProvider_t* Payload_creator = malloc(sizeof(ObjectProvider_t));
-  
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
+
   if(Payload_creator != NULL){
     Payload_creator->sizeIdentifierSize = 4;
     Payload_creator->defaultSize = 0;
@@ -359,17 +359,17 @@ XYResult_t* initTable(){
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 
   // Initialize Index Creator
   ObjectProvider_t* Index_creator = malloc(sizeof(ObjectProvider_t));
-  
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
+
   if(Index_creator != NULL){
     Index_creator->sizeIdentifierSize = 0;
     Index_creator->defaultSize = 4;
@@ -381,17 +381,17 @@ XYResult_t* initTable(){
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 
   // Initialize Previous Hash Creator
   ObjectProvider_t* PreviousHash_creator = malloc(sizeof(ObjectProvider_t));
-  
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
+
   if(PreviousHash_creator != NULL){
     PreviousHash_creator->sizeIdentifierSize = 0;
     PreviousHash_creator->defaultSize = 34;
@@ -403,17 +403,17 @@ XYResult_t* initTable(){
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 
   // Initialize Next Public Key Creator
   ObjectProvider_t* NPK_creator = malloc(sizeof(ObjectProvider_t));
-  
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
+
   if(NPK_creator != NULL){
     NPK_creator->sizeIdentifierSize = 0;
     NPK_creator->defaultSize = 0;
@@ -425,17 +425,17 @@ XYResult_t* initTable(){
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 
   // Initialize Bound Witness Transfer
   ObjectProvider_t* BWT_creator = malloc(sizeof(ObjectProvider_t));
-  
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
+
   if(BWT_creator != NULL){
     BWT_creator->sizeIdentifierSize = 0;
     BWT_creator->defaultSize = 0;
@@ -447,12 +447,12 @@ XYResult_t* initTable(){
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 
   // Initialize Bridge Hash Set Creator
-  struct ObjectProvider* HASHSET_creator = malloc(sizeof(ObjectProvider));
+  ObjectProvider_t* HASHSET_creator = malloc(sizeof(ObjectProvider_t));
   if(NPK_creator != NULL){
     HASHSET_creator->sizeIdentifierSize = 2;
     HASHSET_creator->defaultSize = 0;
@@ -468,7 +468,7 @@ XYResult_t* initTable(){
   }
 
   // Initialize Bridge Block Set
-  struct ObjectProvider* BBS_creator = malloc(sizeof(ObjectProvider));
+  ObjectProvider_t* BBS_creator = malloc(sizeof(ObjectProvider_t));
   if(BBS_creator != NULL){
     BBS_creator->sizeIdentifierSize = 4;
     BBS_creator->defaultSize = 0;
@@ -485,11 +485,11 @@ XYResult_t* initTable(){
 
   // Initialize SHA256 Hash Creator
   ObjectProvider_t* SHA256_creator = malloc(sizeof(ObjectProvider_t));
-  
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
+
   if(SHA256_creator != NULL){
     SHA256_creator->sizeIdentifierSize = 0;
     SHA256_creator->defaultSize = 32;
@@ -501,40 +501,40 @@ XYResult_t* initTable(){
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 
   // Initialize ECDSA Secp256k1 Uncompressed Key TODO
   ObjectProvider_t* secp256k1_creator = malloc(sizeof(ObjectProvider_t));
-  
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
+
   if(secp256k1_creator != NULL){
     secp256k1_creator->sizeIdentifierSize = 0;
     secp256k1_creator->defaultSize = 64;
     secp256k1_creator->create = &ECDSA_secp256k1Uncompressed_creator_create;
     secp256k1_creator->fromBytes = &ECDSA_secp256k1Uncompressed_creator_fromBytes;
     secp256k1_creator->toBytes = &ECDSA_secp256k1Uncompressed_creator_toBytes;
-    
+
     typeTable[0x04][0x01] = secp256k1_creator;
   }
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 
   // Initialize SECP256k1 Signature type
-  struct ObjectProvider_t* secp256k1sig_creator = malloc(sizeof(ObjectProvider));
+  ObjectProvider_t* secp256k1sig_creator = malloc(sizeof(ObjectProvider_t));
 
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
+
   if(secp256k1sig_creator != NULL){
     secp256k1sig_creator->sizeIdentifierSize = 1;
     secp256k1sig_creator->defaultSize = 0;
@@ -546,34 +546,34 @@ XYResult_t* initTable(){
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 
   // Initialize SECP256k1 Signature type
-  ObjectProvider_t* secp256k1sha1sig_creator = malloc(sizeof(ObjectProvider));
+  ObjectProvider_t* secp256k1sha1sig_creator = malloc(sizeof(ObjectProvider_t));
   if(secp256k1sha1sig_creator != NULL){
     secp256k1sha1sig_creator->sizeIdentifierSize = 0;
     secp256k1sha1sig_creator->defaultSize = 69;
     secp256k1sha1sig_creator->create = &ECDSA_secp256k1Sig_creator_create;
     secp256k1sha1sig_creator->fromBytes = &ECDSA_secp256k1Sig_creator_fromBytes;
     secp256k1sha1sig_creator->toBytes = &ECDSA_secp256k1Sig_creator_toBytes;
-    typeTable[MAJOR_SIGNATURES][MINOR_ECDSA_SECP256K1_SHA1_SIGNATURE] = seqcp256k1sha1sig_creator;
+    typeTable[MAJOR_SIGNATURES][MINOR_ECDSA_SECP256K1_SHA1_SIGNATURE] = secp256k1sha1sig_creator;
   }
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 
   // Initialize RSSI Heuristic Creator
   ObjectProvider_t* rssi_creator = malloc(sizeof(ObjectProvider_t));
-  
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
+
   if(rssi_creator != NULL){
     rssi_creator->sizeIdentifierSize = 0;
     rssi_creator->defaultSize = 1;
@@ -589,7 +589,7 @@ XYResult_t* initTable(){
   }
 
   // Initialize Text Heuristic Creator
-  struct ObjectProvider* text_creator = malloc(sizeof(ObjectProvider));
+  ObjectProvider_t* text_creator = malloc(sizeof(ObjectProvider_t));
   if(text_creator != NULL){
     text_creator->sizeIdentifierSize = 2;
     text_creator->defaultSize = 0;
@@ -601,15 +601,15 @@ XYResult_t* initTable(){
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 
   preallocated_return_result_ptr = &preallocated_return_result;
- 
+
   preallocated_return_result_ptr->error = OK;
   preallocated_return_result_ptr->result = 0;
-    
+
   return preallocated_return_result_ptr;
 }
 
@@ -628,26 +628,26 @@ XYResult_t* initTable(){
  *      preallocated_return_result_ptr     [out]     XYResult_t*
  *
  *  NOTES
- *      
+ *
  ****************************************************************************************
  */
-XYResult_t* tableLookup(char id[2]){
+XYResult_t* tableLookup(const char id[2]){
 
   void* tableValue = typeTable[id[0]][id[1]];
-  
+
   preallocated_return_result_ptr = &preallocated_return_result;
-        
+
   if(tableValue != 0){
-    
+
     preallocated_return_result_ptr->error = OK;
     preallocated_return_result_ptr->result = tableValue;
-      
+
       return preallocated_return_result_ptr;
   }
   else {
     preallocated_return_result_ptr->error = ERR_KEY_DOES_NOT_EXIST;
     preallocated_return_result_ptr->result = 0;
-      
+
     return preallocated_return_result_ptr;
   }
 }

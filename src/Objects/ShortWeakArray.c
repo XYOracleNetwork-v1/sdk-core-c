@@ -29,30 +29,30 @@
 *      Adds a supplied XYObject to a supplied ShortWeakArray
 *
 *  PARAMETERS
-*     *self_ShortWeakArray  [in]      XYObject*
-*     *user_XYObject        [in]      ShortWeakArray*
+*     *self_ShortWeakArray  [in]      XYObject_t*
+*     *user_XYObject        [in]      ShortWeakArray_t*
 *
 *  RETURNS
 *      XYResult  [out]      bool       Returns EXyoErrors::OK if adding succeeded.
 *----------------------------------------------------------------------------*/
-XYResult_t* ShortWeakArray_add(ShortWeakArray_t* self_ShortWeakArray, 
+XYResult_t* ShortWeakArray_add(ShortWeakArray_t* self_ShortWeakArray,
                                XYObject_t* user_XYObject){ //TODO: consider changing self to XYObject
-                               
+
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!self_ShortWeakArray || !user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
+
+  if(!self_ShortWeakArray || !user_XYObject) {RETURN_ERROR(ERR_BADDATA);}
 
   // Lookup the ObjectProvider for the object so we can infer if the object has a default
   // size or a variable size per each element. We know every element in a single-type array
   // has the same type, but we don't know if they have uniform size. An array of Bound Witness
   // objects will be variable size, but all the same type.
-                               
+
   XYResult_t* lookup_result = tableLookup(user_XYObject->id);
-                               
+
   if(lookup_result->error == OK){
-    
+
     ObjectProvider_t* user_ObjectProvider = lookup_result->result;
 
     // First we calculate how much space we need for the payload with
@@ -148,10 +148,10 @@ XYResult_t* ShortWeakArray_add(ShortWeakArray_t* self_ShortWeakArray,
         self_ShortWeakArray->size = newSize;
 
         preallocated_return_result_ptr = &preallocated_return_result;
-        
+
         preallocated_return_result_ptr->error = OK;
         preallocated_return_result_ptr->result = 0;
-       
+
         return preallocated_return_result_ptr;
       }
       else {
@@ -175,19 +175,19 @@ XYResult_t* ShortWeakArray_add(ShortWeakArray_t* self_ShortWeakArray,
 *      Get an XYObject from a supplied ShortWeakArray at a supplied index.
 *
 *  PARAMETERS
-*     *self_ShortWeakArray  [in]       XYObject*
+*     *self_ShortWeakArray  [in]       XYObject_t*
 *     *index                 [in]       Int;
 *
 *  RETURNS
 *      XYResult  [out]      bool       Returns pointer to element in array.
 *----------------------------------------------------------------------------*/
 XYResult_t* ShortWeakArray_get(ShortWeakArray_t* self_ShortWeakArray, int index) {
-  
+
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!self_ShortWeakArray) {RETURN_ERROR(ERR_BADDATA)};
+
+  if(!self_ShortWeakArray) {RETURN_ERROR(ERR_BADDATA);}
 
   /* Here the program will iterate through each element. Getting each
    * element's size and iterating to the next element unless we are
@@ -195,11 +195,11 @@ XYResult_t* ShortWeakArray_get(ShortWeakArray_t* self_ShortWeakArray, int index)
    * and bounds check each loop.
    */
   int internal_index = 0;
-  
+
   for(char* arrayPointer = self_ShortWeakArray->payload; ((void *)arrayPointer < ((self_ShortWeakArray->payload)+(sizeof(char)*(self_ShortWeakArray->size-2)))); ){
-    
+
     XYResult_t* lookup_result = tableLookup(arrayPointer);
-    
+
     if(lookup_result->error == OK){
       ObjectProvider_t* element_creator = lookup_result->result;
 
@@ -223,7 +223,7 @@ XYResult_t* ShortWeakArray_get(ShortWeakArray_t* self_ShortWeakArray, int index)
 
       }
       if(internal_index == index) {
-        
+
         preallocated_return_result_ptr = &preallocated_return_result;
 
         XYResult_t* new_result = newObject(arrayPointer, arrayPointer+2);
@@ -231,7 +231,7 @@ XYResult_t* ShortWeakArray_get(ShortWeakArray_t* self_ShortWeakArray, int index)
         if(new_result->error == OK){
           preallocated_return_result_ptr->error = OK;
           preallocated_return_result_ptr->result = new_result->result;
-          
+
           return preallocated_return_result_ptr;
         }
         else {
@@ -241,7 +241,7 @@ XYResult_t* ShortWeakArray_get(ShortWeakArray_t* self_ShortWeakArray, int index)
       // Skip to next element
       else {
         arrayPointer = arrayPointer+(sizeof(char)*(element_size+2));
-        
+
         if((ShortWeakArray_t **)arrayPointer > (&self_ShortWeakArray+(sizeof(char)*self_ShortWeakArray->size))){
           RETURN_ERROR(ERR_KEY_DOES_NOT_EXIST);
         }
@@ -268,45 +268,45 @@ XYResult_t* ShortWeakArray_get(ShortWeakArray_t* self_ShortWeakArray, int index)
 *     *user_data             [in]       void*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYObject* of the ShortWeakArray type.
+*      XYResult_t*            [out]      bool   Returns XYObject_t* of the ShortWeakArray type.
 *----------------------------------------------------------------------------*/
-XYResult_t* ShortWeakArray_creator_create(char id[2], void* user_data){
-  
+XYResult_t* ShortWeakArray_creator_create(const char id[2], void* user_data){
+
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!user_data) {RETURN_ERROR(ERR_BADDATA)};
+
+  //if(!user_data) {RETURN_ERROR(ERR_BADDATA);}
 
   ShortWeakArray_t* ShortWeakArrayObject = malloc(sizeof(ShortWeakArray_t));
 
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
-  if(!ShortWeakArrayObject) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
 
-  XYResult_t* newObject_result = newObject(ShortWeakArrayID, ShortWeakArrayObject);
-  
+  if(!ShortWeakArrayObject) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
+
+  XYResult_t* newObject_result = newObject((char*)&ShortWeakArray_id, ShortWeakArrayObject);
+
   if(newObject_result->error == OK && ShortWeakArrayObject != NULL){
-    
+
     ShortWeakArrayObject->size = 2;
     ShortWeakArrayObject->add = &ShortWeakArray_add;
     ShortWeakArrayObject->get = &ShortWeakArray_get;
     ShortWeakArrayObject->payload = NULL;
 
     preallocated_return_result_ptr = &preallocated_return_result;
-    
+
     preallocated_return_result_ptr->error = OK;
     XYObject_t* return_object = newObject_result->result;
     preallocated_return_result_ptr->result = return_object;
-    
+
     return preallocated_return_result_ptr;
   }
   else {
     preallocated_return_result_ptr->error = ERR_INSUFFICIENT_MEMORY;
     preallocated_return_result_ptr->result = 0;
-    
+
     return preallocated_return_result_ptr;
   }
 }
@@ -322,38 +322,38 @@ XYResult_t* ShortWeakArray_creator_create(char id[2], void* user_data){
 *     *data               [in]       char*
 *
 *  RETURNS
-*      XYResult_t*        [out]      bool   Returns XYResult* of the ShortWeakArray type.
+*      XYResult_t*        [out]      bool   Returns XYResult_t* of the ShortWeakArray type.
 *----------------------------------------------------------------------------*/
 XYResult_t* ShortWeakArray_creator_fromBytes(char* data){
 
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!data) {RETURN_ERROR(ERR_BADDATA)};
+
+  if(!data) {RETURN_ERROR(ERR_BADDATA);}
 
   preallocated_return_result_ptr = &preallocated_return_result;
-  
+
   ShortWeakArray_t* return_array = malloc(sizeof(ShortWeakArray_t));
-  
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-    
+
   if(return_array){
       return_array->add = &ShortWeakArray_add;
       return_array->remove = NULL;
       return_array->get = &ShortWeakArray_get;
       return_array->size = to_uint16(data);
-    
+
       return_array->payload = malloc(sizeof(char)*(return_array->size-2));
-    
+
       if(return_array->payload != NULL){
         memcpy(return_array->payload, &data[2], (return_array->size-2));
-        
+
         preallocated_return_result_ptr->error = OK;
         preallocated_return_result_ptr->result = return_array;
-        
+
         return preallocated_return_result_ptr;
       }
       else
@@ -375,31 +375,31 @@ XYResult_t* ShortWeakArray_creator_fromBytes(char* data){
 *      the object and return a char* to the serialized bytes.
 *
 *  PARAMETERS
-*    *user_XYObject         [in]       XYObject*
+*    *user_XYObject         [in]       XYObject_t*
 *
 *  RETURNS
 *      XYResult_t*          [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
 XYResult_t* ShortWeakArray_creator_toBytes(XYObject_t* user_XYObject){
-  
+
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
 
-  if(user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x05){
-    
-    ShortWeakArray_t* user_array = (user_XYObject->GetPayload(user_XYObject))->result;
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA);}
+
+  if((user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x05) || (user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x02) || (user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x08) || (user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x03)){
+
+    ShortWeakArray_t* user_array = *(ShortWeakArray_t**)(user_XYObject->GetPayload(user_XYObject))->result;
     uint16_t totalSize = user_array->size;
     char* byteBuffer = malloc(sizeof(char)*totalSize);
-    
+
     preallocated_return_result_ptr = &preallocated_return_result;
-    
+
     /********************************/
     /* guard against malloc errors  */
     /********************************/
-    
+
     if(byteBuffer != NULL){
 
       /*
@@ -408,20 +408,20 @@ XYResult_t* ShortWeakArray_creator_toBytes(XYObject_t* user_XYObject){
        * This switch happens so that when it's copied into a buffer we
        * are in the network byte order.
        */
-      
+
       if(littleEndian()){
-        user_array->size = to_uint16((char*)(uintptr_t)user_array->size);
+        user_array->size = to_uint16((char*)(uintptr_t)&user_array->size);
       }
 
-      memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 2);
+      memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject)->result, 2);
       memcpy(byteBuffer+2, user_array->payload, sizeof(char)*(totalSize-2));
       if(littleEndian()){
-        user_array->size = to_uint16((char*)(uintptr_t)user_array->size);
+        user_array->size = to_uint16((char*)(uintptr_t)&user_array->size);
       }
-      
+
       preallocated_return_result_ptr->error = OK;
       preallocated_return_result_ptr->result = byteBuffer;
-      
+
       return preallocated_return_result_ptr;
     }
     else {
@@ -431,6 +431,6 @@ XYResult_t* ShortWeakArray_creator_toBytes(XYObject_t* user_XYObject){
   else {
     RETURN_ERROR(ERR_BADDATA);
   }
+}
 
 // end of file shortweakarray.c
-

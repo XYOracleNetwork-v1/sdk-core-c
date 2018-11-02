@@ -21,6 +21,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
+#include "defines.h"
 
 #ifndef XYOBJECT_H
 #define XYOBJECT_H
@@ -41,8 +42,8 @@ typedef struct XYResult XYResult_t;
 struct XYObject{
   char id[2];
   void* payload;
-  XYResult_t* (*GetXyobjectId)(struct XYObject*);  // Fetch the above id object and return it.
-  XYResult_t* (*GetPayload)(struct XYObject*);     // Fetch the above payload pointer object and return it.
+  XYResult_t* (*GetXyobjectId)(struct XYObject_t*);  // Fetch the above id object and return it.
+  XYResult_t* (*GetPayload)(struct XYObject_t*);     // Fetch the above payload pointer object and return it.
 } ;
 
 /*
@@ -66,9 +67,9 @@ struct ByteStrongArray{
 struct ShortStrongArray {
   uint16_t size;
   char     id[2];
-  XYResult_t* (*add)(struct ShortStrongArray* self_ShortStrongArray, XYObject_t* user_XYObject);
-  XYResult_t* (*remove)(struct ShortStrongArray* self_ShortStrongArray, int index);
-  XYResult_t* (*get)(struct ShortStrongArray* self_ShortStrongArray, int index);
+  XYResult_t* (*add)(struct ShortStrongArray_t* self_ShortStrongArray, XYObject_t* user_XYObject);
+  XYResult_t* (*remove)(struct ShortStrongArray_t* self_ShortStrongArray, int index);
+  XYResult_t* (*get)(struct ShortStrongArray_t* self_ShortStrongArray, int index);
   void* payload;
 } ; //0x02
 
@@ -89,9 +90,9 @@ typedef struct ObjectProvider ObjectProvider_t;
 struct IntStrongArray {
   uint32_t  size;
   char      id[2];
-  XYResult_t* (*add)(struct IntStrongArray* self_IntStrongArray, XYObject_t* user_XYObject);
-  XYResult_t* (*remove)(struct IntStrongArray* self_IntStrongArray, int index);
-  XYResult_t* (*get)(struct IntStrongArray* self_IntStrongArray, int index);
+  XYResult_t* (*add)(struct IntStrongArray_t* self_IntStrongArray, XYObject_t* user_XYObject);
+  XYResult_t* (*remove)(struct IntStrongArray_t* self_IntStrongArray, int index);
+  XYResult_t* (*get)(struct IntStrongArray_t* self_IntStrongArray, int index);
   void* payload;
 } ; //0x03
 
@@ -105,17 +106,17 @@ struct ByteWeakArray {
 
 struct ShortWeakArray {
   uint16_t size;
-  XYResult_t* (*add)(struct ShortWeakArray* self_ShortWeakArray, XYObject_t* user_XYObject);
-  XYResult_t* (*remove)(struct ShortWeakArray* self_ShortWeakArray, int index);
-  XYResult_t* (*get)(struct ShortWeakArray* self_ShortWeakArray, int index);
+  XYResult_t* (*add)(struct ShortWeakArray_t* self_ShortWeakArray, XYObject_t* user_XYObject);
+  XYResult_t* (*remove)(struct ShortWeakArray_t* self_ShortWeakArray, int index);
+  XYResult_t* (*get)(struct ShortWeakArray_t* self_ShortWeakArray, int index);
   void* payload;
 } ; //0x05
 
 struct IntWeakArray {
   uint32_t  size;
-  XYResult_t* (*add)(struct IntWeakArray* self_IntWeakArray, XYObject_t* user_XYObject);
-  XYResult_t* (*remove)(struct IntWeakArray* self_IntWeakArray, int index);
-  XYResult_t* (*get)(struct IntWeakArray* self_IntWeakArray, int index);
+  XYResult_t* (*add)(struct IntWeakArray_t* self_IntWeakArray, XYObject_t* user_XYObject);
+  XYResult_t* (*remove)(struct IntWeakArray_t* self_IntWeakArray, int index);
+  XYResult_t* (*get)(struct IntWeakArray_t* self_IntWeakArray, int index);
   void* payload;
 } ; //0x06
 
@@ -140,13 +141,37 @@ enum EXyoErrors{
   ERR_TIME_OUT, // Returned if the disk timed out on read/write.
   ERR_COULD_NOT_DELETE, // Returned if delete failed.
   ERR_PERMISSION, // Returned if permissions are improper.
-  ERR_KEY_DOES_NOT_EXIST // Returned if key isn't found in map.
+  ERR_KEY_DOES_NOT_EXIST, // Returned if key isn't found in map.
+  ERR_PEER_INCOMPATABLE,  // Returned if peer isn't capable of interfacing with us
+  ERR_BOUNDWITNESS_FAILED // Returned if the Bound Witness failed unexpextedly
+};
+static char *ErrorStrings[] =
+{
+    "OK",
+    "ERR_CRITICAL", // Catastrophic failure.
+    "ERR_NOID", // Returned when the core can't get the ID.
+    "ERR_CANT_GET_PAYLOAD", // Returned when the payload in inaccesible.
+    "ERR_NOSIGNER", // Returned when the core can't create a signer.
+    "ERR_ADDRESS_UNAVAILABLE", // Could not bind to address provided.
+    "ERR_NETWORK_UNAVAILABLE", // Core network services are unavailable.
+    "ERR_RECEIVER_REFUSED_CONNECTION", // Returned when The receiver refused connection.
+    "ERR_BUSY", // Returned when a core service is busy.
+    "ERR_NOKEYS", // Returned by when no keypair has been generated.
+    "ERR_BADDATA", // Returned if data is malformed e.g. too big.
+    "ERR_BADPUBKEY", // Returned if the public key is invalid.
+    "ERR_BADSIG", // Returned if the signature encoding is improper.
+    "ERR_CORRUPTDATA", // Returned if data is improperly encrypdefaultSize = ted.
+    "ERR_KEY_ALREADY_EXISTS", // Returned if can't insert because key is already mapped.
+    "ERR_INSUFFICIENT_MEMORY", // Returned if there wasn't enough memory to store.
+    "ERR_INTERNAL_ERROR", // Returned if there was a hardware error.
+    "ERR_TIMEOUT", // Returned if the disk timed out on read/write.
+    "ERR_COULD_NOT_DELETE", // Returned if delete failed.
+    "ERR_PERMISSION", // Returned if permissions are improper.
+    "ERR_KEY_DOES_NOT_EXIST", // Returned if key isn't found in map.
+    "ERR_PEER_INCOMPATABLE",  // Returned if peer isn't capable of interfacing with us
+    "ERR_BOUNDWITNESS_FAILED" // Returned if the Bound Witness failed unexpextedly
 };
 
-struct XYResult{
-  enum EXyoErrors error;
-  void* result;
-};
 
 struct KeySet{
   ShortWeakArray_t* keys;
@@ -198,8 +223,8 @@ struct ObjectProvider {
 
 extern XYResult_t* preallocated_return_result_ptr;
 
-extern struct XYResult* preallocated_result;
-extern void* typeTable[17][16];
+extern XYResult_t* preallocated_result;
+extern void* typeTable[TYPE_TABLE_MAJOR_MAX][TYPE_TABLE_MINOR_MAX];
 
 /*
  * STRUCTURES
@@ -224,34 +249,34 @@ extern void* typeTable[17][16];
  ****************************************************************************************
  */
 
-XYResult_t* ByteStrongArray_creator_create(char id[2], void* user_data);
+XYResult_t* ByteStrongArray_creator_create(const char id[2], void* user_data);
 XYResult_t* ByteStrongArray_creator_fromBytes(char* data);
-XYResult_t* ShortStrongArray_creator_create(char id[2], void* user_data);
+XYResult_t* ShortStrongArray_creator_create(const char id[2], void* user_data);
 XYResult_t* ShortStrongArray_creator_fromBytes(char* data);
-XYResult_t* ShortStrongArray_creator_toBytes(struct XYObject* user_XYObject);
-XYResult_t* IntStrongArray_creator_create(char id[2], void* user_data);
+XYResult_t* ShortStrongArray_creator_toBytes(XYObject_t* user_XYObject);
+XYResult_t* IntStrongArray_creator_create(const char id[2], void* user_data);
 XYResult_t* IntStrongArray_creator_fromBytes(char* data);
 XYResult_t* IntStrongArray_creator_toBytes(XYObject_t* user_XYObject);
-XYResult_t* ByteWeakArray_creator_create(char id[2], void* user_data);
+XYResult_t* ByteWeakArray_creator_create(const char id[2], void* user_data);
 XYResult_t* ByteWeakArray_creator_fromBytes(char* data);
-XYResult_t* ShortWeakArray_creator_create(char id[2], void* user_data);
+XYResult_t* ShortWeakArray_creator_create(const char id[2], void* user_data);
 XYResult_t* ShortWeakArray_creator_fromBytes(char* data);
-XYResult_t* ShortWeakArray_creator_toBytes(struct XYObject* user_XYObject);
+XYResult_t* ShortWeakArray_creator_toBytes(XYObject_t* user_XYObject);
 XYResult_t* ByteStrongArray_creator_toBytes(XYObject_t* user_XYObject);
 XYResult_t* ByteWeakArray_creator_toBytes(XYObject_t* user_XYObject);
-XYResult_t* IntWeakArray_creator_create(char id[2], void* user_data);
+XYResult_t* IntWeakArray_creator_create(const char id[2], void* user_data);
 XYResult_t* IntWeakArray_creator_fromBytes(char* data);
 XYResult_t* IntWeakArray_creator_toBytes(XYObject_t* user_XYObject);
 
 XYResult_t* getXyobjectId(XYObject_t* xyobject);
 XYResult_t* getPayload(XYObject_t* xyobject);
-XYResult_t* newObject(char id[2], void* payload);
+XYResult_t* newObject(const char id[2], void* payload);
 XYResult_t* initTable(void);
 XYResult_t* registerType(char id[2], void* creator);
-XYResult_t* tableLookup(char id[2]);
+XYResult_t* tableLookup(const char id[2]);
 
-extern uint32_t to_uint32(char* data);
-extern uint16_t to_uint16(char* data);
+extern uint32_t to_uint32(unsigned char* data);
+extern uint16_t to_uint16(unsigned char* data);
 
 /* Standard Object IDs */
 static const char ByteStrongArray_id[2]       = { 0x01, 0x01 };
@@ -268,7 +293,9 @@ static const char Payload_id[2]               = { 0x02, 0x04 };
 static const char Index_id[2]                 = { 0x02, 0x05 };
 static const char PreviousHash_id[2]          = { 0x02, 0x06 };
 static const char NextPublicKey_id[2]         = { 0x02, 0x07 };
-static const char BoundWitnessTransfer_id[2]  = { 0x02, 0x01 };
+static const char BridgeHashSet_id[2]         = { 0x02, 0x08 };
+static const char BridgeBlockSet_id[2]        = { 0x02, 0x09 };
+static const char BoundWitnessTransfer_id[2]  = { 0x02, 0x0a };
 
 static const char Sha256_id[2]                = { 0x03, 0x05 };
 static const char ECDSASecp256k1_id[2]        = { 0x04, 0x01 };
@@ -276,6 +303,5 @@ static const char ECDSASecp256k1Sig_id[2]     = { 0x05, 0x01 };
 static const char Rssi_id[2]                  = { 0x08, 0x01 };
 
 #endif
- 
+
 // end of file xyobject.h
- 

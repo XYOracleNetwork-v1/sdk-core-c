@@ -28,16 +28,17 @@
  ****************************************************************************************
  */
 
-typedef struct OriginChainState OriginChainState;
+typedef struct OriginChainState OriginChainState_t;
 
 /*
  * STRUCTURES
  ****************************************************************************************
  */
- 
+
 struct OriginChainState {
-  XYResult_t* (*newOriginBlock)(OriginChainState* self_OriginChainState, ByteArray_t* newHash);
-  XYResult_t* (*addSigner)(OriginChainState* self_OriginChainState, Signer_t* newSigner);
+  XYResult_t* (*newOriginBlock)(OriginChainState_t* self_OriginChainState, ByteArray_t* newHash);
+  XYResult_t* (*addSigner)(OriginChainState_t* self_OriginChainState, Signer_t* newSigner);
+  XYResult_t* (*getSigners)(OriginChainState_t* self_OriginChainState);
   Signer_t* currentSigner;
   Signer_t* nextSigner;
   ByteArray_t* latestHash;
@@ -49,7 +50,8 @@ struct OriginChainState {
  ****************************************************************************************
  */
 
-XYResult_t* newOriginBlock(OriginChainState* self_OriginChainState, ByteArray_t* originBlockHash);
-XYResult_t* addSigner(OriginChainState* self_OriginChainState, Signer_t* user_Signer);
+XYResult_t* newOriginBlock(OriginChainState_t* self_OriginChainState, ByteArray_t* originBlockHash);
+XYResult_t* addSigner(OriginChainState_t* self_OriginChainState, Signer_t* user_Signer);
+XYResult_t* getSigners(OriginChainState_t* self_OriginChainState);
 
 #endif

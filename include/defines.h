@@ -119,8 +119,12 @@
 #define TAKE_ORIGIN_CHAIN_OPTION                2
 #define GIVE_ORIGIN_CHAIN_OPTION                4
 
-#define TRUE                                    0x01
-#define FALSE                                   0x00
+#ifndef TRUE
+    #define TRUE  1
+#endif
+#ifndef FALSE
+    #define FALSE 0
+#endif
 
 /*
  * Network.c

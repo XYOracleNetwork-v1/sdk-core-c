@@ -34,14 +34,14 @@
 *  RETURNS
 *      XYResult_t*              [out]      bool   Returns OK if success
 *----------------------------------------------------------------------------*/
-XYResult_t* newOriginBlock(OriginChainState* self_OriginChainState, 
+XYResult_t* newOriginBlock(OriginChainState_t* self_OriginChainState, 
                            ByteArray_t* originBlockHash) {
   
   /********************************/
   /* guard against bad input data */
   /********************************/
   
-  if(!self_OriginChainState || !originBlockHash) {RETURN_ERROR(ERR_BADDATA)};
+  if(!self_OriginChainState || !originBlockHash) {RETURN_ERROR(ERR_BADDATA);}
 
   self_OriginChainState->latestHash = originBlockHash;
   self_OriginChainState->index = self_OriginChainState->index+1;
@@ -72,13 +72,13 @@ XYResult_t* newOriginBlock(OriginChainState* self_OriginChainState,
 *  RETURNS
 *      XYResult_t*                             [out]      bool   Returns OK if success
 *----------------------------------------------------------------------------*/
-XYResult_t* addSigner(OriginChainState* self_OriginChainState, Signer_t* user_Signer) {
+XYResult_t* addSigner(OriginChainState_t* self_OriginChainState, Signer_t* user_Signer) {
   
   /********************************/
   /* guard against bad input data */
   /********************************/
   
-  if(!self_OriginChainState || !user_Signer) {RETURN_ERROR(ERR_BADDATA)};
+  if(!self_OriginChainState || !user_Signer) {RETURN_ERROR(ERR_BADDATA);}
 
   if(self_OriginChainState->currentSigner != NULL){
     self_OriginChainState->nextSigner = user_Signer;
@@ -103,7 +103,7 @@ XYResult_t* addSigner(OriginChainState* self_OriginChainState, Signer_t* user_Si
  *  Gets the current Signer object in use.
  *
  *  PARAMETERS
- *      self      [in]      OriginChainState*
+ *      self      [in]      OriginChainState_t*
  *
  *  RETURNS
  *      Signer          [out]     XYResult<Signer*>
@@ -112,9 +112,9 @@ XYResult_t* addSigner(OriginChainState* self_OriginChainState, Signer_t* user_Si
  *
  ****************************************************************************************
  */
- XYResult* getSigners(OriginChainState* self_OriginChainState){
+ XYResult_t* getSigners(OriginChainState_t* self_OriginChainState){
    if(self_OriginChainState->currentSigner == NULL) { RETURN_ERROR(ERR_NOSIGNER);}
-   XYResult* return_result = malloc(sizeof(XYResult));
+   XYResult_t* return_result = malloc(sizeof(XYResult_t));
    if(return_result){
      return_result->error = OK;
      return_result->result = self_OriginChainState->currentSigner;

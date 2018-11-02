@@ -38,14 +38,14 @@
  ****************************************************************************************
  */
 
-XYResult* initRelayNode(RelayNode* self, OriginChainProvider* repository, HashProvider* hashingProvider, uint8_t heuristicCount){
-  NodeBase* baseNode;
+XYResult_t* initRelayNode(RelayNode* self, OriginChainProvider_t* repository, HashProvider_t* hashingProvider, uint8_t heuristicCount){
+  NodeBase_t* baseNode;
   initNode(&baseNode, repository, hashingProvider, heuristicCount);
   self->node = baseNode;
   self->node->getChoice = Relay_getChoice;
   //self->getChoice = Relay_getChoice;
   self->doConnection = doConnection;
-  XYResult* return_result = malloc(sizeof(XYResult));
+  XYResult_t* return_result = malloc(sizeof(XYResult_t));
   if(return_result){
     return_result->error = OK;
     return_result->result = 0;
@@ -117,15 +117,15 @@ XYResult* initRelayNode(RelayNode* self, OriginChainProvider* repository, HashPr
  *
  ****************************************************************************************
  */
- XYResult* doConnection(RelayNode* self){
-  NetworkPipe* connectionToOtherPartyFrom = self->findSomeoneToTalkTo();
+ XYResult_t* doConnection(RelayNode* self){
+  NetworkPipe_t* connectionToOtherPartyFrom = self->findSomeoneToTalkTo();
   if(connectionToOtherPartyFrom->initializationData == NULL){
-    XYResult* whatTheOtherPartyWantsToDo_result = connectionToOtherPartyFrom->peer->getRole(connectionToOtherPartyFrom);
+    XYResult_t* whatTheOtherPartyWantsToDo_result = connectionToOtherPartyFrom->peer->getRole(connectionToOtherPartyFrom);
     if(whatTheOtherPartyWantsToDo_result->error != OK){
       connectionToOtherPartyFrom->close(connectionToOtherPartyFrom);
       RETURN_ERROR(ERR_PEER_INCOMPATABLE); //TODO: close the pipe?!?
     }
-    ByteArray* whatTheOtherPartyWantsToDo = whatTheOtherPartyWantsToDo_result->result;
+    ByteArray_t* whatTheOtherPartyWantsToDo = whatTheOtherPartyWantsToDo_result->result;
     if(self->procedureCatalogue->canDo(whatTheOtherPartyWantsToDo)){
       return self->node->doBoundWitness(self->node, NULL, connectionToOtherPartyFrom);;
     } else {

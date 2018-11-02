@@ -29,20 +29,20 @@
 *      Adds a supplied XYObject to a supplied IntWeakArray
 *
 *  PARAMETERS
-*     *self_IntWeakArray  [in]      XYObject*
-*     *user_XYObject      [in]      IntWeakArray*
+*     *self_IntWeakArray  [in]      XYObject_t*
+*     *user_XYObject      [in]      IntWeakArray_t*
 *
 *  RETURNS
 *      XYResult_t         [out]     bool       Returns EXyoErrors::OK if adding succeeded.
 *----------------------------------------------------------------------------*/
-XYResult_t* IntWeakArray_add(IntWeakArray_t* self_IntWeakArray, 
+XYResult_t* IntWeakArray_add(IntWeakArray_t* self_IntWeakArray,
                              XYObject_t* user_XYObject){ //TODO: consider changing self to XYObject
-                               
+
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!self_IntWeakArray || !user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
+
+  //if(!self_IntWeakArray || !user_XYObject) {RETURN_ERROR(ERR_BADDATA);}
 
   // Lookup the ObjectProvider for the object so we can infer if the object has a default
   // size or a variable size per each element. We know every element in a single-type array
@@ -142,10 +142,10 @@ XYResult_t* IntWeakArray_add(IntWeakArray_t* self_IntWeakArray,
         self_IntWeakArray->size = newSize;
 
         preallocated_return_result_ptr = &preallocated_return_result;
-        
+
         preallocated_return_result_ptr->error = OK;
         preallocated_return_result_ptr->result = NULL;
-        
+
         return preallocated_return_result_ptr;
       }
       else {
@@ -169,19 +169,19 @@ XYResult_t* IntWeakArray_add(IntWeakArray_t* self_IntWeakArray,
 *      Get an XYObject from a supplied IntWeakArray at a supplied index.
 *
 *  PARAMETERS
-*     *self_IntWeakArray  [in]       XYObject*
+*     *self_IntWeakArray  [in]       XYObject_t*
 *     *index              [in]       Int;
 *
 *  RETURNS
 *      XYResult_t         [out]      bool       Returns pointer to element in array.
 *----------------------------------------------------------------------------*/
 XYResult_t* IntWeakArray_get(IntWeakArray_t* self_IntWeakArray, int index) {
-  
+
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!self_IntWeakArray) {RETURN_ERROR(ERR_BADDATA)};
+
+  if(!self_IntWeakArray) {RETURN_ERROR(ERR_BADDATA);}
 
   /* Here the program will iterate through each element. Getting each
    * element's size and iterating to the next element unless we are
@@ -216,7 +216,7 @@ XYResult_t* IntWeakArray_get(IntWeakArray_t* self_IntWeakArray, int index) {
       if(internal_index == index) {
 
         preallocated_return_result_ptr = &preallocated_return_result;
-        
+
         XYResult_t* new_result = newObject(arrayPointer, arrayPointer+2);
 
         if(new_result->error == OK){
@@ -257,28 +257,28 @@ XYResult_t* IntWeakArray_get(IntWeakArray_t* self_IntWeakArray, int index) {
 *     *user_data             [in]       void*
 *
 *  RETURNS
-*      XYResult_t*           [out]      bool   Returns XYObject* of the IntWeakArray type.
+*      XYResult_t*           [out]      bool   Returns XYObject_t* of the IntWeakArray type.
 *----------------------------------------------------------------------------*/
-XYResult_t* IntWeakArray_creator_create(char id[2], void* user_data){ 
+XYResult_t* IntWeakArray_creator_create(const char id[2], void* user_data){
                               // consider allowing someone to create array with one object
-  
+
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!user_data) {RETURN_ERROR(ERR_BADDATA)};
+
+  //if(!user_data) {RETURN_ERROR(ERR_BADDATA);}
 
   IntWeakArray_t* IntWeakArrayObject = malloc(sizeof(IntWeakArray_t));
 
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-  
-  if(!IntWeakArrayObject) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+
+  if(!IntWeakArrayObject) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
 
   char IntWeakArrayID[2] = {0x01, 0x06};
   XYResult_t* newObject_result = newObject(IntWeakArrayID, IntWeakArrayObject);
-  
+
   if(newObject_result->error == OK && IntWeakArrayObject != NULL){
     IntWeakArrayObject->size = 4;
     IntWeakArrayObject->add = &IntWeakArray_add;
@@ -290,7 +290,7 @@ XYResult_t* IntWeakArray_creator_create(char id[2], void* user_data){
     preallocated_return_result_ptr->error = OK;
     XYObject_t* return_object = newObject_result->result;
     preallocated_return_result_ptr->result = return_object;
-      
+
     return preallocated_return_result_ptr;
   }
   else {
@@ -311,43 +311,43 @@ XYResult_t* IntWeakArray_creator_create(char id[2], void* user_data){
 *     *data             [in]       char*
 *
 *  RETURNS
-*      XYResult_t*      [out]      bool   Returns XYResult* of the IntWeakArray type.
+*      XYResult_t*      [out]      bool   Returns XYResult_t* of the IntWeakArray type.
 *----------------------------------------------------------------------------*/
 XYResult_t* IntWeakArray_creator_fromBytes(char* data){
 
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!data) {RETURN_ERROR(ERR_BADDATA)};
+
+  if(!data) {RETURN_ERROR(ERR_BADDATA);}
 
   preallocated_return_result_ptr = &preallocated_return_result;
 
   IntWeakArray_t* return_array = malloc(sizeof(IntWeakArray_t));
-  
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-  
+
   if(return_array){
-    
+
       return_array->add = &IntWeakArray_add;
       return_array->remove = NULL;
       return_array->get = &IntWeakArray_get;
       return_array->size = to_uint32(data);
       return_array->payload = malloc(sizeof(char)*(return_array->size-4));
-    
+
       /********************************/
       /* guard against malloc errors  */
       /********************************/
-  
+
       if(return_array->payload != NULL){
-        
+
         memcpy(return_array->payload, &data[4], (return_array->size-4));
-        
+
         preallocated_return_result_ptr->error = OK;
         preallocated_return_result_ptr->result = return_array;
-        
+
         return preallocated_return_result_ptr;
       }
       else
@@ -369,33 +369,33 @@ XYResult_t* IntWeakArray_creator_fromBytes(char* data){
 *      the object and return a char* to the serialized bytes.
 *
 *  PARAMETERS
-*    *user_XYObject       [in]       XYObject*
+*    *user_XYObject       [in]       XYObject_t*
 *
 *  RETURNS
 *      XYResult_t*        [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
 XYResult_t* IntWeakArray_creator_toBytes(XYObject_t* user_XYObject){
-  
+
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
+
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA);}
 
   if(user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x06){
-    
-    IntWeakArray_t* user_array = (user_XYObject->GetPayload(user_XYObject))->result;
-    
+
+    IntWeakArray_t* user_array = *(IntWeakArray_t**)(user_XYObject->GetPayload(user_XYObject))->result;
+
     uint32_t totalSize = user_array->size;
-    
+
     char* byteBuffer = malloc(sizeof(char)*totalSize);
 
     preallocated_return_result_ptr = &preallocated_return_result;
-    
+
     /********************************/
     /* guard against malloc errors  */
     /********************************/
-  
+
     if(byteBuffer != NULL){
 
       /*
@@ -405,18 +405,20 @@ XYResult_t* IntWeakArray_creator_toBytes(XYObject_t* user_XYObject){
        * are in the network byte order.
        */
       if(littleEndian()){
-        user_array->size = to_uint32((char*)(uintptr_t)user_array->size);
+        user_array->size = to_uint32((char*)(uintptr_t)&user_array->size);
       }
-      memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 4);
+      memcpy(byteBuffer, &user_array->size, 4);
       if(totalSize > 4){
+        breakpoint();
         memcpy(byteBuffer+4, user_array->payload, sizeof(char)*(totalSize-4));
       }
       if(littleEndian()){
-        user_array->size = to_uint32((char*)(uintptr_t)user_array->size);
+        user_array->size = to_uint32((char*)(uintptr_t)&user_array->size);
       }
+      breakpoint();
       preallocated_return_result_ptr->error = OK;
       preallocated_return_result_ptr->result = byteBuffer;
-      
+
       return preallocated_return_result_ptr;
     }
     else {

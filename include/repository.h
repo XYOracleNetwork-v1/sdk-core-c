@@ -19,6 +19,7 @@
 
 #include <stdint.h>
 #include "xyobject.h"
+#include "xyo.h"
 
 #ifndef REPOSITORY_H
 #define REPOSITORY_H
@@ -35,19 +36,20 @@
 
 typedef struct OriginChainProviderT {
   void* repository;
-  XYResult* (*append)(struct OriginChainProviderT* self, ByteArray* value, uint16_t timeout);
-  XYResult* (*getChain)(struct OriginChainProviderT* self);
-  XYResult* (*deleteChain)(struct OriginChainProviderT* self);
+  XYResult_t* (*append)(struct OriginChainProviderT* self, ByteArray_t* value, uint16_t timeout);
+  XYResult_t* (*getChain)(struct OriginChainProviderT* self);
+  XYResult_t* (*deleteChain)(struct OriginChainProviderT* self);
 
   /* Externally implemented methods. These methods are
    * called into from outside the library.
    */
-  XYResult* (*saveChain)(struct OriginChainProviderT* self);
-  XYResult* (*reconstructChain)(struct OriginChainProviderT* self);
+  XYResult_t* (*saveChain)(struct OriginChainProviderT* self);
+  XYResult_t* (*reconstructChain)(struct OriginChainProviderT* self);
   char optionalBits[ORIGINCHAIN_EXTRA_BITS];
   uint16_t logicalEnd;
+} OriginChainProvider_t;
 
-struct RepositoryProvider{
+typedef struct RepositoryProviderT {
   uint32_t repository;
   uint32_t logicalEnd;
   XYResult_t* (*write)(ByteArray_t* value, uint32_t offset, uint32_t timeout);
@@ -55,15 +57,19 @@ struct RepositoryProvider{
   XYResult_t* (*readRows)(uint32_t beginning, uint32_t end, uint32_t timeout);
   XYResult_t* (*delete)(uint32_t offset, uint32_t timeout);
   XYResult_t* (*deleteRows)(uint32_t beginning, uint32_t end, uint32_t timeout);
-};
+} RepositoryProvider_t;
 
 struct OriginChainRepository {
-  XYResult* (*append)(ByteArray* value, uint timeout);
-  RepositoryProvider* repo;
+  XYResult_t* (*append)(ByteArray_t* value, uint timeout);
+  struct RepositoryProvider_t* repo;
 };
+
+XYResult_t* append(OriginChainProvider_t* self, ByteArray_t* value, uint16_t timeout);
+XYResult_t* getChain(OriginChainProvider_t* self);
+XYResult_t* deleteChain(OriginChainProvider_t* self);
+OriginChainProvider_t* initOriginChainProvider( void );
 
 #define REPOSITORY_H
 #endif
 
 // end of file repository.h
-

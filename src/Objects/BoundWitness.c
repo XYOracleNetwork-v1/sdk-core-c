@@ -12,7 +12,7 @@
  ****************************************************************************************
  */
 
-#include "xyo.h"   
+#include "xyo.h"
 #include <stdlib.h>
 #include "BoundWitness.h"      // includes "xyobject.h", "hash.h", <stdint.h>
 
@@ -26,33 +26,33 @@
 *      as parameters
 *
 *  PARAMETERS
-*     *user_BoundWitness    [in]       void* (BoundWitness*)(BoundWitnessTransfer*)
+*     *user_BoundWitness    [in]       void* (BoundWitness_t*)(BoundWitnessTransfer_t*)
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYObject* with a byteBuffer as the result.
+*      XYResult_t*            [out]      bool   Returns XYObject_t* with a byteBuffer as the result.
 *----------------------------------------------------------------------------*/
 XYResult_t* BoundWitness_getSigningData(void* user_BoundWitness){
-  
+
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!user_BoundWitness) {RETURN_ERROR(ERR_BADDATA)};  // return an error now
 
-  uint32_t publicKeysSize = ((BoundWitness*)user_BoundWitness)->publicKeys->size;
+  if(!user_BoundWitness) {RETURN_ERROR(ERR_BADDATA);}  // return an error now
+
+  uint32_t publicKeysSize = ((BoundWitness_t*)user_BoundWitness)->publicKeys->size;
   uint32_t firstHeuristicsSize;
   uint32_t secondHeuristicsSize;
 
   /* Get Size of keysets + payloads first */
-  IntStrongArray* user_payloadsArray = ((BoundWitness*)user_BoundWitness)->payloads;
-  XYResult* get_result = user_payloadsArray->get(user_payloadsArray, 0);
-  XYObject* user_firstPayloadObject = get_result->result;
+  IntStrongArray_t* user_payloadsArray = ((BoundWitness_t*)user_BoundWitness)->payloads;
+  XYResult_t* get_result = user_payloadsArray->get(user_payloadsArray, 0);
+  XYObject_t* user_firstPayloadObject = get_result->result;
   char* user_firstPayload = user_firstPayloadObject->payload;
   free(get_result);
   firstHeuristicsSize = to_uint32((char*)user_firstPayload+(4*sizeof(char)));
 
   get_result = user_payloadsArray->get(user_payloadsArray, 1);
-  XYObject* user_secondPayloadObject = get_result->result;
+  XYObject_t* user_secondPayloadObject = get_result->result;
   char* user_secondPayload = user_secondPayloadObject->payload;
   free(get_result);
   secondHeuristicsSize = to_uint32((char*)user_secondPayload+(4*sizeof(char)));
@@ -69,11 +69,11 @@ XYResult_t* BoundWitness_getSigningData(void* user_BoundWitness){
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-  
+
   if(byteBuffer){
     // Copy Public Keys in.
 
-    XYResult_t* newObject_result = newObject((char*)&ShortStrongArray_id, ((BoundWitness*)user_BoundWitness)->publicKeys);
+    XYResult_t* newObject_result = newObject((char*)&ShortStrongArray_id, ((BoundWitness_t*)user_BoundWitness)->publicKeys);
     if(newObject_result->error!=OK){
       free(byteBuffer);
       return newObject_result;
@@ -83,13 +83,13 @@ XYResult_t* BoundWitness_getSigningData(void* user_BoundWitness){
       free(byteBuffer);
       return lookup_result;
     }
-    ObjectProvider* SSA_Creator = lookup_result->result;
+    ObjectProvider_t* SSA_Creator = lookup_result->result;
 
-    free(lookup_result);
+    //free(lookup_result);
 
     XYResult_t* toBytes_result = SSA_Creator->toBytes(newObject_result->result);
     free(newObject_result);
-    
+
     if(toBytes_result->error!=OK){
       free(byteBuffer);
       return toBytes_result;
@@ -106,24 +106,23 @@ XYResult_t* BoundWitness_getSigningData(void* user_BoundWitness){
       memcpy(byteBuffer+(publicKeysSize+firstHeuristicsSize*sizeof(char)), user_secondPayload+(4*sizeof(char)), secondHeuristicsSize*sizeof(char));
 
     ByteArray_t* return_bytes = malloc(sizeof(ByteArray_t));
-    
+
     preallocated_return_result_ptr = &preallocated_return_result;
 
     /********************************/
     /* guard against malloc errors  */
     /********************************/
-  
+
     if(return_bytes){
       return_bytes->size = totalSize;
       return_bytes->payload = byteBuffer;
       preallocated_return_result_ptr->error = OK;
       preallocated_return_result_ptr->result = return_bytes;
-      
+
       return preallocated_return_result_ptr;
-      
+
     } else {
       if(return_bytes) free(return_bytes);
-      if(return_result) free(return_result);
       RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
     }
 
@@ -141,27 +140,27 @@ XYResult_t* BoundWitness_getSigningData(void* user_BoundWitness){
 *      Retrieves the bound witness data hash so that it can be used.
 *
 *  PARAMETERS
-*     *user_BoundWitness    [in]       BoundWitness*
+*     *user_BoundWitness    [in]       BoundWitness_t*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYObject* with a byteBuffer as the result.
+*      XYResult_t*            [out]      bool   Returns XYObject_t* with a byteBuffer as the result.
 *----------------------------------------------------------------------------*/
-XYResult_t* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider_t* user_HashProvider){
-  
+XYResult_t* BoundWitness_getHash(BoundWitness_t* user_BoundWitness, HashProvider_t* user_HashProvider){
+
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!user_BoundWitness || !user_HashProvider) {RETURN_ERROR(ERR_BADDATA)};  // return an error now
+
+  if(!user_BoundWitness || !user_HashProvider) {RETURN_ERROR(ERR_BADDATA);}  // return an error now
 
   XYResult_t* signingData_result = user_BoundWitness->getSigningData(user_BoundWitness);
-  
+
   if(signingData_result->error != OK){
     return signingData_result;
   }
-  
+
   ByteArray_t* signingData = signingData_result->result;
-  
+
   return user_HashProvider->createHash(signingData);
 }
 
@@ -174,20 +173,20 @@ XYResult_t* BoundWitness_getHash(BoundWitness* user_BoundWitness, HashProvider_t
 *      Byte array with the XYO Bound Witness Transfer object type bytes.
 *
 *  PARAMETERS
-*     *user_XYObject                     [in]       BoundWitness*
+*     *user_XYObject                     [in]       BoundWitness_t*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYObject* with a char* as the result.
+*      XYResult_t*            [out]      bool   Returns XYObject_t* with a char* as the result.
 *----------------------------------------------------------------------------*/
 XYResult_t* BoundWitnessTransfer_toBytes(XYObject_t* user_XYObject){
-  
+
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};  // return an error now
 
-  BoundWitnessTransfer* user_BoundWitness = user_XYObject->payload;
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA);}  // return an error now
+
+  BoundWitnessTransfer_t* user_BoundWitness = user_XYObject->payload;
   uint32_t totalSize = 5;
   uint32_t publicKeysSize = 0;
   uint32_t payloadsSize = 0;
@@ -198,14 +197,14 @@ XYResult_t* BoundWitnessTransfer_toBytes(XYObject_t* user_XYObject){
    RETURN_ERROR(ERR_CRITICAL);
   }
   ObjectProvider_t* ShortStrongArray_creator = lookup_result->result;
-  free(lookup_result);
+  //free(lookup_result);
 
   lookup_result = tableLookup((char*)&IntStrongArray_id);
   if(lookup_result->error != OK){
    RETURN_ERROR(ERR_CRITICAL);
   }
   ObjectProvider_t* IntStrongArray_creator = lookup_result->result;
-  free(lookup_result);
+  //free(lookup_result);
 
   XYResult_t* newObject_result = NULL;
   XYResult_t* publicKeysBytes_result = NULL;
@@ -284,7 +283,7 @@ XYResult_t* BoundWitnessTransfer_toBytes(XYObject_t* user_XYObject){
     memcpy(return_bytes+offset, signaturesBytes_result->result, signaturesSize);
     offset+=signaturesSize;
   }
-  XYResult* return_result = malloc(sizeof(XYResult));
+  XYResult_t* return_result = malloc(sizeof(XYResult_t));
   if(return_result){
     return_result->error = OK;
     return_result->result = return_bytes;
@@ -303,29 +302,29 @@ XYResult_t* BoundWitnessTransfer_toBytes(XYObject_t* user_XYObject){
 *      Byte array with the XYO Bound Witness Transfer object type bytes.
 *
 *  PARAMETERS
-*     *user_BoundWitness  [in]       BoundWitness*
+*     *user_BoundWitness  [in]       BoundWitness_t*
 *
 *  RETURNS
-*      XYResult*          [out]      bool   Returns XYResult* of the BoundWitnessTransfer type.
+*      XYResult_t*          [out]      bool   Returns XYResult_t* of the BoundWitnessTransfer type.
 *----------------------------------------------------------------------------*/
 XYResult_t* BoundWitnessTransfer_fromBytes(char* user_Transfer){
-  
+
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!user_Transfer) {RETURN_ERROR(ERR_BADDATA)};  // return an error now
 
-  BoundWitnessTransfer* return_BoundWitness = malloc(sizeof(BoundWitnessTransfer));
+  if(!user_Transfer) {RETURN_ERROR(ERR_BADDATA);}  // return an error now
+
+  BoundWitnessTransfer_t* return_BoundWitness = malloc(sizeof(BoundWitnessTransfer_t));
 
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-  
-  if(!return_BoundWitness) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+
+  if(!return_BoundWitness) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
 
   uint32_t BoundWitnessSize = to_uint32((char*)&user_Transfer);
-  
+
   if(littleEndian()){
     BoundWitnessSize = to_uint32((char*)&BoundWitnessSize);
   }
@@ -347,15 +346,15 @@ XYResult_t* BoundWitnessTransfer_fromBytes(char* user_Transfer){
     // Set up the Public Key Array
 
     uint16_t publicKeysSize = to_uint16((unsigned char*)&user_Transfer[5]);
-    XYResult* lookup_result = tableLookup((const char*)&ShortStrongArray_id);
+    XYResult_t* lookup_result = tableLookup((const char*)&ShortStrongArray_id);
 
     if(lookup_result->error == OK){
       ObjectProvider_t* SWA_Creator = lookup_result->result;
-      XYResult_t* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[(char*)&user_Transfer[5]]);
+      XYResult_t* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[5]);
       if(fromBytes_result->error == OK)
       {
         publicKeysPtr = fromBytes_result->result;
-        free(fromBytes_result);
+        //free(fromBytes_result);
       } else {
         free(return_BoundWitness);
         return fromBytes_result;
@@ -374,7 +373,7 @@ XYResult_t* BoundWitnessTransfer_fromBytes(char* user_Transfer){
       if(fromBytes_result->error == OK)
       {
         payloadPtr = fromBytes_result->result;
-        free(fromBytes_result);
+        //free(fromBytes_result);
       } else {
         free(return_BoundWitness);
         return fromBytes_result;
@@ -388,10 +387,10 @@ XYResult_t* BoundWitnessTransfer_fromBytes(char* user_Transfer){
   } else if(choice == 0x02){
     // Set up the Public Key Array
     uint16_t publicKeysSize = to_uint16((unsigned char*)&user_Transfer[5]);
-    XYResult* lookup_result = tableLookup((const char*)&ShortStrongArray_id);
+    XYResult_t* lookup_result = tableLookup((const char*)&ShortStrongArray_id);
     if(lookup_result->error == OK){
       ObjectProvider_t* SWA_Creator = lookup_result->result;
-      free(lookup_result);
+      //free(lookup_result);
       XYResult_t* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[5*sizeof(char)]);
       if(fromBytes_result->error == OK)
       {
@@ -411,7 +410,7 @@ XYResult_t* BoundWitnessTransfer_fromBytes(char* user_Transfer){
     lookup_result = tableLookup((char*)&IntStrongArray_id);
     if(lookup_result->error == OK){
       ObjectProvider_t* SWA_Creator = lookup_result->result;
-      free(lookup_result);
+      //free(lookup_result);
       XYResult_t* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[5+publicKeysSize*sizeof(char)]);
 
       if(fromBytes_result->error == OK)
@@ -431,7 +430,7 @@ XYResult_t* BoundWitnessTransfer_fromBytes(char* user_Transfer){
     lookup_result = tableLookup((char*)&ShortStrongArray_id);
     if(lookup_result->error == OK){
       ObjectProvider_t* SWA_Creator = lookup_result->result;
-      free(lookup_result);
+      //free(lookup_result);
       XYResult_t* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[5+publicKeysSize+payloadSize*sizeof(char)]);
       if(fromBytes_result->error == OK)
       {
@@ -451,8 +450,8 @@ XYResult_t* BoundWitnessTransfer_fromBytes(char* user_Transfer){
     XYResult_t* lookup_result = tableLookup((char*)&SignatureSet_id);
     if(lookup_result->error == OK){
       ObjectProvider_t* SSA_Creator = lookup_result->result;
-      free(lookup_result);
-      XYResult* fromBytes_result = SWA_Creator->fromBytes((char*)&user_Transfer[4*sizeof(char)]);
+      //free(lookup_result);
+      XYResult_t* fromBytes_result = SSA_Creator->fromBytes((char*)&user_Transfer[5]);
       if(fromBytes_result->error == OK)
       {
         signaturesPtr = fromBytes_result->result;
@@ -473,7 +472,7 @@ XYResult_t* BoundWitnessTransfer_fromBytes(char* user_Transfer){
   return_BoundWitness->publicKeys = publicKeysPtr;
   return_BoundWitness->payloads = payloadPtr;
   return_BoundWitness->signatures = signaturesPtr;
-  XYResult* return_result = malloc(sizeof(XYResult));
+  XYResult_t* return_result = malloc(sizeof(XYResult_t));
   if(return_result){
     return_result->error = OK;
     return_result->result = return_BoundWitness;
@@ -496,15 +495,15 @@ XYResult_t* BoundWitnessTransfer_fromBytes(char* user_Transfer){
 *     *user_data             [in]       void*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYObject* of the BoundWitness type.
+*      XYResult_t*            [out]      bool   Returns XYObject_t* of the BoundWitness type.
 *----------------------------------------------------------------------------*/
-XYResult_t* BoundWitnessTransfer_creator_create(char id[2], void* user_data){
+XYResult_t* BoundWitnessTransfer_creator_create(const char id[2], void* user_data){
 
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!user_data) {RETURN_ERROR(ERR_BADDATA)};  // return an error now
+
+  if(!user_data) {RETURN_ERROR(ERR_BADDATA);}  // return an error now
 
   return newObject(id, user_data);
 }
@@ -521,15 +520,15 @@ XYResult_t* BoundWitnessTransfer_creator_create(char id[2], void* user_data){
 *     *user_data             [in]       void*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns XYObject* of the BoundWitness type.
+*      XYResult_t*            [out]      bool   Returns XYObject_t* of the BoundWitness type.
 *----------------------------------------------------------------------------*/
-XYResult_t* BoundWitness_creator_create(char id[2], void* user_data){
+XYResult_t* BoundWitness_creator_create(const char id[2], void* user_data){
 
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!user_data) {RETURN_ERROR(ERR_BADDATA)};  // return an error now
+
+  if(!user_data) {RETURN_ERROR(ERR_BADDATA);}  // return an error now
 
   return newObject(id, user_data);
 }
@@ -546,17 +545,17 @@ XYResult_t* BoundWitness_creator_create(char id[2], void* user_data){
 *     *data       [in]       char*
 *
 *  RETURNS
-*      XYResult*  [out]      bool   Returns XYResult* of the BoundWitness type.
+*      XYResult_t*  [out]      bool   Returns XYResult_t* of the BoundWitness type.
 *----------------------------------------------------------------------------*/
 XYResult_t* BoundWitness_creator_fromBytes(char* data){
-  
+
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!data) {RETURN_ERROR(ERR_BADDATA)};  // return an error now
 
-  BoundWitness* return_BoundWitness = malloc(sizeof(BoundWitness));
+  if(!data) {RETURN_ERROR(ERR_BADDATA);}  // return an error now
+
+  BoundWitness_t* return_BoundWitness = malloc(sizeof(BoundWitness_t));
   uint32_t BoundWitnessSize = to_uint32((unsigned char*)data);
   return_BoundWitness->size = BoundWitnessSize;
   ShortStrongArray_t* publicKeysPtr;
@@ -569,7 +568,7 @@ XYResult_t* BoundWitness_creator_fromBytes(char* data){
    * at the end. First is publicKeys.
    */
   uint16_t publicKeysSize = to_uint16((unsigned char*)&data[4]);
-  XYResult* lookup_result = tableLookup((const char*)&ShortStrongArray_id);
+  XYResult_t* lookup_result = tableLookup((const char*)&ShortStrongArray_id);
   if(lookup_result->error == OK){
     ObjectProvider_t* SWA_Creator = lookup_result->result;
     XYResult_t* fromBytes_result = SWA_Creator->fromBytes((char*)&data[4*sizeof(char)]);
@@ -591,7 +590,7 @@ XYResult_t* BoundWitness_creator_fromBytes(char* data){
   if(!littleEndian()){
     payloadSize = to_uint32((unsigned char*)&payloadSize);
   }
-  //free(lookup_result);
+  ////free(lookup_result);
   lookup_result = tableLookup((const char*)&IntStrongArray_id);
   if(lookup_result->error == OK){
     ObjectProvider_t* SWA_Creator = lookup_result->result;
@@ -611,7 +610,7 @@ XYResult_t* BoundWitness_creator_fromBytes(char* data){
   }
 
   // Signatures
- //free(lookup_result);
+ ////free(lookup_result);
   lookup_result = tableLookup((char*)&ShortStrongArray_id);
   if(lookup_result->error == OK){
     ObjectProvider_t* SWA_Creator = lookup_result->result;
@@ -634,10 +633,10 @@ XYResult_t* BoundWitness_creator_fromBytes(char* data){
   return_BoundWitness->signatures = signaturesPtr;
 
   preallocated_return_result_ptr = &preallocated_return_result;
-  
+
   preallocated_return_result_ptr->error = OK;
   preallocated_return_result_ptr->result = return_BoundWitness;
-  
+
   return preallocated_return_result_ptr;
 }
 
@@ -650,23 +649,23 @@ XYResult_t* BoundWitness_creator_fromBytes(char* data){
 *      the object and return a char* to the serialized bytes.
 *
 *  PARAMETERS
-*    *user_XYObject     [in]       XYObject*
+*    *user_XYObject     [in]       XYObject_t*
 *
 *  RETURNS
 *      XYResult_t*      [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
 XYResult_t* BoundWitness_creator_toBytes(XYObject_t* user_XYObject){
-  
+
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
-  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};  // return an error now
 
-  BoundWitness* user_BoundWitness = user_XYObject->payload;
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA);}  // return an error now
+
+  BoundWitness_t* user_BoundWitness = user_XYObject->payload;
   XYResult_t* lookup_result = tableLookup((char*)&ShortStrongArray_id);
   ObjectProvider_t* SSA_Creator = lookup_result->result;
-  //free(lookup_result);
+  ////free(lookup_result);
   lookup_result = tableLookup((char*)&IntStrongArray_id);
   ObjectProvider_t* ISA_Creator = lookup_result->result;
   /* TODO: AFAIK this should have worked. Instead of using boundwitness->size we dynamically calculate it. */
@@ -696,7 +695,7 @@ XYResult_t* BoundWitness_creator_toBytes(XYObject_t* user_XYObject){
   uint16_t user_publicKeysSize = user_publicKeys->size;
   XYResult_t* newObject_result = newObject((char*)&ShortStrongArray_id, user_publicKeys);
   if(newObject_result->error == OK){
-    XYResult* toBytes_result = SSA_Creator->toBytes(newObject_result->result);
+    XYResult_t* toBytes_result = SSA_Creator->toBytes(newObject_result->result);
     //free(newObject_result);
     if(toBytes_result->error == OK){
       memcpy(byteBuffer+sizeof(uint32_t), toBytes_result->result, user_publicKeysSize);
@@ -732,7 +731,7 @@ XYResult_t* BoundWitness_creator_toBytes(XYObject_t* user_XYObject){
      //free(toBytes_result);
     }
   }
-  
+
   preallocated_return_result_ptr = &preallocated_return_result;
 
   preallocated_return_result_ptr->error = OK;
@@ -741,4 +740,3 @@ XYResult_t* BoundWitness_creator_toBytes(XYObject_t* user_XYObject){
 }
 
 // end of file boundwitness.c
-

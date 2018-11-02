@@ -10,12 +10,6 @@
  * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
  ****************************************************************************************
- */
-
-#ifndef NETWORK_H
-#define NETWORK_H
-
-/*
  * INCLUDES
  ****************************************************************************************
  */
@@ -38,11 +32,11 @@
 
 typedef struct NetworkProvider NetworkProvider;
 typedef struct ProcedureCatalogue ProcedureCatalogue;
-typedef struct NetworkPipe NetworkPipe;
-typedef struct NetworkPeer NetworkPeer;
+typedef struct NetworkPipe NetworkPipe_t;
+typedef struct NetworkPeer NetworkPeer_t;
 
 struct NetworkProvider {
-  NetworkPipe* (*findPeer)(NetworkProvider* self, uint8_t flags);
+  NetworkPipe_t* (*findPeer)(NetworkPipe_t* self, uint8_t flags);
   void (*addPeer)(NetworkProvider* self, char* ip, int port);
 
   /*
@@ -64,21 +58,21 @@ struct ProcedureCatalogue {
  * @param byteArray A series of bytes, that is the other parties catalog.
  * @return If the party can do the operation.
  */
-  uint8_t (*canDo)(ByteArray* catalog);
+  uint8_t (*canDo)(ByteArray_t* catalog);
 
 };
 
 struct NetworkPipe{
-  NetworkPeer* peer;
+  NetworkPeer_t* peer;
   NetworkProvider* provider;
-  ByteArray* initializationData;
-  ByteArray* catalogBuffer;
-  XYResult* (*send)(void* self, ByteArray* data, XYResult* (*callback)(void* self, ByteArray* data));
-  XYResult* (*close)(void* self);
+  ByteArray_t* initializationData;
+  ByteArray_t* catalogBuffer;
+  XYResult_t* (*send)(void* self, ByteArray_t* data, XYResult_t* (*callback)(void* self, ByteArray_t* data));
+  XYResult_t* (*close)(void* self);
 };
 
 struct NetworkPeer{
-  XYResult* (*getRole)(NetworkPipe* pipe);
+  XYResult_t* (*getRole)(NetworkPipe_t* pipe);
 
   /*
    * Sentinel-known implementation specific private variables
@@ -93,7 +87,7 @@ struct NetworkPeer{
 };
 
 struct TcpClient {
-  NetworkPipe* (*findPeer)(struct TcpClient* self, uint8_t flags);
+  NetworkPipe_t* (*findPeer)(struct TcpClient* self, uint8_t flags);
   NetworkProvider* networkProvider;
   struct sockaddr_in* peers[MAX_PEERS];
   ProcedureCatalogue* procedureCatalogue;
@@ -115,6 +109,7 @@ struct server_arguments{
 
 void* serverThread(void* flag);
 void* clientThread(void* args);
-extern NetworkPipe* findPeer(NetworkProvider* self, uint8_t flags);
-extern uint8_t canDo(ByteArray* catalog);
+extern NetworkPipe_t* findPeer(NetworkProvider* self, uint8_t flags);
+extern uint8_t canDo(ByteArray_t* catalog);
+
 #endif

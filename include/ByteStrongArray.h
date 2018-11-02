@@ -9,7 +9,7 @@
  *
  * Copyright (C) 2017 XY - The Findables Company
  *
- * This computer program includes Confidential, Proprietary Information of XY. 
+ * This computer program includes Confidential, Proprietary Information of XY.
  * All Rights Reserved.
  *
  ****************************************************************************************
@@ -49,10 +49,10 @@
  */
 
 /*
-XYResult_t* ByteStrongArray_add_T(ByteStrongArray_t* self_ByteStrongArray, 
+XYResult_t* ByteStrongArray_add(ByteStrongArray_t* self_ByteStrongArray, 
                                   XYObject_t* user_XYObject); //TODO: consider changing self to XYObject
 XYResult_t* ByteStrongArray_get(ByteStrongArray_t* self_ByteStrongArray, int index);
-XYResult_t* ByteStrongArray_creator_create(char id[2], void* user_data);   
+XYResult_t* ByteStrongArray_creator_create(const char id[2], void* user_data);
 XYResult_t* ByteStrongArray_creator_fromBytes(char* data);
 XYResult_t* ByteStrongArray_creator_toBytes_t(XYObject_t* user_XYObject);
 */
@@ -60,6 +60,3 @@ XYResult_t* ByteStrongArray_creator_toBytes_t(XYObject_t* user_XYObject);
 #endif
 
 // end of file bytestrongarray.h
-                                
-                                
-

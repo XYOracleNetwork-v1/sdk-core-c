@@ -37,13 +37,13 @@
 *  RETURNS
 *      newObject(id, user_data)   [out]      bool   Returns XYObject_t* of the Index type.
 *----------------------------------------------------------------------------*/
-XYResult_t* Index_creator_create(char id[2], void* user_data){
+XYResult_t* Index_creator_create(const char id[2], void* user_data){
   
   /********************************/
   /* guard against bad input data */
   /********************************/
   
-  if(!user_data) {RETURN_ERROR(ERR_BADDATA)};
+  if(!user_data) {RETURN_ERROR(ERR_BADDATA);}
 
   return newObject(id, user_data);
 }
@@ -60,7 +60,7 @@ XYResult_t* Index_creator_create(char id[2], void* user_data){
 *     index_data              [in]       char*
 *
 *  RETURNS
-*     newObject(id, &index)   [out]      XYResult_t*   Returns XYResult* of the Index type.
+*     newObject(id, &index)   [out]      XYResult_t*   Returns XYResult_t* of the Index type.
 *----------------------------------------------------------------------------*/
 XYResult_t* Index_creator_fromBytes(char* index_data){
   
@@ -68,7 +68,7 @@ XYResult_t* Index_creator_fromBytes(char* index_data){
   /* guard against bad input data */
   /********************************/
   
-  if(!index_data) {RETURN_ERROR(ERR_BADDATA)};
+  if(!index_data) {RETURN_ERROR(ERR_BADDATA);}
 
   char id[2];
   memcpy(id, index_data, 2);
@@ -98,7 +98,7 @@ XYResult_t* Index_creator_toBytes(XYObject_t* user_XYObject){
   /* guard against bad input data */
   /********************************/
   
-  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA);}
 
   uint32_t encoded_bytes;
   char* index = (char*)user_XYObject->payload;

@@ -36,13 +36,13 @@
 *  RETURNS
 *      XYResult_t*           [out]      bool   Returns XYObject_t* of the PreviousHash type.
 *----------------------------------------------------------------------------*/
-XYResult_t* PreviousHash_creator_create(char id[2], void* user_data){
+XYResult_t* PreviousHash_creator_create(const char id[2], void* user_data){
 
   /********************************/
   /* guard against bad input data */
   /********************************/
   
-  if(!user_data) {RETURN_ERROR(ERR_BADDATA)};
+  if(!user_data) {RETURN_ERROR(ERR_BADDATA);}
 
   return newObject(id, user_data);
 }
@@ -67,7 +67,7 @@ XYResult_t* PreviousHash_creator_fromBytes(char* hash_data){
   /* guard against bad input data */
   /********************************/
   
-  if(!hash_data) {RETURN_ERROR(ERR_BADDATA)};
+  if(!hash_data) {RETURN_ERROR(ERR_BADDATA);}
 
   char id[2];
   memcpy(id, hash_data, 2);
@@ -135,12 +135,12 @@ XYResult_t* PreviousHash_creator_fromBytes(char* hash_data){
     return preallocated_return_result_ptr;
     
   } else if(lookup_result->error == OK && lookup_result2->error == OK){
-    if(lookup_result) free(lookup_result);
+    if(lookup_result) //free(lookup_result);
     if(lookup_result2) free(lookup_result2);
     if(return_PH) free(return_PH);
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   } else{
-    if(lookup_result) free(lookup_result);
+    if(lookup_result) //free(lookup_result);
     if(lookup_result2) free(lookup_result2);
     if(return_PH) free(return_PH);
     RETURN_ERROR(ERR_BADDATA);
@@ -156,10 +156,10 @@ XYResult_t* PreviousHash_creator_fromBytes(char* hash_data){
 *      the object and return a char* to the serialized bytes.
 *
 *  PARAMETERS
-*    *user_XYObject         [in]       XYObject*
+*    *user_XYObject         [in]       XYObject_t*
 *
 *  RETURNS
-*      XYResult*            [out]      bool   Returns char* to serialized bytes.
+*      XYResult_t*            [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
 XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
   
@@ -167,14 +167,14 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
   /* guard against bad input data */
   /********************************/
   
-  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA);}
 
   if(user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x06){   //TODO: wal, constants please
     
     PreviousHash_t* user_PH = (user_XYObject->GetPayload(user_XYObject))->result;
     char id[2];
     memcpy(&id, user_XYObject->id, sizeof(char)*2);
-    XYResult* lookup_result = lookup(id);
+    XYResult_t* lookup_result = tableLookup(id);
     if(lookup_result->error == OK){
       
       ObjectProvider_t* PH_creator = lookup_result->result;
@@ -186,7 +186,7 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
         byteBuffer = malloc((element_size*sizeof(char)));
         //TODO: wal, should check for any malloc errors
 
-        if(!byteBuffer) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+        if(!byteBuffer) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
 
         memcpy(byteBuffer, user_PH->id, 2);
         memcpy(byteBuffer+2, user_PH->hash, (element_size-2*sizeof(char)));
@@ -200,7 +200,7 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
             byteBuffer = malloc((element_size*sizeof(char)));
             //TODO: wal, should check for any malloc errors
 
-            if(!byteBuffer) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+            if(!byteBuffer) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
             
             memcpy(byteBuffer, user_PH->hash, (element_size*sizeof(char)));
             break;
@@ -212,7 +212,7 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
             byteBuffer = malloc(mallocNumber);
             //TODO: wal, should check for any malloc errors
 
-            if(!byteBuffer) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+            if(!byteBuffer) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
 
             if(littleEndian()){
                encodedSize16 = to_uint16((unsigned char*)&element_size);
@@ -229,7 +229,7 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
             byteBuffer = malloc((element_size*sizeof(char)));
             //TODO: wal, should check for any malloc errors
 
-            if(!byteBuffer) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+            if(!byteBuffer) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
 
             if(littleEndian()){
                encodedSize32 = to_uint32((unsigned char*)&element_size);

@@ -36,12 +36,12 @@ struct BoundWitnessOption {
   /*
    * Gets the signed data to include in the bound witness.
    */
-  XYObject* (*getSignedPayload)(void*);
+  XYObject_t* (*getSignedPayload)(void*);
 
   /*
    * Gets the unsigned payload to include in the bound witness.
    */
-  XYObject* (*getUnsignedPayload)(void*);
+  XYObject_t* (*getUnsignedPayload)(void*);
 };
 
 #endif

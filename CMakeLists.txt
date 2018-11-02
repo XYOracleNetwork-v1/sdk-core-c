@@ -6,17 +6,11 @@ set (SDK_VERSION_MINOR 1)
 
 # bring in the headers
 include_directories(include)
+include_directories(include/WolfSSL)
 
 #find_package(PkgConfig REQUIRED)
 #pkg_search_module(OPENSSL REQUIRED openssl)
 find_package (Threads REQUIRED)
-
-#if( OPENSSL_FOUND )
-#    include_directories(${OPENSSL_INCLUDE_DIRS})
-#    message(STATUS "Using OpenSSL ${OPENSSL_VERSION}")
-#else()
-    # Error; with REQUIRED, pkg_search_module() will throw an error by it's own
-#endif()
 
 file(GLOB_RECURSE SOURCES "src/*.c")
 
@@ -37,7 +31,7 @@ set(CMAKE_BUILD_TYPE Debug)
 if(UNIX AND NOT APPLE)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Weverything -fsanitize=address -fsanitize=leak -Wno-padded -Wno-zero-length-array -Wno-unused-parameter")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Weverything -fsanitize=address -fsanitize=leak -Wno-padded -Wno-zero-length-array -Wno-unused-parameter -ferror-limit=50")
 
 	endif()
 endif()

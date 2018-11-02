@@ -49,9 +49,9 @@
 XYResult_t* ByteWeakArray_add_t(ByteWeakArray_t* self_ByteWeakArray, 
                                 XYObject_t* user_XYObject); 
 XYResult_t* ByteWeakArray_get(ByteWeakArray_t* self_ByteWeakArray, int index);
-XYResult_t* ByteWeakArray_creator_create(char id[2], void* user_data);
+XYResult_t* ByteWeakArray_creator_create(const char id[2], void* user_data);
 XYResult_t* ByteWeakArray_creator_fromBytes(char* data);
-XYResult_t* ByteWeakArray_creator_toBytes_t(struct XYObject* user_XYObject);
+XYResult_t* ByteWeakArray_creator_toBytes_t(struct XYObject_t* user_XYObject);
 
 
 #endif

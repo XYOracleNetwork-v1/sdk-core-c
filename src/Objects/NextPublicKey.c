@@ -37,13 +37,13 @@
 *  RETURNS
 *      XYResult_t*          [out]      bool   Returns XYObject_t* of the NextPublicKey type.
 *----------------------------------------------------------------------------*/
-XYResult_t* NextPublicKey_creator_create(char id[2], void* user_data){
+XYResult_t* NextPublicKey_creator_create(const char id[2], void* user_data){
 
   /********************************/
   /* guard against bad input data */
   /********************************/
   
-  if(!user_data) {RETURN_ERROR(ERR_BADDATA)};
+  if(!user_data) {RETURN_ERROR(ERR_BADDATA);}
 
   return newObject(id, user_data);
 }
@@ -60,7 +60,7 @@ XYResult_t* NextPublicKey_creator_create(char id[2], void* user_data){
 *     *pubkey_data      [in]       char*
 *
 *  RETURNS
-*      XYResult_t*      [out]      bool   Returns XYResult* of the NextPublicKey type.
+*      XYResult_t*      [out]      bool   Returns XYResult_t* of the NextPublicKey type.
 *----------------------------------------------------------------------------*/
 XYResult_t* NextPublicKey_creator_fromBytes(char* pubkey_data){
   
@@ -68,7 +68,7 @@ XYResult_t* NextPublicKey_creator_fromBytes(char* pubkey_data){
   /* guard against bad input data */
   /********************************/
   
-  if(!pubkey_data) {RETURN_ERROR(ERR_BADDATA)};
+  if(!pubkey_data) {RETURN_ERROR(ERR_BADDATA);}
 
   char id[2];
   memcpy(id, pubkey_data, 2);
@@ -132,13 +132,13 @@ XYResult_t* NextPublicKey_creator_fromBytes(char* pubkey_data){
     return preallocated_return_result_ptr;
 
   } else if(lookup_result->error == OK && lookup_result2->error == OK){
-    if(lookup_result) free(lookup_result);
+    if(lookup_result) //free(lookup_result);
     if(lookup_result2) free(lookup_result2);
     if(return_NPK) free(return_NPK);
     
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   } else {
-    if(lookup_result) free(lookup_result);
+    if(lookup_result) //free(lookup_result);
     if(lookup_result2) free(lookup_result2);
     if(return_NPK) free(return_NPK);
     
@@ -155,7 +155,7 @@ XYResult_t* NextPublicKey_creator_fromBytes(char* pubkey_data){
 *      the object and return a char* to the serialized bytes.
 *
 *  PARAMETERS
-*    *user_XYObject         [in]       XYObject*
+*    *user_XYObject         [in]       XYObject_t*
 *
 *  RETURNS
 *      XYResult_t*            [out]      bool   Returns char* to serialized bytes.
@@ -166,7 +166,7 @@ XYResult_t* NextPublicKey_creator_toBytes(XYObject_t* user_XYObject){
   /* guard against bad input data */
   /********************************/
   
-  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA)};
+  if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA);}
 
   if(user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x07){
     
