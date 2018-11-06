@@ -20,8 +20,8 @@
 #include <stdlib.h>
 #include "xyo.h"
 #include "xyobject.h"
-#include "BoundWitness.h"
-#include "XYOHeuristicsBuilder.h"
+//#include "BoundWitness.h"
+//#include "XYOHeuristicsBuilder.h"
 
 /*
  * STRUCTURES

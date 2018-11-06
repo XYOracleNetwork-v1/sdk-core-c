@@ -20,7 +20,7 @@
  ****************************************************************************************
  */
 
-#include "xyobject.h"
+#include "objects.h"
 #include "wc_sha256.h"                      // wc_ = wolf crypto library routine (SHA-256)
 
 extern XYResult_t preallocated_return_result;
@@ -44,16 +44,16 @@ typedef unsigned char  byte;
  */
 
 struct HashProvider{
-  
+
   char id[2];                               // 2 bytes representing major and minor
-  XYResult_t* (*createHash)(ByteArray_t*);  // Given just a null terminated char* return a 
+  XYResult_t* (*createHash)(ByteArray_t*);  // Given just a null terminated char* return a
                                             // cryptographic hash for it
   /*
    * Given a cryptographic hash and a piece of data, verify the given hash == hash(data).
    */
-  
+
   XYResult_t* (*verifyHash)(ByteArray_t* dataHashed, XYObject_t* hash);
-  XYResult_t* (*getHashId)(HashProvider_t* hashProviderObject);   // Fetch the above id object 
+  XYResult_t* (*getHashId)(HashProvider_t* hashProviderObject);   // Fetch the above id object
                                                                   // and return it.
 };
 
@@ -70,4 +70,3 @@ XYResult_t* verifyHash(ByteArray_t* dataHashed, XYObject_t* hash);
 #endif
 
 // end of file hash.h
-

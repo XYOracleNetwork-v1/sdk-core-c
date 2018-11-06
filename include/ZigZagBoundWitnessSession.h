@@ -5,7 +5,7 @@
  *
  * @XYO Core library source code.
  *
- * @brief primary crypto routines for the XYO Core.
+ * @brief bound witness session routines for the XYO Core.
  *
  * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
  *
@@ -69,4 +69,5 @@ XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* dat
 XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession_t* userSession,
                                  ByteArray_t* boundWitnessData);
 
+#define ZIGZAGBOUNDWITNESSSESSION_H
 #endif

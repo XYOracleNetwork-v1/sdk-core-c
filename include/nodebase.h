@@ -145,4 +145,3 @@ extern OriginChainState_t* gState;
 
 
 #endif
-// end of file nodebase.h

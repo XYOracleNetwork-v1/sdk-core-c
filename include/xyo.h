@@ -14,6 +14,7 @@
 
 #ifndef XYO_H
 #define XYO_H
+
 /*
  * INCLUDES
  ****************************************************************************************
@@ -21,7 +22,6 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include "xyobject.h"
 #include "defines.h"
 
 /*

@@ -123,6 +123,7 @@ XYResult_t* BoundWitness_getSigningData(void* user_BoundWitness){
 
     } else {
       if(return_bytes) free(return_bytes);
+      
       RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
     }
 
@@ -283,14 +284,13 @@ XYResult_t* BoundWitnessTransfer_toBytes(XYObject_t* user_XYObject){
     memcpy(return_bytes+offset, signaturesBytes_result->result, signaturesSize);
     offset+=signaturesSize;
   }
-  XYResult_t* return_result = malloc(sizeof(XYResult_t));
-  if(return_result){
-    return_result->error = OK;
-    return_result->result = return_bytes;
-    return return_result;
-  } else {
-    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-  }
+
+  preallocated_return_result_ptr = &preallocated_return_result;
+
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = return_bytes;
+  
+  return preallocated_return_result_ptr;
 }
 
 /*----------------------------------------------------------------------------*
@@ -633,10 +633,10 @@ XYResult_t* BoundWitness_creator_fromBytes(char* data){
   return_BoundWitness->signatures = signaturesPtr;
 
   preallocated_return_result_ptr = &preallocated_return_result;
-
+  
   preallocated_return_result_ptr->error = OK;
   preallocated_return_result_ptr->result = return_BoundWitness;
-
+  
   return preallocated_return_result_ptr;
 }
 
@@ -740,3 +740,4 @@ XYResult_t* BoundWitness_creator_toBytes(XYObject_t* user_XYObject){
 }
 
 // end of file boundwitness.c
+

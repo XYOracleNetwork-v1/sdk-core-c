@@ -42,7 +42,7 @@ XYResult_t* NextPublicKey_creator_create(const char id[2], void* user_data){
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
+
   if(!user_data) {RETURN_ERROR(ERR_BADDATA);}
 
   return newObject(id, user_data);
@@ -63,32 +63,32 @@ XYResult_t* NextPublicKey_creator_create(const char id[2], void* user_data){
 *      XYResult_t*      [out]      bool   Returns XYResult_t* of the NextPublicKey type.
 *----------------------------------------------------------------------------*/
 XYResult_t* NextPublicKey_creator_fromBytes(char* pubkey_data){
-  
+
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
+
   if(!pubkey_data) {RETURN_ERROR(ERR_BADDATA);}
 
   char id[2];
   memcpy(id, pubkey_data, 2);
   char pubkey_id[2];
   memcpy(pubkey_id, pubkey_data+(sizeof(char)*2), 2);
-  
+
   XYResult_t* lookup_result = tableLookup(id);
   XYResult_t* lookup_result2 = tableLookup(pubkey_id);
-  
+
   NextPublicKey_t* return_NPK = malloc(sizeof(NextPublicKey_t));
-  
+
   /********************************/
   /* guard against malloc errors  */
   /********************************/
-  
+
   if(lookup_result->error == OK && lookup_result2->error == OK && return_NPK){
-    
+
     ObjectProvider_t* NPK_creator = lookup_result2->result;
     uint32_t element_size = 0;
-    
+
     if(NPK_creator->defaultSize != 0){
       element_size = NPK_creator->defaultSize;
       return_NPK->publicKey = malloc(element_size*sizeof(char));
@@ -114,7 +114,7 @@ XYResult_t* NextPublicKey_creator_fromBytes(char* pubkey_data){
     {
       RETURN_ERROR(ERR_CRITICAL);
     }
-    
+
     if(return_NPK->publicKey){
       memcpy(return_NPK->id, &pubkey_id, 2);
       memcpy(return_NPK->publicKey, pubkey_data+(sizeof(char)*4), (2 * sizeof(char))+(element_size*sizeof(char)));
@@ -128,20 +128,20 @@ XYResult_t* NextPublicKey_creator_fromBytes(char* pubkey_data){
 
     preallocated_return_result_ptr->error = OK;
     preallocated_return_result_ptr->result = return_NPK;
-      
+
     return preallocated_return_result_ptr;
 
   } else if(lookup_result->error == OK && lookup_result2->error == OK){
     if(lookup_result) //free(lookup_result);
     if(lookup_result2) free(lookup_result2);
     if(return_NPK) free(return_NPK);
-    
+
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   } else {
     if(lookup_result) //free(lookup_result);
     if(lookup_result2) free(lookup_result2);
     if(return_NPK) free(return_NPK);
-    
+
     RETURN_ERROR(ERR_BADDATA);
   }
 }
@@ -161,27 +161,27 @@ XYResult_t* NextPublicKey_creator_fromBytes(char* pubkey_data){
 *      XYResult_t*            [out]      bool   Returns char* to serialized bytes.
 *----------------------------------------------------------------------------*/
 XYResult_t* NextPublicKey_creator_toBytes(XYObject_t* user_XYObject){
-  
+
   /********************************/
   /* guard against bad input data */
   /********************************/
-  
+
   if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA);}
 
   if(user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x07){
-    
+
     NextPublicKey_t* user_NPK = (user_XYObject->GetPayload(user_XYObject))->result;
-    
+
     char id[2];
     memcpy(&id, user_NPK->id, 2);
     XYResult_t* lookup_result = tableLookup(id);
-    
+
     if(lookup_result->error == OK){
-      
+
       ObjectProvider_t* NPK_creator = lookup_result->result;
       uint32_t element_size = 0;
       char* byteBuffer;
-      
+
       if(NPK_creator->defaultSize != 0){
         element_size = NPK_creator->defaultSize;
         byteBuffer = malloc(2*sizeof(char) + (element_size*sizeof(char)));
@@ -212,7 +212,7 @@ XYResult_t* NextPublicKey_creator_toBytes(XYObject_t* user_XYObject){
             if(littleEndian()){
                encodedSize16 = to_uint16((unsigned char*)&element_size);
             }
-            
+
             memcpy(byteBuffer, &id, 2);
             memcpy(byteBuffer+(2*sizeof(char)), &encodedSize16, 2);
             memcpy(byteBuffer+(4*sizeof(char)), user_NPK->publicKey+2, (element_size-(sizeof(char)*2)));
@@ -227,7 +227,7 @@ XYResult_t* NextPublicKey_creator_toBytes(XYObject_t* user_XYObject){
             if(littleEndian()){
                encodedSize32 = to_uint32((unsigned char*)&element_size);
             }
-            
+
             memcpy(byteBuffer, &id, 2);
             memcpy(byteBuffer+(2*sizeof(char)), &encodedSize32, 4);
             memcpy(byteBuffer+(6*sizeof(char)), user_NPK->publicKey+4, (element_size-(sizeof(char)*4)));
@@ -243,7 +243,7 @@ XYResult_t* NextPublicKey_creator_toBytes(XYObject_t* user_XYObject){
 
       preallocated_return_result_ptr->error = OK;
       preallocated_return_result_ptr->result = byteBuffer;
-        
+
       return preallocated_return_result_ptr;
     }
     else
@@ -258,4 +258,3 @@ XYResult_t* NextPublicKey_creator_toBytes(XYObject_t* user_XYObject){
 }
 
 // end of file nextpublickey.c
-

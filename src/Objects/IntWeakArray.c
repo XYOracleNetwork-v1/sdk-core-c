@@ -409,13 +409,11 @@ XYResult_t* IntWeakArray_creator_toBytes(XYObject_t* user_XYObject){
       }
       memcpy(byteBuffer, &user_array->size, 4);
       if(totalSize > 4){
-        breakpoint();
         memcpy(byteBuffer+4, user_array->payload, sizeof(char)*(totalSize-4));
       }
       if(littleEndian()){
         user_array->size = to_uint32((char*)(uintptr_t)&user_array->size);
       }
-      breakpoint();
       preallocated_return_result_ptr->error = OK;
       preallocated_return_result_ptr->result = byteBuffer;
 

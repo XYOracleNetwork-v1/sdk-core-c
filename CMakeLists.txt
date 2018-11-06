@@ -20,7 +20,7 @@ file(GLOB_RECURSE SOURCES "src/*.c")
 
 include_directories("${PROJECT_BINARY_DIR}")
 
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 
 #find_program(iwyu_path NAMES iwyu-tool iwyu-fix-includes)
 #if(NOT iwyu_path)
@@ -31,16 +31,18 @@ set(CMAKE_BUILD_TYPE Debug)
 if(UNIX AND NOT APPLE)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Weverything -fsanitize=address -fsanitize=leak -Wno-padded -Wno-zero-length-array -Wno-unused-parameter -ferror-limit=50")
+		#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Weverything -fsanitize=address -fsanitize=leak -Wno-padded -Wno-zero-length-array -Wno-unused-parameter -ferror-limit=50")
 
 	endif()
 endif()
 # add the executable
-#add_executable(sdk ${SOURCES})
+# add_executable(sdk-xyo ${SOURCES})
+
 
 ADD_LIBRARY(sdk-xyo STATIC ${SOURCES})
 target_link_libraries(sdk-xyo ${OPENSSL_LIBRARIES})
 target_link_libraries (sdk-xyo ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries (sdk-xyo wolfssl)
 
 set_property(TARGET sdk-xyo PROPERTY C_INCLUDE_WHAT_YOU_USE ${iwyu_path})
 

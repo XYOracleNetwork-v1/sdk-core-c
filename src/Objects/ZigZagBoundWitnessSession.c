@@ -196,4 +196,5 @@ XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* dat
   }
 }
 
+#define ZIGZAGBOUNDWITNESSSESSION_H
 #endif

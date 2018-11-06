@@ -18,7 +18,7 @@
  */
 
 #include <stdint.h>
-#include "xyobject.h"
+#include "objects.h"
 #include "xyo.h"
 
 #ifndef REPOSITORY_H

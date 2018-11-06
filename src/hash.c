@@ -3,7 +3,7 @@
  *
  * @file hash.c
  *
- * @XYO Core library source code.
+ * @XY4 project source code.
  *
  * @brief primary hashing routines for the XYO Core.
  *
@@ -16,7 +16,7 @@
  * INCLUDES
  ****************************************************************************************
  */
-#include "hash.h"
+
 #include <stdlib.h>
 #include "hash.h"
 #include "xyobject.h"
@@ -26,6 +26,8 @@
  * FUNCTIONS & METHODS
  ****************************************************************************************
  */
+
+ void trng_acquire(){return;}
 
 /**
  ****************************************************************************************
@@ -53,7 +55,7 @@ XYResult_t* getHashId(HashProvider_t* hashProviderObject){
   /* some guards against bad data */
   /********************************/
 
-  if(!hashProviderObject) {RETURN_ERROR(ERR_BADDATA);}
+  if(!hashProviderObject) {RETURN_ERROR(ERR_BADDATA)};
 
   preallocated_return_result_ptr = &preallocated_return_result;
 
@@ -93,7 +95,7 @@ XYResult_t* createHash(ByteArray_t* dataToHash){
   /********************************/
   if(!dataToHash ||
      !dataToHash->payload ||
-     !dataToHash->size) {RETURN_ERROR(ERR_BADDATA);}
+     !dataToHash->size) {RETURN_ERROR(ERR_BADDATA)};
 
   static byte sha256OutputBuffer[WC_SHA256_DIGEST_SIZE];      // currently 32 bytes
 
@@ -109,7 +111,7 @@ XYResult_t* createHash(ByteArray_t* dataToHash){
 
   int wc_init_error = wc_InitSha256(&sha256HashObject);       // prepares the wolf crypto lib
 
-  if (wc_init_error) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);} // did we get the newHasher?
+  if (wc_init_error) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)}; // did we get the newHasher?
 
   /******************************************************************/
   /* this wc call can be called again and again to update the hash  */
@@ -163,7 +165,7 @@ XYResult_t* verifyHash(ByteArray_t* dataToBeHashed, XYObject_t* hashForCompariso
   if(!dataToBeHashed ||
      !dataToBeHashed->size ||
      !hashForComparison ||
-     !hashForComparison->payload) {RETURN_ERROR(ERR_BADDATA);}
+     !hashForComparison->payload) {RETURN_ERROR(ERR_BADDATA)};
 
   static bool hashesMatch;
 
@@ -171,7 +173,7 @@ XYResult_t* verifyHash(ByteArray_t* dataToBeHashed, XYObject_t* hashForCompariso
 
   preallocated_return_result_ptr = newHashProvider();       //TODO: wal, make sure this is freed
 
-  if(preallocated_return_result_ptr->error != OK) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
+  if(preallocated_return_result_ptr->error != OK) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
 
   HashProvider_t* newHasher  = (HashProvider_t*)preallocated_return_result_ptr->result;
 
@@ -241,7 +243,7 @@ XYResult_t* newHashProvider(){
   /* guard against malloc errors  */
   /********************************/
 
-  if (!newHasher) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}        // did we get the newHasher?
+  if (!newHasher) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};        // did we get the newHasher?
 
   newHasher->createHash = &createHash;
   newHasher->verifyHash = &verifyHash;
@@ -275,8 +277,8 @@ struct XYResult{
 struct XYObject{
   char id[2];
   void* payload;
-  char* (*GetXyobjectId)(struct XYObject_t*);  // Fetch the above id object and return it.
-  void* (*GetPayload)(struct XYObject_t*);     // Fetch the above payload pointer object and return it.
+  char* (*GetXyobjectId)(struct XYObject*);  // Fetch the above id object and return it.
+  void* (*GetPayload)(struct XYObject*);     // Fetch the above payload pointer object and return it.
 } ;
 */
 

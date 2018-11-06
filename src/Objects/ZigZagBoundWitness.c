@@ -437,7 +437,9 @@ XYResult_t* addIncomingSignatures(ZigZagBoundWitness_t* self, ShortStrongArray_t
 
   preallocated_return_result_ptr->error = OK;
   preallocated_return_result_ptr->result = &result_int;
+
   for(int i = 0; ; i++){
+
     XYResult_t* get_result = incomingSignatures->get(incomingSignatures, i);
     XYObject_t* xyobject = get_result->result;
     if(xyobject == NULL ){ free(get_result); return 0; }

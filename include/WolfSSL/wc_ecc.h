@@ -643,4 +643,3 @@ WOLFSSL_API void wc_ecc_curve_cache_free(void);
 #endif /* WOLF_CRYPT_ECC_H */
 
 // end of file wc_ecc.h
-

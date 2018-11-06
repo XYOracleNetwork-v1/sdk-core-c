@@ -234,6 +234,7 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
             if(littleEndian()){
                encodedSize32 = to_uint32((unsigned char*)&element_size);
             }
+            memcpy(byteBuffer, &id, 2);
             memcpy(byteBuffer+(2*sizeof(char)), &encodedSize32, 4);
             memcpy(byteBuffer+(6*sizeof(char)), user_PH->hash+4, (element_size-(sizeof(char)*4)));
             break;
@@ -261,7 +262,3 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
     RETURN_ERROR(ERR_BADDATA);
   }
 }
-
-// end of file previoushash.c
-
-
