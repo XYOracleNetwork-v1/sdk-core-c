@@ -70,9 +70,9 @@ struct Signer{
                 XYObject_t* signature,
                 XYObject_t* publicKey);
 
-  ByteArray_t* (*encrypt)(Signer_t*, ByteArray_t*);     // Encrypt the data to the key of
+  ByteArray_t* (*xyencrypt)(Signer_t*, ByteArray_t*);     // Encrypt the data to the key of
                                                         // this Signer object
-  ByteArray_t* (*decrypt)(Signer_t*, ByteArray_t*);     // Decrypt the data with the key
+  ByteArray_t* (*xydecrypt)(Signer_t*, ByteArray_t*);     // Decrypt the data with the key
                                                         // of this Signer object.
   HashProvider_t* hashingProvider;
 };
@@ -102,8 +102,8 @@ XYResult_t* XyoCryptoSigner (XYObject_t* privateKey);
 XYResult_t* getPublicKey(Signer_t* signer);
 XYResult_t* sign(Signer_t* signer, ByteArray_t* dataToSign);
 XYResult_t* verify(Signer_t* signer, ByteArray_t* signedData, XYObject_t* signature, XYObject_t* publicKey);
-XYResult_t* encrypt(Signer_t* signer, ByteArray_t* unEncrypedData);
-XYResult_t* decrypt(Signer_t* signer, ByteArray_t* encrypedData);
+XYResult_t* xyencrypt(Signer_t* signer, ByteArray_t* unEncrypedData);
+XYResult_t* xydecrypt(Signer_t* signer, ByteArray_t* encrypedData);
 XYResult_t* getPrivateKey(Signer_t* signer);
 XYResult_t* newPrivateKey(void);
 

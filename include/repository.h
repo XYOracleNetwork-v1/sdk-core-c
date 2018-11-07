@@ -60,7 +60,7 @@ typedef struct RepositoryProviderT {
 } RepositoryProvider_t;
 
 struct OriginChainRepository {
-  XYResult_t* (*append)(ByteArray_t* value, uint timeout);
+  XYResult_t* (*append)(ByteArray_t* value, uint16_t timeout);
   struct RepositoryProvider_t* repo;
 };
 

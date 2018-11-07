@@ -641,7 +641,7 @@ XYResult_t* verify(Signer_t* signer,
  *      will return a malloc error if malloc fails.
  ****************************************************************************************
  */
-XYResult_t* encrypt(Signer_t* signer, ByteArray_t* unEncrypedData) {
+XYResult_t* xyencrypt(Signer_t* signer, ByteArray_t* unEncrypedData) {
 
   /************************************/
   /* guard against bad input data     */
@@ -693,7 +693,7 @@ XYResult_t* encrypt(Signer_t* signer, ByteArray_t* unEncrypedData) {
  *      will return a malloc error if malloc fails.
  ****************************************************************************************
  */
-XYResult_t* decrypt(Signer_t* signer, ByteArray_t* encrypedData) {
+XYResult_t* xydecrypt(Signer_t* signer, ByteArray_t* encrypedData) {
 
   /************************************/
   /* guard against bad input data     */
