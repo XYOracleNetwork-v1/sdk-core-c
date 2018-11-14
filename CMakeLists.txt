@@ -51,6 +51,6 @@ INSTALL(TARGETS sdk-xyo
         DESTINATION "lib"
         )
 INSTALL (
-    DIRECTORY ${CMAKE_SOURCE_DIR}/include/
+    DIRECTORY ${CMAKE_SOURCE_DIR}/src/
     DESTINATION "include/xyo"
     FILES_MATCHING PATTERN "*.h*")
