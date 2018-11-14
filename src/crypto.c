@@ -19,11 +19,8 @@
 
 #include <stdlib.h>
 #include "crypto.h"         // includes "xyobject.h", "hash.h"
-#include "wc_rsa.h"
 #include "xyo.h"
-#include "trng.h"
-#include "wc_ecc.h"
-#include "wc_random.h"
+
 
 /*
  * FUNCTIONS & METHODS
@@ -139,7 +136,7 @@ XYResult_t* newCryptoCreator(){
   if(!aNewCryptoCreator) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};           // couldn't create a new creator
 
   preallocated_return_result_ptr = newPrivateKey();                         // Generate a new private key.
-/*
+  /*
   if(preallocated_return_result_ptr->error) {RETURN_ERROR(ERR_NOKEYS)};     // couldn't create a new
                                                                             // private key.
                                                                             // return the error now
@@ -406,9 +403,8 @@ XYResult_t* getPrivateKey(Signer_t* signer){
   WC_RNG dialogRng;
   int keysize;
 
-/************************************/
 XYResult_t* newPrivateKey() {
-
+/*
 static WC_RNG randomNumberGenerator;
 // RsaKey rsaPrivateKey;
   ecc_key eccPrivateKey;
@@ -418,6 +414,7 @@ static WC_RNG randomNumberGenerator;
   // ********************************/
   // * initialize stack structures  */
   // ********************************/
+  /*
 
   XMEMSET(&randomNumberGenerator, 0, sizeof(randomNumberGenerator));
   //XMEMSET(&rsaPrivateKey, 0, sizeof(rsaPrivateKey));
@@ -427,6 +424,7 @@ static WC_RNG randomNumberGenerator;
   // ********************************/
   // * guard against malloc errors  */
   // ********************************/
+  /*
 
   if(!aNewPrivateKey) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
 
@@ -467,9 +465,9 @@ static WC_RNG randomNumberGenerator;
 
   //ref, wc_ecc_make_key(WC_RNG *rng, int keysize, ecc_key *key);
   //wc_ecc_make_key(&dialogRng, PRIVATE_KEY_LENGTH_1024, &eccPrivateKey);
-
-  preallocated_return_result_ptr->error = error;
-  preallocated_return_result_ptr->result = aNewPrivateKey;  // the ByteArray_t holding the new private key
+  */
+  preallocated_return_result_ptr->error = OK;
+  preallocated_return_result_ptr->result = malloc(sizeof(ByteArray_t));  // the ByteArray_t holding the new private key
 
   //error = wc_FreeRng(&randomNumberGenerator);               // required release
 

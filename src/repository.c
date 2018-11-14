@@ -16,8 +16,8 @@
  * INCLUDES
  ****************************************************************************************
  */
-#include "repository.h"
-#include "BoundWitness.h"
+#include "state.h"
+#include "ZigZagBoundWitnessSession.h"
 
 /*----------------------------------------------------------------------------*
 *  NAME

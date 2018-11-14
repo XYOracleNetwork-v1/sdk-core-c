@@ -16,7 +16,8 @@
  * INCLUDES
  ****************************************************************************************
  */
-#include "originchain.h"
+#include "objects.h"
+#include "state.h"
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -153,7 +154,7 @@ XYResult_t* getOriginBlockByPreviousHash(OriginChainNavigator* self_OriginChainN
 *       XYResult_t*               [out]      XYObject_t*  Returns XYObject of
 *                                                       Boound Witness type
 *----------------------------------------------------------------------------*/
-XYResult_t* addBoundWitness(OriginChainNavigator* self_OriginChainNavigator,
+XYResult_t* addBoundWitness(OriginChainNavigator_t* self_OriginChainNavigator,
                             BoundWitness_t* user_BoundWitness) {
 
   /********************************/
@@ -336,7 +337,7 @@ XYResult_t* findPreviousBlocks(OriginChainNavigator* self_OriginChainNavigator,
 *  RETURNS
 *      XYResult_t*                              [out]      XYObject_t*   Returns XYObject of Boound Witness type
 *----------------------------------------------------------------------------*/
-XYResult_t* containsOriginBlock(OriginChainNavigator* self_OriginChainNavigator, BoundWitness_t* user_BoundWitness){
+XYResult_t* containsOriginBlock(OriginChainNavigator_t* self_OriginChainNavigator, BoundWitness_t* user_BoundWitness){
   XYResult_t* hash_result = user_BoundWitness->getHash(user_BoundWitness, self_OriginChainNavigator->Hash);
   if(hash_result->error != OK){
     RETURN_ERROR(ERR_CRITICAL);
