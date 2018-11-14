@@ -5,8 +5,8 @@ set (SDK_VERSION_MAJOR 0)
 set (SDK_VERSION_MINOR 1)
 
 # bring in the headers
-include_directories(include)
-include_directories(include/WolfSSL)
+include_directories(src/include)
+include_directories(src/WolfSSL)
 
 #find_package(PkgConfig REQUIRED)
 #pkg_search_module(OPENSSL REQUIRED openssl)
@@ -20,7 +20,7 @@ file(GLOB_RECURSE SOURCES "src/*.c")
 
 include_directories("${PROJECT_BINARY_DIR}")
 
-set(CMAKE_BUILD_TYPE Release)
+set(CMAKE_BUILD_TYPE Debug)
 
 #find_program(iwyu_path NAMES iwyu-tool iwyu-fix-includes)
 #if(NOT iwyu_path)
