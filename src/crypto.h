@@ -1,15 +1,12 @@
 /**
- ****************************************************************************************
- *
  * @file crypto.h
- *
- * @XY4 project source code.
- *
- * @brief primary crypto routines for the XY4 firmware.
- *
- * Copyright (C) 2017 XY - The Findables Company. All Rights Reserved.
- *
- ****************************************************************************************
+ * @author Arie Trouw (developer@xy.company)
+ * @brief Primary crypto routines for the XY4 firmware.
+ * @version 0.1
+ * @date 2018-11-15
+ * 
+ * @copyright Copyright (c) 2018 XY - The Persistant COmpany
+ * 
  */
 
 #ifndef XYCRYPTO

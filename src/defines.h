@@ -1,15 +1,12 @@
 /**
- ****************************************************************************************
- *
  * @file defines.h
- *
- * @XYO Core library source code.
- *
+ * @author Arie Trouw (developer@xy.company)
  * @brief All standard definitions in XYO Library
- *
- * Copyright (C) 2018 XY - The Findables Company
- *
- ****************************************************************************************
+ * @version 0.1
+ * @date 2018-11-15
+ * 
+ * @copyright Copyright (c) 2018 XY - The Persistant COmpany
+ * 
  */
 
 /*
