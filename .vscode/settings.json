@@ -1,0 +1,10 @@
+{
+  "c-cpp-flylint.clang.standard": [
+    "c99"
+  ],
+  "c-cpp-flylint.clang.language": "c",
+  "files.associations": {
+    "*.c": "c",
+    "*.h": "c"
+  }
+}
