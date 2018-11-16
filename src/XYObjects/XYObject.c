@@ -17,12 +17,7 @@
  ****************************************************************************************
  */
 
-#include <stdlib.h>
-#include <string.h>
-
-#include "endian.h"
 #include "XYObject.h"
-#include "XYResult.h"
 
 /**
  * ==== Private Functions ====

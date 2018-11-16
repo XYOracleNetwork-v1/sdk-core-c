@@ -1,9 +1,6 @@
-#ifndef XYOBJECTS_H
-#define XYOBJECTS_H
-
 #include <string.h>
-#include "defines.h"
-#include "XYResult.h"
+#include <stdint.h>
+#include "../XYResult.h"
 
 #define XY_TYPE_OFFSET (0)
 #define XY_TYPE_LENGTH (2)
@@ -49,9 +46,10 @@ XYResult_t XYObject_getFullLength(XYObject_t *self);
  */
 
 //should be called at the top of any XYObject function using self
-#define INIT_SELF() \
+#define INIT_SELF(_MAJOR_, _MINOR_) \
   DECLARE_RESULT(); \
-  CHECK_NULL(self);
+  CHECK_NULL(self); \
+  CHECK_IS_XYOBJECT( _MAJOR_, _MINOR_ );
 
 //check if the passed in buffer is the expected object type
 #define IS_XYOBJECT(_MAJOR_, _MINOR_, _PTR_) ((((unsigned char *)_PTR_)[0] == _MAJOR_) && (((unsigned char *)_PTR_)[1] == _MINOR_))
@@ -70,5 +68,3 @@ XYResult_t XYObject_getFullLength(XYObject_t *self);
 
 #define XYOBJ_COPY_UINT8_ARRAY(_DEST_, _OFFSET_, _LEN_) memcpy(_DEST_, self + _OFFSET_, _LEN_)
 #define XYOBJ_INCREMENT_UINT16(_buffer_, _offset_, _value_) to_uint16_be((uint8_t *)_buffer_ + _offset_, to_uint16((uint8_t *)_buffer_ + _offset_) + _value_)
-
-#endif

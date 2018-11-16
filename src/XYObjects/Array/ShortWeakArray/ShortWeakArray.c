@@ -9,26 +9,13 @@
  * 
  */
 
-#include "XYResult.h"
-#include "XYObject.h"
-#include "endian.h"
-
-#define MAJOR_ARRAY (0x01)
-#define MINOR_SHORT_SIZE_ARRAY (0x05)
+#include "ShortWeakArray.h"
+#include "../../XYObjectTypes.h"
  
-/**
- * @brief Add an Item to a ShortWeakArray
- * 
- * @param self 
- * @param newItemType 
- * @param length 
- * @return XYResult_t 
- */
 XYResult_t ShortWeakArray_add(XYObject_t* self,
                                unsigned char newItemType[2],
                                int length){
-  INIT_SELF();
-  CHECK_IS_XYOBJECT( MAJOR_ARRAY, MINOR_SHORT_SIZE_ARRAY )
+  INIT_SELF(MAJOR_2BYTE_ARRAY, MINOR_ARRAY_WEAK);
 
   XYResult_t currentLength = XYObject_getLength(self);
   CHECK_RESULT(currentLength);
@@ -46,8 +33,8 @@ XYResult_t ShortWeakArray_add(XYObject_t* self,
 }
 
 XYResult_t ShortWeakArray_get(XYObject_t* self, int index) {
-  INIT_SELF();
-  CHECK_IS_XYOBJECT( MAJOR_ARRAY, MINOR_SHORT_SIZE_ARRAY )
+  INIT_SELF(MAJOR_2BYTE_ARRAY, MINOR_ARRAY_WEAK);
+  CHECK_IS_XYOBJECT( MAJOR_2BYTE_ARRAY, MINOR_ARRAY_WEAK )
 
   XYResult_t currentLength = XYObject_getLength(self);
   CHECK_RESULT(currentLength);
