@@ -12,18 +12,21 @@
 #include "ShortWeakArray.h"
  
 XYResult_t ShortWeakArray_add(XYObject_t* self,
-                               unsigned char newItemType[2],
-                               int length){
+                               XYObjectHeader_t newItemHeader,
+                               int newItemLength){
   INIT_SELF(MINOR_NULL);
 
   XYResult_t currentLength = XYObject_getLength(self);
   CHECK_RESULT(currentLength);
 
+  XYResult_t fullLength = XYObject_getFullLength(self);
+  CHECK_RESULT(fullLength);
+
   //put the new object at the end of the current object
-  uint8_t* newObject = ((uint8_t*)self + XY_TYPE_LENGTH + currentLength.value.i);
+  uint8_t* newObject = ((uint8_t*)self + fullLength.value.i);
 
   //set the type of the newly added item
-  XYOBJ_COPY_UINT8_ARRAY(newObject, XY_TYPE_OFFSET, XY_TYPE_LENGTH);
+  XYOBJ_COPY_UINT8_ARRAY(newObject, &newItemHeader, sizeof(newItemHeader));
 
   //set the new length of the array object (old length + new object length)
   XYOBJ_INCREMENT_UINT16(XY_LENGTH_OFFSET, length);
