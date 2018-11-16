@@ -18,6 +18,7 @@
  */
 
 #include "XYObject.h"
+#include "XYObjectHeader.h"
 
 /**
  * ==== Private Functions ====
@@ -25,52 +26,49 @@
 
 //assuming validation by caller
 int getLength(XYObject_t* self) {
-  uint8_t major = XYOBJ_READ_UINT8(XY_MAJOR_OFFSET);
+  XYHeader_t header;
+  XYOBJ_COPY_UINT8_ARRAY(&header, XY_HEADER_OFFSET, XY_HEADER_LENGTH);
 
-  int result = 0;
-
-  //if the top bit is set, then there is a length field
-  //that we need to skip
-  if (major & 0x80) {
-
-    if (major & 0x40) {
-      //if the second highest bit is 1, the length field is 4 bytes
-      result = XYOBJ_READ_UINT8(XY_LENGTH_OFFSET);
-    } else {
-      //if the second highest bit is 0, the length field is 2 bytes
-      result += 2;
-    }
-  } else {
-    result = major;
+  switch(header.flags.lengthType) {
+    case XY_LENGTH_1BYTE:
+      return XYOBJ_READ_UINT8(XY_LENGTH_OFFSET);
+    case XY_LENGTH_2BYTE:
+      return XYOBJ_READ_UINT16(XY_LENGTH_OFFSET);
+    case XY_LENGTH_4BYTE:
+      return XYOBJ_READ_UINT32(XY_LENGTH_OFFSET);
+    case XY_LENGTH_8BYTE:
+      return XYOBJ_READ_UINT64(XY_LENGTH_OFFSET);
   }
-  return result;
+
+  return 0;
 }
 
 //assuming validation by caller
 int getLengthFieldSize(XYObject_t* self) {
-  uint8_t major = XYOBJ_READ_UINT8(XY_MAJOR_OFFSET);
-  int result = 0;
-  //if the top bit is set, then there is a length field
-  if (major & 0x80) {
+  XYHeader_t header;
+  XYOBJ_COPY_UINT8_ARRAY(&header, XY_HEADER_OFFSET, XY_HEADER_LENGTH);
 
-    if (major & 0x40) {
-      //if the second highest bit is 1, the length field is 4 bytes
-      result = 4;
-    } else {
-      //if the second highest bit is 0, the length field is 2 bytes
-      result = 2;
-    }
+  switch(header.flags.lengthType) {
+    case XY_LENGTH_1BYTE:
+      return 1;
+    case XY_LENGTH_2BYTE:
+      return 2;
+    case XY_LENGTH_4BYTE:
+      return 4;
+    case XY_LENGTH_8BYTE:
+      return 8;
   }
-  return result;
+
+  return 0;
 }
 
 /**
  * ==== Public Functions ====
  */
 
-XYResult_t XYObject_getType(XYObject_t* self) {
+XYResult_t XYObject_getHeader(XYObject_t* self) {
   INIT_SELF_UNKNOWN();
-  XYOBJ_COPY_UINT8_ARRAY(result.value.bytes, XY_TYPE_OFFSET, XY_TYPE_LENGTH);
+  XYOBJ_COPY_UINT8_ARRAY(result.value.bytes, XY_HEADER_OFFSET, XY_HEADER_LENGTH);
   return result;
 }
 
@@ -88,6 +86,6 @@ XYResult_t XYObject_getLength(XYObject_t* self) {
 
 XYResult_t XYObject_getFullLength(XYObject_t* self) {
   INIT_SELF_UNKNOWN();
-  result.value.i = getLength(self) + XY_TYPE_LENGTH;
+  result.value.i = getLength(self) + XY_HEADER_LENGTH;
   return result;
 }

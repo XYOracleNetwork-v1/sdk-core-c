@@ -9,12 +9,12 @@
  * 
  */
 
-#include "ShortWeakArray.h"
+#include "LongWeakArray.h"
  
-XYResult_t ShortWeakArray_add(XYObject_t* self,
+XYResult_t LongWeakArray_add(XYObject_t* self,
                                unsigned char newItemType[2],
                                int length){
-  INIT_SELF(MAJOR_2BYTE_ARRAY, MINOR_ARRAY_WEAK);
+  INIT_SELF(MAJOR_4BYTE_ARRAY, MINOR_ARRAY_WEAK);
 
   XYResult_t currentLength = XYObject_getLength(self);
   CHECK_RESULT(currentLength);
@@ -31,8 +31,8 @@ XYResult_t ShortWeakArray_add(XYObject_t* self,
   return result;
 }
 
-XYResult_t ShortWeakArray_get(XYObject_t* self, int index) {
-  INIT_SELF(MAJOR_2BYTE_ARRAY, MINOR_ARRAY_WEAK);
+XYResult_t LongWeakArray_get(XYObject_t* self, int index) {
+  INIT_SELF(MAJOR_4BYTE_ARRAY, MINOR_ARRAY_WEAK);
   CHECK_IS_XYOBJECT( MAJOR_2BYTE_ARRAY, MINOR_ARRAY_WEAK )
 
   XYResult_t currentLength = XYObject_getLength(self);

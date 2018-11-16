@@ -9,18 +9,13 @@
  * 
  */
 
-// Masks for deternining the method of length discovery for a given major
-#define MAJOR_LENGTH_INTRINSIC  (0x00) /*00xxxxxx*/
-#define MAJOR_LENGTH_2BYTE      (0x80) /*10xxxxxx*/
-#define MAJOR_LENGTH_4BYTE      (0xC0) /*11xxxxxx*/
+#define XY_TYPE_NULL        (0x00)
+#define MAJOR_ARRAY         (0x01)
 
-#define MAJOR_NULL        (0x00)
-#define MAJOR_ARRAY       (0x01)
+#define MAJOR_2BYTE_ARRAY   (MAJOR_ARRAY | MAJOR_LENGTH_2BYTE)
+#define MAJOR_4BYTE_ARRAY   (MAJOR_ARRAY | MAJOR_LENGTH_4BYTE)
 
-#define MAJOR_2BYTE_ARRAY (MAJOR_ARRAY | MAJOR_LENGTH_2BYTE)
-#define MAJOR_4BYTE_ARRAY (MAJOR_ARRAY | MAJOR_LENGTH_4BYTE)
+#define MINOR_NULL          (0x00)
 
-#define MINOR_NULL        (0x00)
-
-#define MINOR_ARRAY_WEAK (0x01)
-#define MINOR_ARRAY_STRONG (0x02)
+#define MINOR_ARRAY_WEAK    (0x01)
+#define MINOR_ARRAY_STRONG  (0x02)

@@ -20,6 +20,14 @@
  */
 
 /**
+ * @brief Convert 64-bit Value from Big Endian to Platform Endian
+ * 
+ * @param char 
+ * @return uint32_t 
+ */
+uint64_t to_uint64(unsigned char* data);
+
+/**
  * @brief Convert 32-bit Value from Big Endian to Platform Endian
  * 
  * @param char 
@@ -34,6 +42,14 @@ uint32_t to_uint32(unsigned char* data);
  * @return uint16_t 
  */
 uint16_t to_uint16(unsigned char* data);
+
+/**
+ * @brief Write 64-Bit Big Endian value to a buffer from a Platform Endian source
+ * 
+ * @param char 
+ * @param value 
+ */
+void to_uint64_be(unsigned char* dest, uint64_t value);
 
 /**
  * @brief Write 32-Bit Big Endian value to a buffer from a Platform Endian source
