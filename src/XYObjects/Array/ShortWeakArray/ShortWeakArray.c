@@ -9,8 +9,7 @@
  * 
  */
 
-#include "ShortWeakArray.h"
-#include "../../XYObjectTypes.h"
+#include "ShortWeakArray2.h"
  
 XYResult_t ShortWeakArray_add(XYObject_t* self,
                                unsigned char newItemType[2],

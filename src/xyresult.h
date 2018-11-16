@@ -21,7 +21,7 @@ typedef struct XYResult{
 
 #define XYERROR(_STATUS_) { XYResult_t result; result.status = _STATUS_; result.value.i = 0; return result; };
 #define CHECK_NULL(_VALUE_) if (!_VALUE_) { XYERROR(XY_STATUS_ERROR); }
-#define CHECK_RESULT(_RESULT_) if (_RESULT_.status != XY_STATUS_OK) { return result; };
+#define CHECK_RESULT(_RESULT_) if (_RESULT_.status != XY_STATUS_OK) { return _RESULT_; };
 
 #define XY_STATUS_OK (0)
 #define XY_STATUS_INDEXOUTOFRANGE (1)

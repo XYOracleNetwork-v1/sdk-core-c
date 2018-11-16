@@ -53,7 +53,7 @@ XYResult_t XYObject_getFullLength(XYObject_t *self);
   CHECK_NULL(self);
 
 #define INIT_SELF(_MAJOR_, _MINOR_) \
-  INIT_SELF(); \
+  INIT_SELF_UNKNOWN(); \
   CHECK_IS_XYOBJECT( _MAJOR_, _MINOR_ );
 
 //check if the passed in buffer is the expected object type

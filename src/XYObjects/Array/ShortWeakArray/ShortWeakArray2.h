@@ -1,5 +1,7 @@
 #include "../../../XYResult.h"
 #include "../../XYObject.h"
+#include "../../XYObjectTypes.h"
+
 
 /**
  * @brief Add Item to a Short Weak Array
@@ -22,4 +24,3 @@ XYResult_t ShortWeakArray_add(XYObject_t *self,
  */
 XYResult_t ShortWeakArray_get(XYObject_t *self,
                               int index);
-                              
