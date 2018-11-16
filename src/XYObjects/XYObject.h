@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdint.h>
 #include "../XYResult.h"
+#include "../endian.h"
 
 #define XY_TYPE_OFFSET (0)
 #define XY_TYPE_LENGTH (2)
@@ -46,9 +47,13 @@ XYResult_t XYObject_getFullLength(XYObject_t *self);
  */
 
 //should be called at the top of any XYObject function using self
-#define INIT_SELF(_MAJOR_, _MINOR_) \
+
+#define INIT_SELF_UNKNOWN() \
   DECLARE_RESULT(); \
-  CHECK_NULL(self); \
+  CHECK_NULL(self);
+
+#define INIT_SELF(_MAJOR_, _MINOR_) \
+  INIT_SELF(); \
   CHECK_IS_XYOBJECT( _MAJOR_, _MINOR_ );
 
 //check if the passed in buffer is the expected object type

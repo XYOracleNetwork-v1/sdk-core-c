@@ -69,25 +69,25 @@ int getLengthFieldSize(XYObject_t* self) {
  */
 
 XYResult_t XYObject_getType(XYObject_t* self) {
-  INIT_SELF();
+  INIT_SELF_UNKNOWN();
   XYOBJ_COPY_UINT8_ARRAY(result.value.bytes, XY_TYPE_OFFSET, XY_TYPE_LENGTH);
   return result;
 }
 
 XYResult_t XYObject_getValue(XYObject_t* self) {
-  INIT_SELF();
+  INIT_SELF_UNKNOWN();
   result.value.ptr = ((uint8_t*)self) + getLengthFieldSize(self);
   return result;
 }
 
 XYResult_t XYObject_getLength(XYObject_t* self) {
-  INIT_SELF();
+  INIT_SELF_UNKNOWN();
   result.value.i = getLength(self);
   return result;
 }
 
 XYResult_t XYObject_getFullLength(XYObject_t* self) {
-  INIT_SELF();
+  INIT_SELF_UNKNOWN();
   result.value.i = getLength(self) + XY_TYPE_LENGTH;
   return result;
 }
