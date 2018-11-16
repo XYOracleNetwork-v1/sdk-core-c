@@ -40,11 +40,11 @@ void breakpoint(void){};
 *      found          [out]      uintxx   returns unsigned integer representing the data given
 *----------------------------------------------------------------------------*/
  uint32_t to_uint32(unsigned char* data) {
-   return 16777216U*data[0] + 65536U*data[1] + 256U*data[2] + data[3];
+   return (data[0] << 24) + (data[1] << 16) + (data[2] << 8) + data[3];
  }
 
  uint16_t to_uint16(unsigned char* data) {
-   return 256U*data[0] + data[1];
+   return (data[0] << 8) + data[1];
  }
 
 /*----------------------------------------------------------------------------*

@@ -24,15 +24,16 @@
 #include <stdint.h>
 #include <stdio.h>
 #include "defines.h"
+#include "XYResult.h"
 
 /*
  * DEFINES
  ****************************************************************************************
  */
-uint8_t _lastError;
-#define RETURN_ERROR(ERR) return_error(ERR, __FILE__, __LINE__);
+//uint8_t _lastError;
+//#define RETURN_ERROR(ERR) return_error(ERR, __FILE__, __LINE__);
 
-#define return_error(ERR, __FILE__, __LINE__)               \
+/*#define return_error(ERR, __FILE__, __LINE__)               \
 if(ERR == ERR_INSUFFICIENT_MEMORY){                         \
   printf(YEL "ERR_INSUFFICIENT_MEMORY @ %s:%d\n" RESET, __FILE__, __LINE__);  \
   preallocated_result->error = ERR_INSUFFICIENT_MEMORY;     \
@@ -53,9 +54,9 @@ if(ERR == ERR_INSUFFICIENT_MEMORY){                         \
       preallocated_result->result = 0; _lastError = ERR;    \
       return preallocated_result;                           \
     }                                                       \
-}
+}*/
 
-#define LAST_ERROR() return _lastError;
+//#define LAST_ERROR() return _lastError;
 
 /*
  * FUNCTION DECLARATIONS

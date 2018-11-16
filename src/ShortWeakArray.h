@@ -1,0 +1,4 @@
+#ifndef SHORTWEAKARRAY_H
+#define SHORTWEAKARRAY_H
+
+#endif
