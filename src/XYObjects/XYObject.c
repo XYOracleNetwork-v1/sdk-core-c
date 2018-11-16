@@ -26,10 +26,7 @@
 
 //assuming validation by caller
 int getLength(XYObject_t* self) {
-  XYHeader_t header;
-  XYOBJ_COPY_UINT8_ARRAY(&header, XY_HEADER_OFFSET, XY_HEADER_LENGTH);
-
-  switch(header.flags.lengthType) {
+  switch(self->header.flags.lengthType) {
     case XY_LENGTH_1BYTE:
       return XYOBJ_READ_UINT8(XY_LENGTH_OFFSET);
     case XY_LENGTH_2BYTE:
@@ -45,10 +42,7 @@ int getLength(XYObject_t* self) {
 
 //assuming validation by caller
 int getLengthFieldSize(XYObject_t* self) {
-  XYHeader_t header;
-  XYOBJ_COPY_UINT8_ARRAY(&header, XY_HEADER_OFFSET, XY_HEADER_LENGTH);
-
-  switch(header.flags.lengthType) {
+  switch(self->header.flags.lengthType) {
     case XY_LENGTH_1BYTE:
       return 1;
     case XY_LENGTH_2BYTE:
@@ -66,15 +60,9 @@ int getLengthFieldSize(XYObject_t* self) {
  * ==== Public Functions ====
  */
 
-XYResult_t XYObject_getHeader(XYObject_t* self) {
-  INIT_SELF_UNKNOWN();
-  XYOBJ_COPY_UINT8_ARRAY(result.value.bytes, XY_HEADER_OFFSET, XY_HEADER_LENGTH);
-  return result;
-}
-
 XYResult_t XYObject_getValue(XYObject_t* self) {
   INIT_SELF_UNKNOWN();
-  result.value.ptr = ((uint8_t*)self) + getLengthFieldSize(self);
+  result.value.ptr = ((uint8_t*)self) + XY_HEADER_LENGTH + getLengthFieldSize(self);
   return result;
 }
 

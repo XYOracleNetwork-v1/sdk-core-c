@@ -1,6 +1,7 @@
 #include <string.h>
 #include <stdint.h>
 #include "../XYResult.h"
+#include "XYObjectHeader.h"
 #include "../endian.h"
 
 /*
@@ -10,7 +11,7 @@
 
 typedef struct XYObject
 {
-  unsigned char id[2];
+  XYObjectHeader_t header;
   void *payload;
 } XYObject_t;
 
@@ -19,18 +20,15 @@ typedef struct XYObject
  ****************************************************************************************
  */
 
-//the ID is a two byte array containing the major and minor
-XYResult_t XYObject_getHeader(XYObject_t *self);
-
-//the value is all the data in the object other than the header (major/minor/optional length)
+//the value is all the data in the object other than the header (header/length length)
 XYResult_t XYObject_getValue(XYObject_t *self);
 
 //this is the length of the object, including the length field (if one exists),
-//but not including the major/minor fields
+//but not including the header
 XYResult_t XYObject_getLength(XYObject_t *self);
 
 //this is the length of the object, including the length field (if one exists),
-//and also including the major/minor fields
+//and also including the header
 XYResult_t XYObject_getFullLength(XYObject_t *self);
 
 /*
@@ -44,16 +42,16 @@ XYResult_t XYObject_getFullLength(XYObject_t *self);
   DECLARE_RESULT(); \
   CHECK_NULL(self);
 
-#define INIT_SELF(_MAJOR_, _MINOR_) \
+#define INIT_SELF(_TYPE_) \
   INIT_SELF_UNKNOWN(); \
-  CHECK_IS_XYOBJECT( _MAJOR_, _MINOR_ );
+  CHECK_IS_XYOBJECT( _TYPE_ );
 
 //check if the passed in buffer is the expected object type
-#define IS_XYOBJECT(_MAJOR_, _MINOR_, _PTR_) ((((unsigned char *)_PTR_)[0] == _MAJOR_) && (((unsigned char *)_PTR_)[1] == _MINOR_))
+#define IS_XYOBJECT(_TYPE_, _PTR_) (((XYObjectHeader_t*)_PTR_)->type == _TYPE_)
 
 //check the object type and return a validation error if it fails
-#define CHECK_IS_XYOBJECT(_MAJOR_, _MINOR_) \
-  if (!IS_XYOBJECT(_MAJOR_, _MINOR_, self)) \
+#define CHECK_IS_XYOBJECT(_TYPE_) \
+  if (!IS_XYOBJECT(_TYPE_, self)) \
   {                                         \
     XYERROR(XY_STATUS_ERROR);               \
   }
@@ -65,4 +63,4 @@ XYResult_t XYObject_getFullLength(XYObject_t *self);
 #define XYOBJ_READ_UINT64(_OFFSET_) to_uint64(((uint8_t *)self) + _OFFSET_)
 
 #define XYOBJ_COPY_UINT8_ARRAY(_DEST_, _OFFSET_, _LEN_) memcpy(_DEST_, self + _OFFSET_, _LEN_)
-#define XYOBJ_INCREMENT_UINT16(_buffer_, _offset_, _value_) to_uint16_be((uint8_t *)_buffer_ + _offset_, to_uint16((uint8_t *)_buffer_ + _offset_) + _value_)
+#define XYOBJ_INCREMENT_UINT16(_OFFSET_, _VALUE_) to_uint16_be((uint8_t *)self + _OFFSET_, to_uint16((uint8_t *)_buffer_ + _OFFSET_) + _VALUE_)

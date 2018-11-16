@@ -14,7 +14,7 @@
 XYResult_t ShortWeakArray_add(XYObject_t* self,
                                unsigned char newItemType[2],
                                int length){
-  INIT_SELF(MAJOR_2BYTE_ARRAY, MINOR_ARRAY_WEAK);
+  INIT_SELF(MINOR_NULL);
 
   XYResult_t currentLength = XYObject_getLength(self);
   CHECK_RESULT(currentLength);
@@ -26,13 +26,13 @@ XYResult_t ShortWeakArray_add(XYObject_t* self,
   XYOBJ_COPY_UINT8_ARRAY(newObject, XY_TYPE_OFFSET, XY_TYPE_LENGTH);
 
   //set the new length of the array object (old length + new object length)
-  XYOBJ_INCREMENT_UINT16(self, XY_LENGTH_OFFSET, length);
+  XYOBJ_INCREMENT_UINT16(XY_LENGTH_OFFSET, length);
   
   return result;
 }
 
 XYResult_t ShortWeakArray_get(XYObject_t* self, int index) {
-  INIT_SELF(MAJOR_2BYTE_ARRAY, MINOR_ARRAY_WEAK);
+  INIT_SELF(MINOR_NULL);
   CHECK_IS_XYOBJECT( MAJOR_2BYTE_ARRAY, MINOR_ARRAY_WEAK )
 
   XYResult_t currentLength = XYObject_getLength(self);

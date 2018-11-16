@@ -2,20 +2,20 @@
 
 //bit fields for the flags in the first byte of the header
 typedef struct XYHeaderFlags {
-  uint8_t lengthType: 2;
-  uint8_t iteratable: 1;
-  uint8_t typed: 1;
-  uint8_t reserved: 4;
+  uint8_t reserved: 4;      /*----xxxx*/
+  uint8_t typed: 1;         /*---x----*/
+  uint8_t iteratable: 1;    /*--x-----*/
+  uint8_t lengthType: 2;    /*xx------*/
 } XYHeaderFlags_t;
 
 // the type of the object
-typedef struct XYHeader {
+typedef struct XYObjectHeader {
   XYHeaderFlags_t flags;
   uint8_t type;
-} XYHeader_t;
+} XYObjectHeader_t;
 
 #define XY_HEADER_OFFSET (0)
-#define XY_HEADER_LENGTH (2)
+#define XY_HEADER_LENGTH (sizeof(XYObjectHeader_t))
 
 // Masks for deternining the method of length discovery for a given major
 #define XY_LENGTH_1BYTE      (0x0)
