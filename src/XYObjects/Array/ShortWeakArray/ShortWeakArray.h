@@ -4,16 +4,16 @@
 
 
 /**
- * @brief Add Item to a Short Weak Array
+ * @brief Add Item from a Short Weak Array
  * 
  * @param self 
- * @param newItemType 
- * @param length 
+ * @param newItemHeader 
+ * @param newItemLength 
  * @return XYResult_t 
  */
-XYResult_t ShortWeakArray_add(XYObject_t *self,
-                              unsigned char newItemType[2],
-                              int length);
+XYResult_t ShortWeakArray_add(XYObject_t* self,
+                               XYObjectHeader_t newItemHeader,
+                               int newItemLength);
 
 /**
  * @brief Get Item from a Short Weak Array

@@ -4,16 +4,16 @@
 
 
 /**
- * @brief Add Item to a Long Weak Array
+ * @brief Add Item from a Long Weak Array
  * 
  * @param self 
- * @param newItemType 
- * @param length 
+ * @param newItemHeader 
+ * @param newItemLength 
  * @return XYResult_t 
  */
-XYResult_t LongWeakArray_add(XYObject_t *self,
-                              unsigned char newItemType[2],
-                              int length);
+XYResult_t LongWeakArray_add(XYObject_t* self,
+                               XYObjectHeader_t newItemHeader,
+                               int newItemLength);
 
 /**
  * @brief Get Item from a Long Weak Array

@@ -65,4 +65,4 @@ XYResult_t XYObject_getFullLength(XYObject_t *self);
 #define XYOBJ_READ_UINT8_ARRAY(_DEST_, _OFFSET_, _LEN_) memcpy(_DEST_, (uint8_t *)self + _OFFSET_, _LEN_)
 #define XYOBJ_WRITE_UINT8_ARRAY(_SRC_, _OFFSET_, _LEN_) memcpy((uint8_t *)self + _OFFSET_, _SRC_,  _LEN_)
 
-#define XYOBJ_INCREMENT_UINT16(_OFFSET_, _VALUE_) to_uint16_be((uint8_t *)self + _OFFSET_, to_uint16((uint8_t *)_buffer_ + _OFFSET_) + _VALUE_)
+#define XYOBJ_INCREMENT_UINT16(_OFFSET_, _VALUE_) to_uint16_be((uint8_t *)self + _OFFSET_, to_uint16((uint8_t *)self + _OFFSET_) + _VALUE_)
