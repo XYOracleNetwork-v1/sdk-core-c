@@ -1,5 +1,5 @@
 /**
- * @file ShortWeakArray.c
+ * @file WeakArray.c
  * @author Arie Trouw (developer@xy.company)
  * @brief 
  * @version 0.1
@@ -9,9 +9,9 @@
  * 
  */
 
-#include "ShortWeakArray.h"
+#include "WeakArray.h"
 
-XYResult_t ShortWeakArray_add(XYObject_t *self,
+XYResult_t WeakArray_add(XYObject_t *self,
                               XYObjectHeader_t newItemHeader,
                               int newItemLength)
 {
@@ -35,7 +35,7 @@ XYResult_t ShortWeakArray_add(XYObject_t *self,
   return result;
 }
 
-XYResult_t ShortWeakArray_get(XYObject_t *self, int index)
+XYResult_t WeakArray_get(XYObject_t *self, int index)
 {
   INIT_SELF(MINOR_NULL);
 
@@ -70,4 +70,4 @@ XYResult_t ShortWeakArray_get(XYObject_t *self, int index)
   return result;
 }
 
-// end of file ShortWeakArray.c
+// end of file WeakArray.c

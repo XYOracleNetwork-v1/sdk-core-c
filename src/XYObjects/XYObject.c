@@ -18,7 +18,6 @@
  */
 
 #include "XYObject.h"
-#include "XYObjectHeader.h"
 
 /**
  * ==== Private Functions ====
