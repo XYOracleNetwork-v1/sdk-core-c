@@ -4,7 +4,7 @@
 #include <string.h>
 
 #include "xyresult.h"
-#include "xyobject.h"
+#include "XYObjects/XYObject.h"
 #include "ByteArray.h"
 #include "xyo.h"
 
@@ -12,7 +12,7 @@
 #include "include/arrays/ByteWeakArray.h"
 
 #include "include/arrays/ShortStrongArray.h"
-#include "include/arrays/ShortWeakArray.h"
+#include "XYObjects/Array/WeakArray/WeakArray.h"
 
 #include "include/arrays/IntStrongArray.h"
 #include "include/arrays/IntWeakArray.h"

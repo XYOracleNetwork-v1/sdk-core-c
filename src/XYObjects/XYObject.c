@@ -25,15 +25,15 @@
 
 //assuming validation by caller
 int getLength(XYObject_t* self) {
-  switch(self->header.flags.lengthType) {
+  switch(self->header->flags.lengthType) {
     case XY_LENGTH_1BYTE:
-      return XYOBJ_READ_UINT8(XY_LENGTH_OFFSET);
+      return XYOBJ_READ_UINT8();
     case XY_LENGTH_2BYTE:
-      return XYOBJ_READ_UINT16(XY_LENGTH_OFFSET);
+      return XYOBJ_READ_UINT16();
     case XY_LENGTH_4BYTE:
-      return XYOBJ_READ_UINT32(XY_LENGTH_OFFSET);
+      return XYOBJ_READ_UINT32();
     case XY_LENGTH_8BYTE:
-      return XYOBJ_READ_UINT64(XY_LENGTH_OFFSET);
+      return XYOBJ_READ_UINT64();
   }
 
   return 0;
@@ -41,7 +41,7 @@ int getLength(XYObject_t* self) {
 
 //assuming validation by caller
 int getLengthFieldSize(XYObject_t* self) {
-  switch(self->header.flags.lengthType) {
+  switch(self->header->flags.lengthType) {
     case XY_LENGTH_1BYTE:
       return 1;
     case XY_LENGTH_2BYTE:

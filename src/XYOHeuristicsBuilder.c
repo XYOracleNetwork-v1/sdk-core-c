@@ -16,7 +16,7 @@
  * INCLUDES
  ****************************************************************************************
  */
- #include "xyobject.h"
+ #include "XYObjects/XYObject.h"
  #include <stdlib.h>
  #include <string.h>
  #include "xyo.h"
@@ -70,7 +70,7 @@ int littleEndian(void){
   // return 0 for big endian, 1 for little endian.
   return (*((uint8_t*)(&i))) == 0x67;
 }
-
+/*
 XYResult_t* Heuristic_RSSI_Creator_create(const char id[2], void* rssi){
   return newObject(id, rssi);
 }
@@ -109,7 +109,7 @@ XYResult_t* Heuristic_Text_Creator_fromBytes(char* heuristic_data){
 
   /********************************/
   /* guard against malloc errors  */
-  /********************************/
+  /******************************** /
 
   if(!payload_bytes) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
 
@@ -131,7 +131,7 @@ XYResult_t* Heuristic_Text_Creator_toBytes(XYObject_t* user_XYObject){
 
   /********************************/
   /* guard against malloc errors  */
-  /********************************/
+  /******************************** /
 
   if(encoded_bytes == NULL) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
 
@@ -147,5 +147,5 @@ XYResult_t* Heuristic_Text_Creator_toBytes(XYObject_t* user_XYObject){
 
   return preallocated_return_result_ptr;
 }
-
+*/
 // end of file xyoheuristicsbuilder.c

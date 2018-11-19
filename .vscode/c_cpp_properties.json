@@ -2,7 +2,11 @@
     "configurations": [
         {
             "name": "Mac",
-            "includePath": [],
+            "includePath": [
+                "src/include",
+                "src/",
+                "XYObjects/"
+            ],
             "defines": [],
             "macFrameworkPath": [
                 "/System/Library/Frameworks",

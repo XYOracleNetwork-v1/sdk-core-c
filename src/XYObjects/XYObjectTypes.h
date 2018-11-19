@@ -15,7 +15,7 @@
 #define MAJOR_2BYTE_ARRAY   (MAJOR_ARRAY | MAJOR_LENGTH_2BYTE)
 #define MAJOR_4BYTE_ARRAY   (MAJOR_ARRAY | MAJOR_LENGTH_4BYTE)
 
-#define MINOR_NULL          (0x00)
+#define TYPE_NULL          (0x00)
 
-#define MINOR_ARRAY_WEAK    (0x01)
-#define MINOR_ARRAY_STRONG  (0x02)
+#define TYPE_ARRAY_WEAK    (0x01)
+#define TYPE_ARRAY_STRONG  (0x02)
