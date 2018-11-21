@@ -17,5 +17,5 @@
 
 #define TYPE_NULL          (0x00)
 
-#define TYPE_ARRAY_WEAK    (0x01)
-#define TYPE_ARRAY_STRONG  (0x02)
+#define TYPE_ARRAY   (0x01)
+//#define TYPE_ARRAY_STRONG  (0x02)

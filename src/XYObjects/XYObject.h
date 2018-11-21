@@ -67,3 +67,4 @@ XYResult_t XYObject_getFullLength(XYObject_t *self);
 
 #define XYOBJ_INCREMENT_UINT16(_VALUE_) to_uint16_be((unsigned char*)((XYObject_t *)self)->payload, to_uint16(self->payload) + _VALUE_)
 #define XYOBJ_INCREMENT_UINT32(_VALUE_) to_uint32_be((unsigned char*)((XYObject_t *)self)->payload, to_uint32(self->payload) + _VALUE_)
+#define XYOBJ_INCREMENT_UINT64(_VALUE_) to_uint64_be((unsigned char *)((XYObject_t *)self)->payload, to_uint64(self->payload) + _VALUE_)

@@ -18,9 +18,9 @@ typedef struct XYObjectHeader {
 #define XY_HEADER_LENGTH (sizeof(XYObjectHeader_t))
 
 // Masks for deternining the method of length discovery for a given major
-#define XY_LENGTH_1BYTE      (0x0)
-#define XY_LENGTH_2BYTE      (0x1)
-#define XY_LENGTH_4BYTE      (0x2)
-#define XY_LENGTH_8BYTE      (0x3)
+#define XY_LENGTH_1BYTE      (0x00)
+#define XY_LENGTH_2BYTE      (0x01)
+#define XY_LENGTH_4BYTE      (0x02)
+#define XY_LENGTH_8BYTE      (0x03)
 
 #define XY_LENGTH_OFFSET (XY_HEADER_LENGTH)
