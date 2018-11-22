@@ -19,7 +19,7 @@
 
 #ifndef BOUNDWITNESSOPTION_H
 #define BOUNDWITNESSOPTION_H
-//#include "xyobject.h"
+//#include "XYObjects/XYObject.h"
 
 typedef struct BoundWitnessOption BoundWitnessOption_t;
 

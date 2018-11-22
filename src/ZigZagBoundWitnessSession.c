@@ -26,7 +26,7 @@
  ****************************************************************************************
  */
 
-XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* data);
+//XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* data);
 
 /*----------------------------------------------------------------------------*
 *   NAME
@@ -45,13 +45,13 @@ XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* dat
 *                                                   data to send to the other party.
 *   NOTES
 *
-*----------------------------------------------------------------------------*/
-XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession_t* userSession,
-                                 ByteArray_t* boundWitnessData){
+*----------------------------------------------------------------------------* /
+XYResult_t completeBoundWitness(NodeBase_t* userSession,
+                                 char* boundWitnessData){
 
   /********************************/
   /* guard against bad input data */
-  /********************************/
+  /******************************** /
 
   if(!userSession || !boundWitnessData) {RETURN_ERROR(ERR_BADDATA);}
 
@@ -62,7 +62,7 @@ XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession_t* userSession,
 
     RETURN_ERROR(ERR_INTERNAL_ERROR);
   }
-  */
+  * /
 
   if(boundWitnessData->payload == NULL){
     RETURN_ERROR(ERR_PEER_INCOMPATABLE);
@@ -101,7 +101,7 @@ XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession_t* userSession,
 
   /********************************/
   /* guard against malloc errors  */
-  /********************************/
+  /******************************** /
 
   if(returnData == NULL) {
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
@@ -122,7 +122,7 @@ XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession_t* userSession,
      * The first 4 bytes of a packet in our protocol should always be size of the whole
      * message in bytes in big endian. choice->size should return the same as CATALOG_SIZE+5
      * but this is explicit.
-     */
+     * /
 
     returnData->payload = malloc(sizeof(char)*(CATALOG_SIZE + 5) + returnData->size);
 
@@ -147,8 +147,9 @@ XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession_t* userSession,
       return userSession->NetworkPipe->send((void*)userSession, returnData, receiverCallback);
     } else { RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
   }
+  
 }
-
+*/
 /*----------------------------------------------------------------------------*
 *  NAME
 *     receiverCallback
@@ -165,11 +166,12 @@ XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession_t* userSession,
 *      XYResult_t   [out]     XYResult_t*                   Returns XYResult<ByteArray_t*> the
 *                                                           data to send to the other party.
 *----------------------------------------------------------------------------*/
+/*
 XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* data){
 
   /********************************/
   /* guard against bad input data */
-  /********************************/
+  /******************************** /
 
   if(!self || !data) {RETURN_ERROR(ERR_BADDATA);}
 
@@ -195,7 +197,8 @@ XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* dat
     return self->completeBoundWitness(self, data);
 
   }
-}
+  */
+//}
 
 #define ZIGZAGBOUNDWITNESSSESSION_H
 #endif

@@ -41,11 +41,12 @@ XYResult_t* NextPublicKey_creator_create(const char id[2], void* user_data){
 
   /********************************/
   /* guard against bad input data */
-  /********************************/
+  /******************************** /
 
   if(!user_data) {RETURN_ERROR(ERR_BADDATA);}
 
   return newObject(id, user_data);
+  */
 }
 
 /*----------------------------------------------------------------------------*
@@ -66,7 +67,7 @@ XYResult_t* NextPublicKey_creator_fromBytes(char* pubkey_data){
 
   /********************************/
   /* guard against bad input data */
-  /********************************/
+  /******************************** /
 
   if(!pubkey_data) {RETURN_ERROR(ERR_BADDATA);}
 
@@ -82,7 +83,7 @@ XYResult_t* NextPublicKey_creator_fromBytes(char* pubkey_data){
 
   /********************************/
   /* guard against malloc errors  */
-  /********************************/
+  /******************************** /
 
   if(lookup_result->error == OK && lookup_result2->error == OK && return_NPK){
 
@@ -144,6 +145,7 @@ XYResult_t* NextPublicKey_creator_fromBytes(char* pubkey_data){
 
     RETURN_ERROR(ERR_BADDATA);
   }
+  */
 }
 
 /*----------------------------------------------------------------------------*
@@ -164,7 +166,7 @@ XYResult_t* NextPublicKey_creator_toBytes(XYObject_t* user_XYObject){
 
   /********************************/
   /* guard against bad input data */
-  /********************************/
+  /******************************** /
 
   if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA);}
 
@@ -255,6 +257,7 @@ XYResult_t* NextPublicKey_creator_toBytes(XYObject_t* user_XYObject){
   {
     RETURN_ERROR(ERR_BADDATA);
   }
+  */
 }
 
 // end of file nextpublickey.c

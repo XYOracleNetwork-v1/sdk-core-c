@@ -36,11 +36,12 @@ XYResult_t* PreviousHash_creator_create(const char id[2], void* user_data){
 
   /********************************/
   /* guard against bad input data */
-  /********************************/
+  /******************************** /
 
   if(!user_data) {RETURN_ERROR(ERR_BADDATA);}
 
   return newObject(id, user_data);
+  */
 }
 
 /*----------------------------------------------------------------------------*
@@ -61,7 +62,7 @@ XYResult_t* PreviousHash_creator_fromBytes(char* hash_data){
 
   /********************************/
   /* guard against bad input data */
-  /********************************/
+  /******************************** /
 
   if(!hash_data) {RETURN_ERROR(ERR_BADDATA);}
 
@@ -75,7 +76,7 @@ XYResult_t* PreviousHash_creator_fromBytes(char* hash_data){
 
   /********************************/
   /* guard against malloc errors  */
-  /********************************/
+  /******************************** /
 
   if(lookup_result->error == OK &&
      lookup_result2->error == OK &&
@@ -112,7 +113,7 @@ XYResult_t* PreviousHash_creator_fromBytes(char* hash_data){
 
     /********************************/
     /* guard against malloc errors  */
-    /********************************/
+    /******************************** /
 
     if(return_PH->hash){
       memcpy(return_PH->id, &hash_id, 2);
@@ -141,6 +142,7 @@ XYResult_t* PreviousHash_creator_fromBytes(char* hash_data){
     if(return_PH) free(return_PH);
     RETURN_ERROR(ERR_BADDATA);
   }
+  */
 }
 
 /*----------------------------------------------------------------------------*
@@ -161,7 +163,7 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
 
   /********************************/
   /* guard against bad input data */
-  /********************************/
+  /******************************** /
 
   if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA);}
 
@@ -257,4 +259,5 @@ XYResult_t* PreviousHash_creator_toBytes(XYObject_t* user_XYObject){
   {
     RETURN_ERROR(ERR_BADDATA);
   }
+  */
 }

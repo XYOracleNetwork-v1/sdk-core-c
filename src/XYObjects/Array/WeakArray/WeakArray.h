@@ -1,3 +1,5 @@
+#pragma once
+
 #include "../../../XYResult.h"
 #include "../../XYObject.h"
 #include "../../XYObjectTypes.h"

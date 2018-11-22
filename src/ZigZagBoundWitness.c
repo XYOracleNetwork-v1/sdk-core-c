@@ -39,9 +39,10 @@
 *----------------------------------------------------------------------------*/
 int publicKeyCount = 0; //TODO: Are these values needed?
 int signatureCount = 0;
-XYResult_t* incomingData(ZigZagBoundWitness_t* self,
-                         BoundWitnessTransfer_t* boundWitness,
+XYResult_t incomingData(ZigZagBoundWitness_t* self,
+                         //BoundWitnessTransfer_t* boundWitness,
                          int endpoint){
+  /*
   static int result_int;
   self->publicKeyCount = 0;
   self->signatureCount = 0;
@@ -77,7 +78,7 @@ XYResult_t* incomingData(ZigZagBoundWitness_t* self,
 
   /********************************/
   /* guard against malloc errors  */
-  /********************************/
+  /******************************** /
 
   if(BoundWitness_raw == NULL) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
 
@@ -145,7 +146,7 @@ XYResult_t* incomingData(ZigZagBoundWitness_t* self,
     payloadArray->add(payloadArray, arrayObject);
     free(newObject_result);
 
-    /* TODO: In the future lets replace the following lines with one signForSelf call */
+    /* TODO: In the future lets replace the following lines with one signForSelf call * /
     //XYResult_t* signForSelf_result = self->signForSelf(tempWitness_raw);
     //XYResult_t* signingData_result = self->boundWitness->getSigningData(self->boundWitness);
     //ByteArray_t* signingData = signingData_result->result;
@@ -193,6 +194,7 @@ XYResult_t* incomingData(ZigZagBoundWitness_t* self,
   free(newObject_result);
 
   return toBytes_result;
+  */
 }
 
 /*----------------------------------------------------------------------------*
@@ -209,11 +211,11 @@ XYResult_t* incomingData(ZigZagBoundWitness_t* self,
 *  RETURNS
 *      XYResult       [out]     bool       Returns Bool True if it succeeded.
 *----------------------------------------------------------------------------*/
-XYResult_t* addTransfer(ZigZagBoundWitness_t* self, BoundWitnessTransfer_t* boundWitness){
+/* XYResult_t* addTransfer(ZigZagBoundWitness_t* self, BoundWitnessTransfer_t* boundWitness){
 
   /********************************/
   /* some guards against bad data */
-  /********************************/
+  /******************************** /
 
   if(!self || !boundWitness) {RETURN_ERROR(ERR_BADDATA);}  // return the error now
 
@@ -228,7 +230,7 @@ XYResult_t* addTransfer(ZigZagBoundWitness_t* self, BoundWitnessTransfer_t* boun
 
   /********************************/
   /* guard against bad input data */
-  /********************************/
+  /******************************** /
 
   if(!self || !boundWitness) {RETURN_ERROR(ERR_BADDATA);}
 
@@ -268,7 +270,8 @@ XYResult_t* addTransfer(ZigZagBoundWitness_t* self, BoundWitnessTransfer_t* boun
     result_int = 0;
     //return 0;   //TODO: wal, why 0?  how 'bout a meaningful constant here?
     return preallocated_return_result_ptr;
-}
+    */
+//}
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -284,11 +287,12 @@ XYResult_t* addTransfer(ZigZagBoundWitness_t* self, BoundWitnessTransfer_t* boun
 *  RETURNS
 *      XYResult_t         [out]   bool        Returns Bool True if it succeeded.
 *----------------------------------------------------------------------------*/
+/*
 XYResult_t* addIncomingKeys(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingKeySets){
 
   /********************************/
   /* some guards against bad data */
-  /********************************/
+  /******************************** /
 
   if(!self || !incomingKeySets) {RETURN_ERROR(ERR_BADDATA);}  // return the error now
 
@@ -312,7 +316,7 @@ XYResult_t* addIncomingKeys(ZigZagBoundWitness_t* self, ShortStrongArray_t* inco
       XYResult_t* array_creator_result = tableLookup((const char*)&KeySet_id);
       ObjectProvider_t* array_creator = array_creator_result->result;
 
-      /* The first two bytes were in big endian, to_uint16 flips them to little endian */
+      /* The first two bytes were in big endian, to_uint16 flips them to little endian * /
       uint16_t fixSize = to_uint16((unsigned char*)xyobject->payload);
       memcpy(xyobject->payload, &fixSize, 2);
       //char* payloadptr = xyobject->payload;
@@ -336,7 +340,8 @@ XYResult_t* addIncomingKeys(ZigZagBoundWitness_t* self, ShortStrongArray_t* inco
       return preallocated_return_result_ptr;
     }
   }
-}
+  */
+//}
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -352,11 +357,11 @@ XYResult_t* addIncomingKeys(ZigZagBoundWitness_t* self, ShortStrongArray_t* inco
 *  RETURNS
 *      XYResult_t         [out]   bool        Returns Bool True if it succeeded.
 *----------------------------------------------------------------------------*/
-XYResult_t* addIncomingPayload(ZigZagBoundWitness_t* self, IntStrongArray_t* incomingPayloads){
+/* XYResult_t* addIncomingPayload(ZigZagBoundWitness_t* self, IntStrongArray_t* incomingPayloads){
 
   /********************************/
   /* some guards against bad data */
-  /********************************/
+  /******************************** /
 
   if(!self || !incomingPayloads) {RETURN_ERROR(ERR_BADDATA);}  // return the error now
 
@@ -396,7 +401,7 @@ XYResult_t* addIncomingPayload(ZigZagBoundWitness_t* self, IntStrongArray_t* inc
       /*
       uint32_t encoded_size = to_uint32((unsigned char*)xyobject->payload);
       memcpy(xyobject->payload, &encoded_size, 4);
-      */
+      * /
       XYResult_t* add_result = self->dynamicPayloads->add(self->dynamicPayloads, xyobject);
       if(add_result->error != OK) return 1;
     } else {
@@ -407,7 +412,8 @@ XYResult_t* addIncomingPayload(ZigZagBoundWitness_t* self, IntStrongArray_t* inc
       return preallocated_return_result_ptr;
     }
   }
-}
+  */
+//}
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -423,11 +429,11 @@ XYResult_t* addIncomingPayload(ZigZagBoundWitness_t* self, IntStrongArray_t* inc
 *  RETURNS
 *      XYResult_t         [out]   bool        Returns Bool True if it succeeded.
 *----------------------------------------------------------------------------*/
-XYResult_t* addIncomingSignatures(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingSignatures){
+/* XYResult_t* addIncomingSignatures(ZigZagBoundWitness_t* self, ShortStrongArray_t* incomingSignatures){
 
   /********************************/
   /* some guards against bad data */
-  /********************************/
+  /******************************** /
 
   if(!self || !incomingSignatures) {RETURN_ERROR(ERR_BADDATA);}  // return the error now
 
@@ -459,7 +465,7 @@ XYResult_t* addIncomingSignatures(ZigZagBoundWitness_t* self, ShortStrongArray_t
 
       XYResult_t* newObject_result = newObject((const char*)&SignatureSet_id, signatureArray);
       if(newObject_result->error != OK){  result_int = -1; preallocated_return_result_ptr;  }
-      */
+      * /
       const char* incomingSignaturesAddr = incomingSignatures->payload;
       secp256k1Signature_t* signature = malloc(sizeof(secp256k1Signature_t));
       signature->size = *(incomingSignaturesAddr+6);
@@ -479,7 +485,8 @@ XYResult_t* addIncomingSignatures(ZigZagBoundWitness_t* self, ShortStrongArray_t
       return preallocated_return_result_ptr;
     }
   }
-}
+  */
+//}
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -494,11 +501,11 @@ XYResult_t* addIncomingSignatures(ZigZagBoundWitness_t* self, ShortStrongArray_t
 *  RETURNS
 *     XYResult_t          [out]   bool        Returns Bool True if it succeeded.
 *----------------------------------------------------------------------------*/
-XYResult_t* makeSelfKeySet(ZigZagBoundWitness_t* self){
+/* XYResult_t* makeSelfKeySet(ZigZagBoundWitness_t* self){
 
   /********************************/
   /* some guards against bad data */
-  /********************************/
+  /******************************** /
 
   if(!self) {RETURN_ERROR(ERR_BADDATA);}  // return the error now
 
@@ -535,7 +542,8 @@ XYResult_t* makeSelfKeySet(ZigZagBoundWitness_t* self){
   preallocated_return_result_ptr->result = keysetObject;
 
   return preallocated_return_result_ptr;
-}
+  */
+//}
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -552,11 +560,11 @@ XYResult_t* makeSelfKeySet(ZigZagBoundWitness_t* self){
 *      _result*     [out]      XYResult_t*
 *
 *----------------------------------------------------------------------------*/
-XYResult_t* signForSelf(ZigZagBoundWitness_t* self){
+/* XYResult_t* signForSelf(ZigZagBoundWitness_t* self){
 
   /********************************/
   /* some guards against bad data */
-  /********************************/
+  /******************************** /
 
   if(!self) {RETURN_ERROR(ERR_BADDATA);}  // return the error now
 
@@ -587,7 +595,7 @@ XYResult_t* signForSelf(ZigZagBoundWitness_t* self){
     free(create_result);
     return self->dynamicSignatures->add(self->dynamicSignatures, add_result->result);
   }
-
-}
+  */
+//}
 
 // end of file zigzagboundwitness.c

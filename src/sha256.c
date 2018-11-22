@@ -1,5 +1,5 @@
 #include "xyresult.h"
-#include "xyobject.h"
+#include "XYObjects/XYObject.h"
 #include "hash.h"
 
 XYResult_t* Heuristic_sha256_Creator_create(const char id[2], void* sha256){

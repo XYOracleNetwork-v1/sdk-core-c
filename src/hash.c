@@ -19,7 +19,7 @@
 
 #include <stdlib.h>
 #include "hash.h"
-#include "xyobject.h"
+#include "XYObjects/XYObject.h"
 #include "xyo.h"
 
 /*
@@ -53,7 +53,7 @@ XYResult_t* getHashId(HashProvider_t* hashProviderObject){
 
   /********************************/
   /* some guards against bad data */
-  /********************************/
+  /******************************** /
 
   if(!hashProviderObject) {RETURN_ERROR(ERR_BADDATA)};
 
@@ -63,6 +63,7 @@ XYResult_t* getHashId(HashProvider_t* hashProviderObject){
   preallocated_return_result_ptr->result = hashProviderObject->id;
 
   return preallocated_return_result_ptr;
+  */
 }
 
 /**
@@ -92,7 +93,7 @@ XYResult_t* createHash(ByteArray_t* dataToHash){
 
   /********************************/
   /* guard against bad data       */
-  /********************************/
+  /******************************** /
   if(!dataToHash ||
      !dataToHash->payload ||
      !dataToHash->size) {RETURN_ERROR(ERR_BADDATA)};
@@ -105,7 +106,7 @@ XYResult_t* createHash(ByteArray_t* dataToHash){
 
   /**************************************************/
   /* SHA-256 is currently the only hash implemented */
-  /**************************************************/
+  /************************************************** /
 
   wc_Sha256 sha256HashObject;
 
@@ -115,7 +116,7 @@ XYResult_t* createHash(ByteArray_t* dataToHash){
 
   /******************************************************************/
   /* this wc call can be called again and again to update the hash  */
-  /******************************************************************/
+  /****************************************************************** /
   wc_Sha256Update(&sha256HashObject,
                   (unsigned char*)dataToHash->payload,
                   dataToHash->size);
@@ -130,6 +131,7 @@ XYResult_t* createHash(ByteArray_t* dataToHash){
   int cleanupError = wolfCrypt_Cleanup();                 // clean up resources used by wolfCrypt
 
   return preallocated_return_result_ptr;
+  */
 }
 
 /**
@@ -161,7 +163,7 @@ XYResult_t* verifyHash(ByteArray_t* dataToBeHashed, XYObject_t* hashForCompariso
 
   /********************************/
   /* some guards against bad data */
-  /********************************/
+  /******************************** /
   if(!dataToBeHashed ||
      !dataToBeHashed->size ||
      !hashForComparison ||
@@ -190,7 +192,7 @@ XYResult_t* verifyHash(ByteArray_t* dataToBeHashed, XYObject_t* hashForCompariso
 
       /****************************************************************************/
       /* compare the new hash created with the one supplied to us for comparison. */
-      /****************************************************************************/
+      /**************************************************************************** /
 
       preallocated_return_result_ptr->error = ERR_INTERNAL_ERROR; // presume hashes don't match
       hashesMatch = FALSE;
@@ -213,6 +215,7 @@ XYResult_t* verifyHash(ByteArray_t* dataToBeHashed, XYObject_t* hashForCompariso
                                                             // result of this verify hash operation.
                                                             // TRUE = 1 = hashes match
                                                             // FALSE = 0 = hashes don't match
+  */
 }
 
 /**
@@ -236,12 +239,12 @@ XYResult_t* verifyHash(ByteArray_t* dataToBeHashed, XYObject_t* hashForCompariso
  ****************************************************************************************
  */
 XYResult_t* newHashProvider(){
-
+  /*
   HashProvider_t* newHasher = malloc(sizeof(HashProvider_t));    //TODO: wal, make sure this is freed
 
   /********************************/
   /* guard against malloc errors  */
-  /********************************/
+  /******************************** /
 
   if (!newHasher) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};        // did we get the newHasher?
 
@@ -257,6 +260,7 @@ XYResult_t* newHashProvider(){
   preallocated_return_result_ptr->result = newHasher;
 
   return preallocated_return_result_ptr;
+  */
 }
 
 //////////////////////////////////////////////////

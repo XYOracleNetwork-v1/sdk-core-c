@@ -1,3 +1,5 @@
+#pragma once
+
 #include <string.h>
 #include <stdint.h>
 #include "../XYResult.h"
@@ -30,6 +32,25 @@ XYResult_t XYObject_getLength(XYObject_t *self);
 //this is the length of the object, including the length field (if one exists),
 //and also including the header
 XYResult_t XYObject_getFullLength(XYObject_t *self);
+
+static const char TypedArray_id[2]            = { 0x30, 0x01 };
+static const char UnTypedArray_id[2]          = { 0x20, 0x01 };
+
+static const char BoundWitness_id[2]          = { 0x02, 0x01 };
+static const char KeySet_id[2]                = { 0x02, 0x02 };
+static const char SignatureSet_id[2]          = { 0x02, 0x03 };
+static const char Payload_id[2]               = { 0x02, 0x04 };
+static const char Index_id[2]                 = { 0x02, 0x05 };
+static const char PreviousHash_id[2]          = { 0x02, 0x06 };
+static const char NextPublicKey_id[2]         = { 0x02, 0x07 };
+static const char BridgeHashSet_id[2]         = { 0x02, 0x08 };
+static const char BridgeBlockSet_id[2]        = { 0x02, 0x09 };
+static const char BoundWitnessTransfer_id[2]  = { 0x02, 0x0a };
+
+static const char Sha256_id[2]                = { 0x03, 0x05 };
+static const char ECDSASecp256k1_id[2]        = { 0x04, 0x01 };
+static const char ECDSASecp256k1Sig_id[2]     = { 0x05, 0x01 };
+static const char Rssi_id[2]                  = { 0x08, 0x01 };
 
 /*
  * MACROS

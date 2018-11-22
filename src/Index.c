@@ -19,7 +19,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "xyo.h"
-#include "xyobject.h"
+#include "XYObjects/XYObject.h"
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -39,11 +39,12 @@ XYResult_t* Index_creator_create(const char id[2], void* user_data){
 
   /********************************/
   /* guard against bad input data */
-  /********************************/
+  /******************************** /
 
   if(!user_data) {RETURN_ERROR(ERR_BADDATA);}
 
   return newObject(id, user_data);
+  */
 }
 
 /*----------------------------------------------------------------------------*
@@ -64,7 +65,7 @@ XYResult_t* Index_creator_fromBytes(char* index_data){
 
   /********************************/
   /* guard against bad input data */
-  /********************************/
+  /******************************** /
 
   if(!index_data) {RETURN_ERROR(ERR_BADDATA);}
 
@@ -74,6 +75,7 @@ XYResult_t* Index_creator_fromBytes(char* index_data){
   uint32_t indexref = to_uint32((unsigned char*)&index_data[2]);
   memcpy(index, &indexref, 4);
   return newObject(id, index);
+  */
 }
 
 /*----------------------------------------------------------------------------*
@@ -94,7 +96,7 @@ XYResult_t* Index_creator_toBytes(XYObject_t* user_XYObject){
 
   /********************************/
   /* guard against bad input data */
-  /********************************/
+  /******************************** /
 
   if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA);}
 
@@ -113,6 +115,7 @@ XYResult_t* Index_creator_toBytes(XYObject_t* user_XYObject){
   preallocated_return_result_ptr->result = &encoded_bytes;
 
   return preallocated_return_result_ptr;
+  */
 }
 
 // end of file index.c

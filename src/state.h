@@ -19,34 +19,25 @@
 
 #ifndef STATE_H
 #include <stdint.h>
-#include "xyobject.h"
+#include "XYObjects/XYObject.h"
 #include "crypto.h"
 #include "xyo.h"
-#include "ZigZagBoundWitnessSession.h"
-#include "include/state/originchain.h"
-#include "include/state/repository.h"
+//#include "ZigZagBoundWitnessSession.h"
+//#include "include/state/originchain.h"
+//#include "include/state/repository.h"
 
 /*
  * TYPE DEFINITIONS
  ****************************************************************************************
  */
 
-typedef struct OriginChainState OriginChainState_t;
-
-/*
- * STRUCTURES
- ****************************************************************************************
- */
-
-struct OriginChainState {
-  XYResult_t* (*newOriginBlock)(OriginChainState_t* self_OriginChainState, ByteArray_t* newHash);
-  XYResult_t* (*addSigner)(OriginChainState_t* self_OriginChainState, Signer_t* newSigner);
-  XYResult_t* (*getSigners)(OriginChainState_t* self_OriginChainState);
+typedef struct OriginChainState {
   Signer_t* currentSigner;
   Signer_t* nextSigner;
-  ByteArray_t* latestHash;
+  char latestHash[32];
   uint32_t index;
-};
+} OriginChainState_t;
+
 
 /*
  * FUNCTION DECLARATIONS
@@ -57,4 +48,5 @@ XYResult_t* newOriginBlock(OriginChainState_t* self_OriginChainState, ByteArray_
 XYResult_t* addSigner(OriginChainState_t* self_OriginChainState, Signer_t* user_Signer);
 XYResult_t* getSigners(OriginChainState_t* self_OriginChainState);
 
+#define STATE_H
 #endif

@@ -23,7 +23,7 @@
 #include <stdio.h>
 #include "defines.h"
 #include "xyresult.h"
-#include "xyobject.h"
+#include "XYObjects/XYObject.h"
 #include "arrays.h"
 #include "ByteArray.h"
 #include "include/objects/Payload.h"

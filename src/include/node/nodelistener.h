@@ -18,7 +18,7 @@
  */
 #ifndef NODELISTENER_H
 #define NODELISTENER_H
-//#include "xyobject.h"
+//#include "XYObjects/XYObject.h"
 //#include "BoundWitness.h"
 
 typedef struct NodeListener NodeListener;

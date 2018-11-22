@@ -13,7 +13,6 @@
  */
 
 #ifndef ZIGZAGBOUNDWITNESSSESSION_H
-#define ZIGZAGBOUNDWITNESSSESSION_H
 
 /*
  * INCLUDES
@@ -22,37 +21,33 @@
 
 //#include "network.h"                // includes <stdint.h>
 #include "xyresult.h"
-#include "xyobject.h"
+#include "XYObjects/XYObject.h"
 #include "arrays.h"
 #include "ByteArray.h"
 #include "hash.h"
 #include "crypto.h"
 #include "include/objects/BoundWitness.h"
 #include "include/objects/ZigZagBoundWitness.h"     // "crypto.h", "BoundWitness.h", "xyobject.h", "hash.h"
-
-
+#include "relaynode.h"
+#include "include/node/nodebase.h"
 
 /*
  * TYPE DEFINITIONS
  ****************************************************************************************
  */
 
-typedef struct ZigZagBoundWitnessSession ZigZagBoundWitnessSession_t;
+//typedef struct ZigZagBoundWitnessSession ZigZagBoundWitnessSession_t;
 //typedef struct NetworkPipe NetworkPipe_t;
-typedef struct NetworkPeer NetworkPeer_t;
+//typedef struct NetworkPeer NetworkPeer_t;
 
 /*
  * STRUCTURES
  ****************************************************************************************
- */
+ * /
 
 struct ZigZagBoundWitnessSession {
-  XYResult_t* (*completeBoundWitness)(ZigZagBoundWitnessSession_t* userSession, ByteArray_t* bwData);
-  NetworkPipe_t* NetworkPipe;
-  ZigZagBoundWitness_t* boundWitness;
-  uint8_t cycles;
-  uint8_t choice;
-};
+  
+}
 /*
 struct NetworkPipe{
   NetworkPeer_t* peer;
@@ -74,9 +69,8 @@ struct NetworkPeer{
  ****************************************************************************************
  */
 
-XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* data);
-XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession_t* userSession,
-                                 ByteArray_t* boundWitnessData);
+//XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* data);
+
 
 #define ZIGZAGBOUNDWITNESSSESSION_H
 #endif

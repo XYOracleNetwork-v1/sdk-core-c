@@ -21,43 +21,6 @@
 /**
  ****************************************************************************************
  *  NAME
- *      initRelayNode
- *
- *  DESCRIPTION
- *    Initializes the Node Base class with a repository and hashing provider, and sets up
- *    the state and bound witness session.
- *
- *  PARAMETERS
- *      object      [in]      CryptoCreator*
- *
- *  RETURNS
- *      id          [out]     char*
- *
- *  NOTES
- *
- ****************************************************************************************
- */
-
-XYResult_t* initRelayNode(RelayNode* self, OriginChainProvider_t* repository, HashProvider_t* hashingProvider, uint8_t heuristicCount){
-  NodeBase_t* baseNode;
-  initNode(&baseNode, repository, hashingProvider, heuristicCount);
-  self->node = baseNode;
-  self->node->getChoice = Relay_getChoice;
-  //self->getChoice = Relay_getChoice;
-  self->doConnection = doConnection;
-  XYResult_t* return_result = malloc(sizeof(XYResult_t));
-  if(return_result){
-    return_result->error = OK;
-    return_result->result = 0;
-    return return_result;
-  } else {
-    RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
-  }
-}
-
-/**
- ****************************************************************************************
- *  NAME
  *      Relay_getChoice
  *
  *  DESCRIPTION
@@ -117,22 +80,27 @@ XYResult_t* initRelayNode(RelayNode* self, OriginChainProvider_t* repository, Ha
  *
  ****************************************************************************************
  */
- XYResult_t* doConnection(RelayNode* self){
-  NetworkPipe_t* connectionToOtherPartyFrom = self->findSomeoneToTalkTo();
-  if(connectionToOtherPartyFrom->initializationData == NULL){
-    XYResult_t* whatTheOtherPartyWantsToDo_result = connectionToOtherPartyFrom->peer->getRole(connectionToOtherPartyFrom);
+ XYResult_t doConnection(RelayNode_t* self){
+  NetworkPipe_t connectionToOtherPartyFrom;
+  XYResult_t findPeer_result = findPeer(&self->networkProvider, &connectionToOtherPartyFrom, self->node.choice);
+  
+  //if(connectionToOtherPartyFrom.scratchBuffer == NULL){
+    /*
+    XYResult_t whatTheOtherPartyWantsToDo_result = connectionToOtherPartyFrom->peer->getRole(connectionToOtherPartyFrom);
     if(whatTheOtherPartyWantsToDo_result->error != OK){
       connectionToOtherPartyFrom->close(connectionToOtherPartyFrom);
       RETURN_ERROR(ERR_PEER_INCOMPATABLE); //TODO: close the pipe?!?
     }
     ByteArray_t* whatTheOtherPartyWantsToDo = whatTheOtherPartyWantsToDo_result->result;
-    if(self->procedureCatalogue->canDo(whatTheOtherPartyWantsToDo)){
-      return self->node->doBoundWitness(self->node, NULL, connectionToOtherPartyFrom);;
+    if(canDo(whatTheOtherPartyWantsToDo)){
+      return doBoundWitness(self->node, NULL, connectionToOtherPartyFrom);;
     } else {
       connectionToOtherPartyFrom->close(connectionToOtherPartyFrom);
       RETURN_ERROR(ERR_PEER_INCOMPATABLE);
     }
-  } else {
-    return self->node->doBoundWitness(self->node, connectionToOtherPartyFrom->initializationData, connectionToOtherPartyFrom);;
-  }
+    */
+  //} else {
+  //return doBoundWitness(self->node, connectionToOtherPartyFrom.scratchBuffer, connectionToOtherPartyFrom);;
+  //}
+  XYResult_t result = completeBoundWitness(self->node, self->node.NetworkPipe.scratchBuffer);
 }
