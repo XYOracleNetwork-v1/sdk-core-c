@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "WeakArray.h"
+#include "../Iterator.h"
 //#include "../../XYObjectHeader.h"
 #define XY_DEBUGMODE
 #ifdef XY_DEBUGMODE
@@ -123,13 +124,13 @@ int testGap(){
     endPtr = arrayObject.payload + XYObject_getLength(self).value.ui;
     XY_ASSERT_EQUAL(*(endPtr-(sizeof(char)*6)), *(uint8_t*)&signatureFlags );
 
-    WeakArray_gap(&arrayObject, 3, 12, 2);
+    Iterator_gap(&arrayObject, 3, 12, 2);
     char* newEndPtr = arrayObject.payload + XYObject_getLength(self).value.ui;
 
     XY_ASSERT_EQUAL(*(newEndPtr-(sizeof(char)*6*2)), *(uint8_t*)&signatureFlags );
     XY_ASSERT_EQUAL(newEndPtr-2, endPtr );
 
-    WeakArray_gap(&arrayObject, 2, 18, 5);
+    Iterator_gap(&arrayObject, 2, 18, 5);
     newEndPtr = arrayObject.payload + XYObject_getLength(self).value.ui;
 
     XY_ASSERT_EQUAL(*(newEndPtr-(sizeof(char)*6*2)), *(uint8_t*)&signatureFlags );

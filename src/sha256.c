@@ -3,18 +3,21 @@
 #include "hash.h"
 
 XYResult_t* Heuristic_sha256_Creator_create(const char id[2], void* sha256){
-  return newObject(id, sha256);
+  return NULL;//newObject(id, sha256);
 }
 
 XYResult_t* Heuristic_sha256_Creator_fromBytes(char* heuristic_data){
+  /*
   char id[2];
   memcpy(id, heuristic_data, 2);
   char* hash = malloc(sizeof(char)*32);
   memcpy(hash, heuristic_data+2, 32);
-  return newObject(id, &hash);
+  */
+  return NULL; //newObject(id, &hash);
 }
 
 XYResult_t* Heuristic_sha256_Creator_toBytes(XYObject_t* user_XYObject){
+  /*
   XYResult_t* return_result = malloc(sizeof(XYResult_t));
   if(return_result){
     char* return_buffer = malloc(sizeof(char)*32);
@@ -26,4 +29,6 @@ XYResult_t* Heuristic_sha256_Creator_toBytes(XYObject_t* user_XYObject){
   } else {
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
+  */
+  return NULL;
 }

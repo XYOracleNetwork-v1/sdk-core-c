@@ -60,7 +60,7 @@ typedef struct BoundWitnessOption BoundWitnessOption;
 
 typedef struct NodeBase {
   OriginChainState_t originChainState;
-  struct NetworkPipe_t* NetworkPipe;
+  NetworkPipe_t* NetworkPipe;
   uint8_t choice;
 } NodeBase_t;
 
@@ -74,7 +74,7 @@ void notifyListeners(NodeBase_t* self, BoundWitness_t* boundWitness);
 XYResult_t* getBridgedBlocks(NodeBase_t* self);
 //XYResult_t doBoundWitness(NodeBase_t* self, ByteArray_t* startingData, struct NetworkPipe_t* pipe);
 XYResult_t completeBoundWitness(NodeBase_t* userSession,
-                                  char* boundWitnessData);
+                                  ByteArray_t* boundWitnessData, NetworkPipe_t* pipe);
 uint8_t updateOriginState(NodeBase_t* self, BoundWitness_t* boundWitness);
 void onBoundWitnessEndSuccess(NodeBase_t* self, BoundWitness_t* boundWitness);
 void onBoundWitnessEndFailure( void );

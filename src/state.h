@@ -46,7 +46,7 @@ typedef struct OriginChainState {
 
 XYResult_t* newOriginBlock(OriginChainState_t* self_OriginChainState, ByteArray_t* originBlockHash);
 XYResult_t* addSigner(OriginChainState_t* self_OriginChainState, Signer_t* user_Signer);
-XYResult_t* getSigners(OriginChainState_t* self_OriginChainState);
+XYResult_t getSigners(OriginChainState_t* self_OriginChainState);
 
 #define STATE_H
 #endif

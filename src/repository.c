@@ -16,8 +16,7 @@
  * INCLUDES
  ****************************************************************************************
  */
-#include "state.h"
-#include "ZigZagBoundWitnessSession.h"
+#include "repository.h"
 
 /*----------------------------------------------------------------------------*
 *  NAME
@@ -34,6 +33,7 @@
 *      XYResult_t*                              [out]      bool   Returns OK if success
 *----------------------------------------------------------------------------*/
 OriginChainProvider_t* initOriginChainProvider(){
+  /*
   XYResult_t* lookup_result = tableLookup(IntStrongArray_id);
   if(lookup_result->error != OK) { return NULL; }
   ObjectProvider_t* ISA_Creator = lookup_result->result;
@@ -54,6 +54,8 @@ OriginChainProvider_t* initOriginChainProvider(){
   } else {
     return NULL;
   }
+  */
+  return NULL;
 
 }
 
@@ -160,7 +162,8 @@ XYResult_t* read(RepositoryProvider_t* self, uint16_t offset, uint16_t timeout){
 *      XYResult_t*                              [out]      bool   Returns OK if success
 *----------------------------------------------------------------------------*/
 XYResult_t* append(OriginChainProvider_t* self, ByteArray_t* value, uint16_t timeout){
-  if(timeout){ /* unimplemented */ }
+  /*
+  if(timeout){ /* unimplemented * / }
   XYResult_t* lookup_result = tableLookup(BoundWitness_id);
 
   ObjectProvider_t* BoundWitness_Creator = lookup_result->result;
@@ -177,7 +180,8 @@ XYResult_t* append(OriginChainProvider_t* self, ByteArray_t* value, uint16_t tim
   //boundWitness->size = to_uint32((unsigned char*)(uintptr_t)&boundWitness->size);
   self->logicalEnd = self->logicalEnd +1;
   return ((IntStrongArray_t*)self->repository)->add(self->repository, boundWitnessObject);
-
+  */
+  return NULL;
 }
 
 /*----------------------------------------------------------------------------*
@@ -194,6 +198,7 @@ XYResult_t* append(OriginChainProvider_t* self, ByteArray_t* value, uint16_t tim
 *      XYResult_t*                              [out]      XYObject_t*   IntStrongArray
 *----------------------------------------------------------------------------*/
 XYResult_t* getChain(OriginChainProvider_t* self){
+  /*
   XYResult_t* lookup_result = tableLookup(IntStrongArray_id);
   if(lookup_result->error != OK) { RETURN_ERROR(ERR_CRITICAL); }
   ObjectProvider_t* ISA_Creator = lookup_result->result;
@@ -217,6 +222,8 @@ XYResult_t* getChain(OriginChainProvider_t* self){
     free(toBytes_result);
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
+  */
+  return NULL;
 }
 
 /*----------------------------------------------------------------------------*
@@ -233,12 +240,12 @@ XYResult_t* getChain(OriginChainProvider_t* self){
 *      XYResult_t*                              [out]      XYObject_t*   IntStrongArray
 *----------------------------------------------------------------------------*/
 XYResult_t* deleteChain(OriginChainProvider_t* self){
-  /* format old chain */
+  /* format old chain * /
 
-  /* KNOWN MEMORY LEAK. TODO: IMPLEMENT ARRAY DECONSTRUCTOR */
+  /* KNOWN MEMORY LEAK. TODO: IMPLEMENT ARRAY DECONSTRUCTOR * /
   free(((IntStrongArray_t*)self->repository)->payload);
 
-  /* Create new IntStrongArray */
+  /* Create new IntStrongArray * /
 
   XYResult_t* lookup_result = tableLookup(IntStrongArray_id);
   if(lookup_result->error != OK) { RETURN_ERROR(ERR_CRITICAL); }
@@ -261,4 +268,6 @@ XYResult_t* deleteChain(OriginChainProvider_t* self){
   } else {
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
+  */
+  return NULL;
 }

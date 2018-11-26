@@ -63,7 +63,8 @@ struct NetworkPeer{
 struct NetworkPipe{
   NetworkPeer_t peer;
   NetworkProvider_t* provider;
-  char scratchBuffer[1024];
+  uint8_t role;
+  ByteArray_t scratchBuffer;
 };
 
 struct TcpClient {

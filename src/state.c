@@ -39,7 +39,7 @@ XYResult_t* newOriginBlock(OriginChainState_t* self_OriginChainState,
 
   /********************************/
   /* guard against bad input data */
-  /********************************/
+  /******************************** /
 
   if(!self_OriginChainState || !originBlockHash) {RETURN_ERROR(ERR_BADDATA);}
 
@@ -54,8 +54,8 @@ XYResult_t* newOriginBlock(OriginChainState_t* self_OriginChainState,
 
   preallocated_return_result_ptr->error = OK;
   preallocated_return_result_ptr->result = 0;
-
-  return preallocated_return_result_ptr;
+  */
+  return NULL;//preallocated_return_result_ptr;
 }
 
 /*----------------------------------------------------------------------------*
@@ -76,7 +76,7 @@ XYResult_t* addSigner(OriginChainState_t* self_OriginChainState, Signer_t* user_
 
   /********************************/
   /* guard against bad input data */
-  /********************************/
+  /******************************** /
 
   if(!self_OriginChainState || !user_Signer) {RETURN_ERROR(ERR_BADDATA);}
 
@@ -91,8 +91,8 @@ XYResult_t* addSigner(OriginChainState_t* self_OriginChainState, Signer_t* user_
 
   preallocated_return_result_ptr->error = OK;
   preallocated_return_result_ptr->result = 0;
-
-  return preallocated_return_result_ptr;
+  */
+  return NULL;//preallocated_return_result_ptr;
 }
 
 /**
@@ -113,8 +113,9 @@ XYResult_t* addSigner(OriginChainState_t* self_OriginChainState, Signer_t* user_
  *
  ****************************************************************************************
  */
- XYResult_t* getSigners(OriginChainState_t* self_OriginChainState){
-   if(self_OriginChainState->currentSigner == NULL) { RETURN_ERROR(ERR_NOSIGNER);}
+ XYResult_t getSigners(OriginChainState_t* self_OriginChainState){
+   if(self_OriginChainState->currentSigner == NULL) { XYERROR(XY_STATUS_ERROR);}
+   /*
    XYResult_t* return_result = malloc(sizeof(XYResult_t));
    if(return_result){
      return_result->error = OK;
@@ -123,5 +124,8 @@ XYResult_t* addSigner(OriginChainState_t* self_OriginChainState, Signer_t* user_
    } else {
      RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
    }
+   */
+   XYResult_t result;
+   return result;
  }
 // end of file state.c

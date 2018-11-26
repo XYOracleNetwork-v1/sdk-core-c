@@ -30,9 +30,10 @@
 //#include "include/state/originchain.h"
 //#include "include/state/repository.h"
 //#include "ZigZagBoundWitnessSession.h"
+#include "network.h"
 #include "include/node/nodebase.h"
 
-#include "network.h"
+
 
 
 

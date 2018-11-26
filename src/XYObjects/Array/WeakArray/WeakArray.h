@@ -29,7 +29,6 @@ XYResult_t WeakArray_add(XYObject_t *self,
 XYResult_t WeakArray_get(XYObject_t *self,
                          int index);
 
-XYResult_t WeakArray_gap(XYObject_t *self, uint32_t element, uint32_t bytesAfter, uint32_t offset);
 
 #define XYOBJ_INCREMENT(_VALUE_)                          \
   switch (((XYObject_t *)self)->header->flags.lengthType) \
@@ -47,18 +46,5 @@ XYResult_t WeakArray_gap(XYObject_t *self, uint32_t element, uint32_t bytesAfter
     XYOBJ_INCREMENT_UINT64(_VALUE_);                      \
     break;                                                \
   }
-
-typedef struct arrayItr
-{
-  XYObject_t array;
-  uint16_t index;
-  void *indexPtr;
-} XYArrayItr_t;
-
-XYArrayItr_t WeakArrayIterator(XYObject_t* self);
-XYObject_t IteratorNext(XYArrayItr_t* itr);
-XYObject_t IteratorGet(XYArrayItr_t* itr);
-
-#define XYCHECK_ITRERATOR(_ITR_) if(( (XYArrayItr_t)_ITR_.header != NULL && (XYArrayItr_t)_ITR_.payload != NULL){ result.status = ERR_CRITICAL}
 
 uint8_t lengthTypeToLength(int _VALUE_);

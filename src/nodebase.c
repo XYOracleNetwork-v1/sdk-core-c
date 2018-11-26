@@ -16,7 +16,13 @@
  * INCLUDES
  ****************************************************************************************
  */
-#include "relaynode.h"
+#include "state.h"
+#include "XYObjects/XYObject.h"
+#include "ByteArray.h"
+#include "network.h"
+#include "defines.h"
+#include "include/node/nodebase.h"
+
 
 /**
  ****************************************************************************************
@@ -467,7 +473,7 @@ void notifyListeners(NodeBase_t* self, BoundWitness_t* boundWitness){
 /*
 * Create bound witness, handle outcome, and store if needed
 */
-XYResult_t* doBoundWitness(NodeBase_t* self, ByteArray_t* startingData, NetworkPipe_t* pipe){
+XYResult_t completeBoundWitness(NodeBase_t* self, ByteArray_t* startingData, NetworkPipe_t* pipe){
   /*
   if(self->session == NULL){
     if(return_result == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
@@ -502,7 +508,7 @@ XYResult_t* doBoundWitness(NodeBase_t* self, ByteArray_t* startingData, NetworkP
     self->session->boundWitness->signForSelf = signForSelf;
     */
     //free(lookup_result);
-    XYResult_t completeBoundWitness_result = completeBoundWitness(self, startingData);
+    XYResult_t completeBoundWitness_result = completeBoundWitness(self, startingData, pipe);
     /*
     pipe->close(self->session);
     if(completeBoundWitness_result.status != XY_STATUS_OK){
@@ -518,6 +524,7 @@ XYResult_t* doBoundWitness(NodeBase_t* self, ByteArray_t* startingData, NetworkP
     RETURN_ERROR(ERR_CRITICAL);
   }
   */
+ return completeBoundWitness_result;
 }
 /*
 * Update the state of the origin chain.

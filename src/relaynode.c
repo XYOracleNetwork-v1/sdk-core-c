@@ -81,8 +81,7 @@
  ****************************************************************************************
  */
  XYResult_t doConnection(RelayNode_t* self){
-  NetworkPipe_t connectionToOtherPartyFrom;
-  XYResult_t findPeer_result = findPeer(&self->networkProvider, &connectionToOtherPartyFrom, self->node.choice);
+
   
   //if(connectionToOtherPartyFrom.scratchBuffer == NULL){
     /*
@@ -102,5 +101,5 @@
   //} else {
   //return doBoundWitness(self->node, connectionToOtherPartyFrom.scratchBuffer, connectionToOtherPartyFrom);;
   //}
-  XYResult_t result = completeBoundWitness(self->node, self->node.NetworkPipe.scratchBuffer);
+  XYResult_t result = completeBoundWitness(&self->node, self->node.NetworkPipe->scratchBuffer, self->node.NetworkPipe);
 }
