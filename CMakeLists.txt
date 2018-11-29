@@ -31,8 +31,7 @@ set(CMAKE_BUILD_TYPE Debug)
 if(UNIX AND NOT APPLE)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Weverything -fsanitize=address -fsanitize=leak -Wno-padded -Wno-zero-length-array -Wno-unused-parameter -ferror-limit=50")
-
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Weverything -fsanitize=address -fsanitize=leak -Wno-padded -Wno-zero-length-array -Wno-unused-parameter -ferror-limit=50")
 	endif()
 endif()
 # add the executable

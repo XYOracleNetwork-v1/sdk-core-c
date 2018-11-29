@@ -22,6 +22,7 @@
 #define MAJOR_HEURISTICS                        (0x08)
 #define MAJOR_CUSTOM                            (0x10)
 
+#define MINOR_ARRAY                             (0x01)
 /*
  * MAJOR_ARRAY group Minor values
  */
@@ -138,7 +139,7 @@
 #define ERROR_ALLOC_FAILED                      -26
 #define ERROR_SEND_FAILED                       -27
 #define MAX_PEERS                                10
-#define CATALOG_BUFFER_SIZE                       9
+#define CATALOG_BUFFER_SIZE                       5
 #define CATALOG_SIZE                              4
 #define DEFAULT_NUM_PEERS                         1
 

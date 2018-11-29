@@ -32,22 +32,9 @@
 #include "ByteArray.h"
 #include "xyresult.h"
 
-typedef struct NetworkProvider NetworkProvider_t;
 typedef struct ProcedureCatalogue ProcedureCatalogue_t;
 typedef struct NetworkPipe NetworkPipe_t;
 typedef struct NetworkPeer NetworkPeer_t;
-
-struct NetworkProvider {
-  /*
-   * Sentinel-known implementation specific private variables
-   * They can be erased in later networking impelmentations,
-   * the only file that uses these variables at the time
-   * of writing is network.c for TCP.
-   */
-   struct sockaddr_in peer;
-   uint16_t port;
-   uint8_t peerCount;
-};
 
 struct NetworkPeer{
   /*
@@ -58,18 +45,14 @@ struct NetworkPeer{
    */
   int socket;
   struct sockaddr_in address;
+  uint16_t port;
 };
 
 struct NetworkPipe{
   NetworkPeer_t peer;
-  NetworkProvider_t* provider;
   uint8_t role;
   ByteArray_t scratchBuffer;
-};
-
-struct TcpClient {
-  NetworkProvider_t* networkProvider;
-  struct sockaddr_in* peers[MAX_PEERS];
+  char theirCatalog[CATALOG_BUFFER_SIZE+4];
 };
 
 
@@ -88,7 +71,7 @@ struct server_arguments{
 
 void* serverThread(void* flag);
 void* clientThread(void* args);
-extern XYResult_t findPeer(NetworkProvider_t* self, NetworkPipe_t* pipe, uint8_t flags);
+extern XYResult_t findPeer(NetworkPipe_t* pipe, char* buffer, uint32_t size, uint8_t flags);
 extern uint8_t canDo(ByteArray_t* catalog);
 
 #endif

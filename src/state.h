@@ -33,7 +33,6 @@
 
 typedef struct OriginChainState {
   Signer_t* currentSigner;
-  Signer_t* nextSigner;
   char latestHash[32];
   uint32_t index;
 } OriginChainState_t;

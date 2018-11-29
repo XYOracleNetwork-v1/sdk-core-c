@@ -5,6 +5,7 @@
 #include "../XYResult.h"
 #include "XYObjectHeader.h"
 #include "../endian.h"
+#include "../defines.h"
 
 /*
  * TYPES
@@ -68,7 +69,8 @@ static const char Rssi_id[2]                  = { 0x08, 0x01 };
   CHECK_IS_XYOBJECT( _TYPE_ );
 
 //check if the passed in buffer is the expected object type
-#define IS_XYOBJECT(_TYPE_, _PTR_) (((XYObject_t*)_PTR_)->header->type == _TYPE_)
+#define IS_XYOBJECT(_TYPE_, _PTR_) matchType(_PTR_, _TYPE_)
+//(((XYObject_t*)_PTR_)->header->type == _TYPE_)
 
 //check the object type and return a validation error if it fails
 #define CHECK_IS_XYOBJECT(_TYPE_) \
@@ -89,3 +91,5 @@ static const char Rssi_id[2]                  = { 0x08, 0x01 };
 #define XYOBJ_INCREMENT_UINT16(_VALUE_) to_uint16_be((unsigned char*)((XYObject_t *)self)->payload, to_uint16(self->payload) + _VALUE_)
 #define XYOBJ_INCREMENT_UINT32(_VALUE_) to_uint32_be((unsigned char*)((XYObject_t *)self)->payload, to_uint32(self->payload) + _VALUE_)
 #define XYOBJ_INCREMENT_UINT64(_VALUE_) to_uint64_be((unsigned char *)((XYObject_t *)self)->payload, to_uint64(self->payload) + _VALUE_)
+
+uint8_t matchType(XYObject_t* self, uint8_t type);

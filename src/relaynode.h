@@ -38,13 +38,15 @@
 
 
 #include "include/node/nodebase.h"
+#include "XYObjects/Array/Iterator.h"
+#include "XYObjects/XYObject.h"
 
 typedef struct RelayNode RelayNode_t;
 
 struct RelayNode {
   NodeBase_t node;
   NodeListener listener;
-  NetworkProvider_t networkProvider;
+  NetworkPipe_t networkPipe;
 };
 
 //XYResult_t* initRelayNode(RelayNode_t* self, OriginChainProvider_t* repository, HashProvider_t* hashingProvider, uint8_t heuristicCount);
@@ -58,6 +60,8 @@ struct RelayNode {
 
 uint8_t Relay_getChoice(uint8_t* theirCatalog);
 XYResult_t doConnection(RelayNode_t* self);
+XYResult_t insertPublicKey(RelayNode_t* relay);
+XYResult_t insertPayloads(RelayNode_t* relay);
 //extern NetworkPipe_t* findSomeoneToTalkTo( void );
 
 

@@ -508,7 +508,7 @@ XYResult_t completeBoundWitness(NodeBase_t* self, ByteArray_t* startingData, Net
     self->session->boundWitness->signForSelf = signForSelf;
     */
     //free(lookup_result);
-    XYResult_t completeBoundWitness_result = completeBoundWitness(self, startingData, pipe);
+    //XYResult_t completeBoundWitness_result = completeBoundWitness(self, startingData, pipe);
     /*
     pipe->close(self->session);
     if(completeBoundWitness_result.status != XY_STATUS_OK){
@@ -524,7 +524,6 @@ XYResult_t completeBoundWitness(NodeBase_t* self, ByteArray_t* startingData, Net
     RETURN_ERROR(ERR_CRITICAL);
   }
   */
- return completeBoundWitness_result;
 }
 /*
 * Update the state of the origin chain.

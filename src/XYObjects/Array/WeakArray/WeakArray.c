@@ -12,9 +12,6 @@
 #include "WeakArray.h"
 #include <stdlib.h>
 
-void breakpoint(void);
-void breakpoint(void){}
-
 uint8_t lengthTypeToLength(int _VALUE_){
   switch (_VALUE_)
   {
@@ -50,7 +47,7 @@ XYResult_t WeakArray_add(XYObject_t *self,
   uint8_t *newObject = (((XYObject_t *)self)->payload + currentLength.value.i);
   
   //set the type of the newly added item
-  if(self->header->flags.typed){
+  if(!self->header->flags.typed || currentLength.value.ui == lengthTypeToLength(self->header->flags.lengthType)){
     memcpy(newObject, &newItemHeader, sizeof(newItemHeader));
   }
 
