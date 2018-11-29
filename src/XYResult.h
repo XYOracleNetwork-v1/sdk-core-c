@@ -20,6 +20,7 @@ typedef struct XYResult{
 } XYResult_t;
 
 #define XYERROR(_STATUS_) { XYResult_t result; result.status = _STATUS_; result.value.i = 0; return result; };
+#define XYSTATUS(_STATUS_) { result.status = _STATUS_; result.value.i = 0; return result; };
 #define CHECK_NULL(_VALUE_) if (!_VALUE_) { XYERROR(XY_STATUS_ERROR); }
 #define CHECK_RESULT(_RESULT_) if (_RESULT_.status != XY_STATUS_OK) { return _RESULT_; };
 
