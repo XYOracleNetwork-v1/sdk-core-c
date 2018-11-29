@@ -143,7 +143,10 @@
 #define CATALOG_SIZE                              4
 #define DEFAULT_NUM_PEERS                         1
 
-#define CAUSES_BUGS                          100000
+#define UNTYPED_ITERABLE                        160
+#define TYPED_ITERABLE                          176
+#define NONITERABLE_TWOBYTE                     111
+
 /*
  * Configs
  */

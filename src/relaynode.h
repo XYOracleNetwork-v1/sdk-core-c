@@ -62,6 +62,8 @@ uint8_t Relay_getChoice(uint8_t* theirCatalog);
 XYResult_t doConnection(RelayNode_t* self);
 XYResult_t insertPublicKey(RelayNode_t* relay);
 XYResult_t insertPayloads(RelayNode_t* relay);
+XYResult_t insertSignature(RelayNode_t* relay);
+extern XYResult_t socket_send(NetworkPipe_t* self, char* data, uint32_t count);
 //extern NetworkPipe_t* findSomeoneToTalkTo( void );
 
 
