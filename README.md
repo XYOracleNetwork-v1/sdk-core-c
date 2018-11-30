@@ -24,3 +24,5 @@ This should compile a XYO library in the `build` folder.
 This project is licensed under the MIT License - see the LICENSE.md file for details
 
 
+
+<br><br><p align="center">Made with  ❤️  by [**XY - The Persistent Company**] (https://xy.company)</p>
