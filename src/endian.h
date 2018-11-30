@@ -67,4 +67,12 @@ void to_uint32_be(unsigned char* dest, uint32_t value);
  */
 void to_uint16_be(unsigned char* dest, uint16_t value);
 
+/**
+ * @brief Detect if the machine running is littleEndian.
+ * 
+ * @param char 
+ * @param value 
+ */
+int littleEndian(void);
+
 #endif

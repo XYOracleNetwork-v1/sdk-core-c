@@ -18,13 +18,6 @@ XYArrayItr_t WeakArrayIterator(XYObjectHeader_t* header, char* buffer){
   } else {
     uint8_t lenLen = lengthTypeToLength(header->flags.lengthType);
     return (XYArrayItr_t){header, buffer, (XYObjectHeader_t*)(buffer+lenLen), (XYObjectHeader_t*)(buffer+lenLen+2)};
-    /*
-    if(header->flags.typed == 1){
-      return (XYArrayItr_t){header, buffer, (XYObjectHeader_t*)buffer+lenLen, buffer+lenLen+2};
-    } else {
-      return (XYArrayItr_t){header, buffer, (XYObjectHeader_t*)buffer+lenLen, buffer+lenLen};
-    }
-    */
   }
 }
 
@@ -76,17 +69,8 @@ XYObject_t IteratorGet(XYArrayItr_t* itr){
   return returnObject;
 }
 
-//void breakpoint();
-//void breakpoint(){}
-//#define Iterator_gap(_self, _element, _bytesAfter, _offset, _optional) Iterator_bookmark(_self, _element, _bytesAfter, _offset, _optional)
-
 XYResult_t Iterator_bookmark(XYObject_t* self, uint32_t element, uint32_t bytesAfter, uint32_t offset, XYArrayItr_t* optionalItr){
   DECLARE_RESULT()
-
-  /*
-   * Malloc needed here to prevent memcpy from 
-   * copying into the buffer it's replacing
-   */
   XYArrayItr_t* objectItr;
  
   if(optionalItr != NULL){
@@ -105,14 +89,8 @@ XYResult_t Iterator_bookmark(XYObject_t* self, uint32_t element, uint32_t bytesA
   }
   
   char* current = objectItr->indexPtr;
-  ///char* tempBuffer = malloc(((char*)self->payload+(XYObject_getLength(self).value.ui))-current);
   
   memmove(current+offset, current, bytesAfter);
-  //memcpy(tempBuffer, current, bytesAfter);
-  //memset(current, 0, ((char*)self->payload+(XYObject_getLength(self).value.ui))-current);
-  //memcpy(current+offset, tempBuffer, bytesAfter);
-  
-  //free(tempBuffer);
   
   XYOBJ_INCREMENT(offset);
   
@@ -123,13 +101,6 @@ XYResult_t Iterator_bookmark(XYObject_t* self, uint32_t element, uint32_t bytesA
 XYResult_t Iterator_insert(XYObject_t* self, uint32_t element, uint32_t offset, uint32_t totalBytes, char* bytes){
   
   DECLARE_RESULT();
-
-  /*
-   * Malloc needed here to prevent memcpy from 
-   * copying into the buffer it's replacing
-   */
-  
-  
   XYArrayItr_t objectItr = WeakArrayIterator(self->header, self->payload);
   char* charCounter = objectItr.indexPtr;
   XYObject_t currentObject = IteratorGet(&objectItr);
@@ -146,9 +117,7 @@ XYResult_t Iterator_insert(XYObject_t* self, uint32_t element, uint32_t offset, 
   uint32_t bytesAfter = current-charCounter;
   
   memmove(current+offset, current, bytesAfter);
-  //memcpy(tempBuffer, current, bytesLeft);
   memcpy(current, bytes, offset);
-  //memcpy(current+offset, tempBuffer, bytesLeft);
   
 
   XYOBJ_INCREMENT(offset);

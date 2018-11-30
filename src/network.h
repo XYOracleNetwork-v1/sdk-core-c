@@ -27,10 +27,9 @@
 #include <string.h>
 #include <fcntl.h>
 #include <limits.h>
-#include "xyo.h"
 #include "defines.h"
 #include "ByteArray.h"
-#include "xyresult.h"
+#include "XYResult.h"
 
 typedef struct ProcedureCatalogue ProcedureCatalogue_t;
 typedef struct NetworkPipe NetworkPipe_t;

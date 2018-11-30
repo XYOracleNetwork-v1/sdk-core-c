@@ -21,6 +21,7 @@ file(GLOB_RECURSE SOURCES "src/*.c")
 include_directories("${PROJECT_BINARY_DIR}")
 
 set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Release)
 
 #find_program(iwyu_path NAMES iwyu-tool iwyu-fix-includes)
 #if(NOT iwyu_path)

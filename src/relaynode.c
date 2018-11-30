@@ -47,20 +47,27 @@
      }
    }
    return 0;
-   /*
-     if((*theirCatalog - BOUND_WITNESS_OPTION) & TAKE_ORIGIN_CHAIN_OPTION){
-       return GIVE_ORIGIN_CHAIN_OPTION + BOUND_WITNESS_OPTION;
-     }
-   } else {
-     if(*theirCatalog & BOUND_WITNESS_OPTION){
-       return BOUND_WITNESS_OPTION;
-     } else {
-       return 0;
-     }
-   }
-   return 0;
-   */
 }
+
+#define typedFlags 176
+#define untypedFlags 78
+#define untypedFlagsNoIteration 190
+
+char payloadBuffer[30] = { TYPED_ITERABLE, 0x01, 0x00, 0x00, 0x00, sizeof(payloadBuffer)-2, 176, 0x08, 
+                              0x00, 0x00, 0x00, sizeof(payloadBuffer)-8, 78, 0x01, 0x00, sizeof(payloadBuffer)-10, 190, 0x03,
+                              0x00, sizeof(payloadBuffer)-12, 0x00, 0x00, 0x00, 0x01, UNTYPED_ITERABLE, 0x01, 
+                              0x00, 0x00, 0x00, 0x04};
+char paydbg[] = { TYPED_ITERABLE, 0x01, 0x00, 0x00, 0x00, sizeof(payloadBuffer)-2, 176, 0x08, 
+                              0x00, 0x00, 0x00, sizeof(payloadBuffer)-8, 78, 0x01, 0x00, sizeof(payloadBuffer)-10, 190, 0x03,
+                              0x00, sizeof(payloadBuffer)-12, 0x00, 0x00, 0x00, 0x01, UNTYPED_ITERABLE, 0x01, 
+                              0x00, 0x00, 0x00, 0x04};
+
+char signatureBuffer[6+12+66] = { TYPED_ITERABLE, 0x01, 0x00, 0x00, 0x00, sizeof(signatureBuffer)-2, typedFlags, 0x08, 0x00, sizeof(signatureBuffer)-8, untypedFlags, 0x01, 0x00, 70, NONITERABLE_TWOBYTE, 0x04, 0x00, 68 };
+char sigdbg[] = { TYPED_ITERABLE, 0x01, 0x00, 0x00, 0x00, sizeof(signatureBuffer)-2, typedFlags, 0x08, 0x00, sizeof(signatureBuffer)-8, untypedFlags, 0x01, 0x00, 70, NONITERABLE_TWOBYTE, 0x04, 0x00, 68 };
+
+char pubkeyBuffer[6+8+66] = { TYPED_ITERABLE, 2, 0, 0, 0, sizeof(pubkeyBuffer)+sizeof(payloadBuffer)+sizeof(signatureBuffer), typedFlags, 0x01, 0x00, 68+4, untypedFlags, 0x0d, 0x00, 68 };
+char pubdbg[] = { TYPED_ITERABLE, 2, 0, 0, 0, sizeof(pubkeyBuffer)+sizeof(payloadBuffer)+sizeof(signatureBuffer), typedFlags, 0x01, 0x00, 68+4, untypedFlags, 0x0d, 0x00, 68 };
+
 
 /**
  ****************************************************************************************
@@ -84,29 +91,27 @@
 
   DECLARE_RESULT();
   result = insertPublicKey(self);
+
   result = insertPayloads(self);
+
   result = insertSignature(self);
-  
+  to_uint32_be(globalBuffer, sizeof(pubkeyBuffer)+sizeof(payloadBuffer)+sizeof(signatureBuffer)+6);
+  breakpoint();
+  socket_send(&self->networkPipe, globalBuffer, sizeof(pubkeyBuffer)+sizeof(payloadBuffer)+sizeof(signatureBuffer)+6, 0);
+  char funBuffer[500];
+  int ret_code = socket_recv(&self->networkPipe, funBuffer, 65000).value.i;
+  for(int i = 0; i < ret_code; i++){
+    printf("%d", ret_code);
+  }
+  printf("\n");
   return result;
 }
 
 XYResult_t insertPublicKey(RelayNode_t* relay){
   DECLARE_RESULT();
-  XYHeaderFlags_t typedFlags;
-  typedFlags.lengthType = 2;
-  typedFlags.iteratable = 1;
-  typedFlags.typed = 1;
-
-  XYHeaderFlags_t untypedFlags;
-  untypedFlags.lengthType = 1;
-  untypedFlags.iteratable = 1;
-  untypedFlags.typed = 0;
 
   XYObject_t arrayObject;
-  XYObjectHeader_t arrayHeader;
-  arrayHeader.flags = typedFlags;
-  arrayHeader.type = TYPE_ARRAY;
-  arrayObject.header = &arrayHeader;
+  arrayObject.header = relay->networkPipe.scratchBuffer.payload;
   arrayObject.payload = relay->networkPipe.scratchBuffer.payload+2;
 
   void* endPtr;
@@ -114,49 +119,29 @@ XYResult_t insertPublicKey(RelayNode_t* relay){
   XYArrayItr_t itr = WeakArrayIterator(relay->networkPipe.scratchBuffer.payload, relay->networkPipe.scratchBuffer.payload+2);
   
   XYObject_t innerArrayObject;
-  XYObjectHeader_t innerArrayHeader;
-  innerArrayHeader.flags = typedFlags;
-  innerArrayHeader.type = TYPE_ARRAY;
-  innerArrayObject.header = &innerArrayHeader;
+  innerArrayObject.header = itr.header;
   innerArrayObject.payload = itr.indexPtr;
+  //innerArrayObject = WeakArray_get(&itr, 0);
   
 
   XYArrayItr_t innerItr = WeakArrayIterator(relay->networkPipe.scratchBuffer.payload, itr.indexPtr);
-  char writeBuffer[6+8+66] = { TYPED_ITERABLE, 2, 0, 0, 0, 0, *(uint8_t*)&typedFlags, 0x01, 0x00, 67+4, *(uint8_t*)&untypedFlags, 0x0d, 0x00, 67 };
-  memset(writeBuffer + 8 + 6, 1, 66);
+  
+  memset(pubkeyBuffer + 8 + 6, 1, 66);
 
   uint32_t oldLength = XYObject_getFullLength(&arrayObject).value.ui;
 
-  Iterator_insert(&innerArrayObject, 0, 67+5, oldLength, writeBuffer+8);
+  Iterator_insert(&innerArrayObject, 0, 67+5, oldLength, pubkeyBuffer+8);
   XYObject_t* self = &arrayObject;
   XYOBJ_INCREMENT(67+5);
-  socket_send(&relay->networkPipe, writeBuffer, sizeof(writeBuffer));
-  breakpoint();
+  socket_send(&relay->networkPipe, pubkeyBuffer, sizeof(pubkeyBuffer), 1);
   return result;
 }
 
 XYResult_t insertPayloads(RelayNode_t* relay){
   DECLARE_RESULT();
-  XYHeaderFlags_t typedFlags;
-  typedFlags.lengthType = 2;
-  typedFlags.iteratable = 1;
-  typedFlags.typed = 1;
-
-  XYHeaderFlags_t untypedFlags;
-  untypedFlags.lengthType = 1;
-  untypedFlags.iteratable = 1;
-  untypedFlags.typed = 0;
-
-  XYHeaderFlags_t untypedFlagsNoIteration;
-  untypedFlags.lengthType = 1;
-  untypedFlags.iteratable = 0;
-  untypedFlags.typed = 0;
 
   XYObject_t arrayObject;
-  XYObjectHeader_t arrayHeader;
-  arrayHeader.flags = typedFlags;
-  arrayHeader.type = TYPE_ARRAY;
-  arrayObject.header = &arrayHeader;
+  arrayObject.header = relay->networkPipe.scratchBuffer.payload;
   arrayObject.payload = relay->networkPipe.scratchBuffer.payload+2;
 
   void* endPtr;
@@ -164,42 +149,17 @@ XYResult_t insertPayloads(RelayNode_t* relay){
   XYArrayItr_t itr = WeakArrayIterator(relay->networkPipe.scratchBuffer.payload, relay->networkPipe.scratchBuffer.payload+2);
   
   XYObject_t innerArrayObject =  IteratorNext(&itr);
-  /*
-  XYObjectHeader_t innerArrayHeader;
-  innerArrayHeader.flags = typedFlags;
-  innerArrayHeader.type = TYPE_ARRAY;
-  innerArrayObject.header = &innerArrayHeader;
-  innerArrayObject.payload = itr.indexPtr;
-  */
 
   XYArrayItr_t innerItr = WeakArrayIterator(relay->networkPipe.scratchBuffer.payload, itr.indexPtr);
-  char writeBuffer[] = { TYPED_ITERABLE, 0x01, 0x00, 0x00, 0x00, 0x00, *(uint8_t*)&typedFlags, 0x08, 
-                                0x00, 67+3, *(uint8_t*)&untypedFlags, 0x01, 0x00, 68, *(uint8_t*)&untypedFlagsNoIteration, 0x03,
-                                0x00, 0x08, 0x00, 0x00, 0x00, 0x01, UNTYPED_ITERABLE, 0x01, 
-                                0x00, 0x00, 0x00, 0x00};
-  //memset(writeBuffer + 10 + 6, 2, (sizeof(writeBuffer)-16));
-  breakpoint();
-  Iterator_insert(&innerArrayObject, 0, (sizeof(writeBuffer)-6), XYObject_getFullLength(&arrayObject).value.ui, &writeBuffer+6);
-  socket_send(&relay->networkPipe, writeBuffer, sizeof(writeBuffer));
+
+  Iterator_insert(&innerArrayObject, 0, (sizeof(payloadBuffer)-6), XYObject_getFullLength(&arrayObject).value.ui, payloadBuffer+6);
+  socket_send(&relay->networkPipe, &payloadBuffer, sizeof(payloadBuffer), 1);
   return result;
 }
 
+
 XYResult_t insertSignature(RelayNode_t* relay){
   DECLARE_RESULT();
-  XYHeaderFlags_t typedFlags;
-  typedFlags.lengthType = 2;
-  typedFlags.iteratable = 1;
-  typedFlags.typed = 1;
-
-  XYHeaderFlags_t untypedFlags;
-  untypedFlags.lengthType = 1;
-  untypedFlags.iteratable = 1;
-  untypedFlags.typed = 0;
-
-  XYHeaderFlags_t untypedFlagsNoIteration;
-  untypedFlags.lengthType = 1;
-  untypedFlags.iteratable = 0;
-  untypedFlags.typed = 0;
 
   XYObject_t arrayObject;
   arrayObject.header = (XYObjectHeader_t*)relay->networkPipe.scratchBuffer.payload;
@@ -209,20 +169,21 @@ XYResult_t insertSignature(RelayNode_t* relay){
 
   XYArrayItr_t itr = WeakArrayIterator((XYObjectHeader_t*)relay->networkPipe.scratchBuffer.payload, relay->networkPipe.scratchBuffer.payload+2);
   IteratorNext(&itr);
-  IteratorNext(&itr);
-  XYObject_t innerArrayObject;
-  XYObjectHeader_t innerArrayHeader;
-  innerArrayHeader.flags = typedFlags;
-  innerArrayHeader.type = TYPE_ARRAY;
-  innerArrayObject.header = &innerArrayHeader;
-  innerArrayObject.payload = itr.indexPtr;
+  
+  XYObject_t innerArrayObject = IteratorNext(&itr);
+  //XYObjectHeader_t innerArrayHeader;
+  //innerArrayHeader.flags = typedFlags;
+  //innerArrayHeader.type = TYPE_ARRAY;
+  //innerArrayObject.header = &innerArrayHeader;
+  //innerArrayObject.payload = itr.indexPtr;
   
 
   XYArrayItr_t innerItr = WeakArrayIterator((XYObjectHeader_t*)relay->networkPipe.scratchBuffer.payload, itr.indexPtr);
 
-  char writeBuffer[10+66] = { *(uint8_t*)&typedFlags, 0x08, 0x00, 67+3, *(uint8_t*)&untypedFlags, 0x01, 0x00, 68, NONITERABLE_TWOBYTE, 0x04 };
-  memset(writeBuffer + 10, 3, 66);
-  Iterator_insert(&innerArrayObject, 0, 67+5, XYObject_getFullLength(&arrayObject).value.ui, &writeBuffer);
+  //char writeBuffer[6+10+66] = { TYPED_ITERABLE, 0x01, 0x00, 0x00, 0x00, 80, *(uint8_t*)&typedFlags, 0x08, 0x00, 74, *(uint8_t*)&untypedFlags, 0x01, 0x00, 70, NONITERABLE_TWOBYTE, 0x04 };
+  memset(signatureBuffer + 12 + 6, 3, 66);
+  Iterator_insert(&innerArrayObject, 0, 67+5, XYObject_getFullLength(&arrayObject).value.ui, signatureBuffer+6);
+  socket_send(&relay->networkPipe, &signatureBuffer, sizeof(signatureBuffer), 1);
 
   return result;
 }

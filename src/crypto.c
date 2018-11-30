@@ -19,7 +19,6 @@
 
 #include <stdlib.h>
 #include "crypto.h"         // includes "xyobject.h", "hash.h"
-#include "xyo.h"
 
 
 /*
@@ -53,57 +52,7 @@
  *      will return a malloc error if malloc fails.
  ****************************************************************************************
  */
-XYResult_t* newCryptoSignerInstance(ByteArray_t* privateKey) {
-
-  /*
-  Signer_t* signer = malloc(sizeof(Signer_t));          //TODO: wal, this should be
-                                                        // freed somewhere
-  /********************************/
-  /* guard against malloc errors  */
-  /******************************** /
-
-  if(!signer) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};  // couldn't create a signer!
-                                                        // return the error now
-  /************************************/
-  /* guard against bad input data     */
-  /************************************ /
-
-  if(!privateKey ||
-     !privateKey->size ||
-     !privateKey->payload) {
-
-    // the supplied private key seems invalid.
-    // so, generate a new one.
-
-    preallocated_return_result_ptr = newPrivateKey();   // XYResult_t* from newPrivateKey
-
-    if(preallocated_return_result_ptr->error) {RETURN_ERROR(ERR_NOKEYS)};        // return the error now
-
-    signer->privateKey = *(ByteArray_t*)preallocated_return_result_ptr->result;  // store the new private key
-
-  } else {
-
-    // the supplied privateKey seems ok, so save it to the signer
-
-    signer->privateKey = *privateKey;
-  }
-
-  preallocated_return_result_ptr = newPublicKey(signer);   // XYResult_t* from newPublicKey
-
-  // make sure we got a new public key.
-
-  if(preallocated_return_result_ptr->error) {RETURN_ERROR(ERR_NOKEYS)};   // return the error now
-
-  signer->publicKey = *(ByteArray_t*)preallocated_return_result_ptr->result;
-
-  signer->sign = &sign;                       // XYResult_t* (*sign)(Signer_t*, ByteArray_t*)
-  signer->verify = &verify;                   // XYResult_t* (*verify)(Signer_t* signer,
-                                              //                       ByteArray_t* signedData,
-                                              //                       XYObject_t* signature,
-                                              //                       XYObject_t* publicKey)
-  return preallocated_return_result_ptr;
-  */
-}
+XYResult_t* newCryptoSignerInstance(ByteArray_t* privateKey) {}
 
 /**
  ****************************************************************************************
@@ -123,42 +72,7 @@ XYResult_t* newCryptoSignerInstance(ByteArray_t* privateKey) {
  *      will return a malloc error if malloc fails.
  ****************************************************************************************
  */
-XYResult_t* newCryptoCreator(){
-
-  /**************************************/
-  /* allocate a new CryptoCreator first */
-  /************************************** /
-
-  CryptoCreator_t* aNewCryptoCreator = malloc(sizeof(CryptoCreator_t));     //TODO: wal, this should
-                                                                            // be freed somewhere.
-  /********************************/
-  /* guard against malloc errors  */
-  /******************************** /
-
-  if(!aNewCryptoCreator) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};           // couldn't create a new creator
-
-  preallocated_return_result_ptr = newPrivateKey();                         // Generate a new private key.
-  /*
-  if(preallocated_return_result_ptr->error) {RETURN_ERROR(ERR_NOKEYS)};     // couldn't create a new
-                                                                            // private key.
-                                                                            // return the error now
-  ByteArray_t* newPrivateKeyPair = preallocated_return_result_ptr->result;
-
-  preallocated_return_result_ptr = newCryptoSignerInstance(newPrivateKeyPair);  // a ByteArray_t*
-                                                                                // to a privateKey
-  if(preallocated_return_result_ptr->error ||
-     !preallocated_return_result_ptr->result) {RETURN_ERROR(ERR_NOSIGNER)};     // no new signer instance!
-                                                                                // return the error now
-  memset(aNewCryptoCreator->id, 0x00, 2);                                       //TODO: wal, constants please
-
-  aNewCryptoCreator->newCryptoSignerInstance = &newCryptoSignerInstance;
-                                                            // store the new signer instance
-                                                            // in the crypto creator
-  aNewCryptoCreator->getId = &cryptoGetId;                  // char* cryptoGetId(CryptoCreator_t* object
-   
-  return preallocated_return_result_ptr;
-  */
-}
+XYResult_t* newCryptoCreator(){}
 
 /**
  ****************************************************************************************
@@ -178,20 +92,7 @@ XYResult_t* newCryptoCreator(){
  *      this routine is a 'getter' only. it does't generate a new ID.
  ****************************************************************************************
  */
-XYResult_t* cryptoGetId(CryptoCreator_t* object){
-
-  /************************************/
-  /* guard against bad input data     */
-  /************************************ /
-
-  if(!object || !object->getId) {RETURN_ERROR(ERR_BADDATA)};  // return the error now
-
-  preallocated_return_result_ptr->error = OK;
-  preallocated_return_result_ptr->result = &object->id;
-
-  return preallocated_return_result_ptr;
-  */
-}
+XYResult_t* cryptoGetId(CryptoCreator_t* object){}
 
 /**
  ****************************************************************************************
@@ -215,24 +116,7 @@ XYResult_t* cryptoGetId(CryptoCreator_t* object){
  *      this routine is a 'getter' only. it does't generate a new ID.
  ****************************************************************************************
  */
-XYResult_t* getSignatureId(Signer_t* signer){
-
-  /************************************/
-  /* guard against bad input data     */
-  /************************************ /
-
-  if(!signer ||
-     !signer->privateKey.size ||
-     !signer->privateKey.payload) {RETURN_ERROR(ERR_BADDATA)};  // return the error now
-
-  static ByteArray_t signatureId[2];              // major/minor, wal, constant please
-
-  preallocated_return_result_ptr->error = OK;
-  preallocated_return_result_ptr->result = signatureId;
-
-  return preallocated_return_result_ptr;          // return the public key
-  */
-}
+XYResult_t* getSignatureId(Signer_t* signer){}
 
 /**
  ****************************************************************************************
@@ -252,22 +136,7 @@ XYResult_t* getSignatureId(Signer_t* signer){
  *      this routine is a 'getter' only. it does't generate a new key.
  ****************************************************************************************
  */
-XYResult_t* getPublicKey(Signer_t* signer){
-
-  /************************************/
-  /* guard against bad input data     */
-  /************************************ /
-
-  if(!signer ||
-     !signer->privateKey.size ||
-     !signer->privateKey.payload) {RETURN_ERROR(ERR_BADDATA)};    // return the error now
-
-  preallocated_return_result_ptr->error = OK;
-  preallocated_return_result_ptr->result = &(signer->publicKey);  // publicKey is a ByteArray_t*
-
-  return preallocated_return_result_ptr;                          // return the public key
-  */
-}
+XYResult_t* getPublicKey(Signer_t* signer){}
 
 /**
  ****************************************************************************************
@@ -289,22 +158,7 @@ XYResult_t* getPublicKey(Signer_t* signer){
  *      this routine is a 'getter' only. it does't generate a new key.
  ****************************************************************************************
  */
-XYResult_t* getPublicKeyId(Signer_t* signer){
-
-  /************************************/
-  /* guard against bad input data     */
-  /************************************ /
-
-  if(!signer ||
-     !signer->privateKey.size ||
-     !signer->privateKey.payload) {RETURN_ERROR(ERR_BADDATA)};   // return the error now
-
-  preallocated_return_result_ptr->error = OK;
-  preallocated_return_result_ptr->result = &signer->publicKey;  // return the public key ByteArray_t*
-
-  return preallocated_return_result_ptr;    // return the public key from signer
-  */
-}
+XYResult_t* getPublicKeyId(Signer_t* signer){}
 
 /**
  ****************************************************************************************
@@ -324,22 +178,7 @@ XYResult_t* getPublicKeyId(Signer_t* signer){
  *      //TODO: convert this routine from a simple 'getter' to a creator.
  ****************************************************************************************
  */
-XYResult_t* newPublicKey(Signer_t* signer){
-
-  /************************************/
-  /* guard against bad input data     */
-  /************************************ /
-
-  if(!signer ||
-     !signer->privateKey.size ||
-     !signer->privateKey.payload) {RETURN_ERROR(ERR_BADDATA)};    // return the error now
-
-  preallocated_return_result_ptr->error = OK;
-  preallocated_return_result_ptr->result = &(signer->publicKey);  // publicKey is a ByteArray_t*
-
-  return preallocated_return_result_ptr;                          // return the public key
-  */
-}
+XYResult_t* newPublicKey(Signer_t* signer){}
 
 /**
  ****************************************************************************************
@@ -367,22 +206,7 @@ XYResult_t* newPublicKey(Signer_t* signer){
  *      keep in mind that this is just a fetch call (getter), not a generate new key call.
  ****************************************************************************************
  */
-XYResult_t* getPrivateKey(Signer_t* signer){
-
-  /************************************/
-  /* guard against bad input data     */
-  /************************************ /
-
-  if(!signer ||
-     !signer->privateKey.payload ||
-     !signer->privateKey.size) {RETURN_ERROR(ERR_NOKEYS)}; // return the error now
-
-  preallocated_return_result_ptr->error = OK;
-  preallocated_return_result_ptr->result = (ByteArray_t*)&signer->privateKey;
-
-  return preallocated_return_result_ptr;                  // return the private key
-  */
-}
+XYResult_t* getPrivateKey(Signer_t* signer){}
 
 /**
  ****************************************************************************************
@@ -413,77 +237,7 @@ uint8_t trng_bits[16];
 WC_RNG dialogRng;
 int keysize;
 */
-XYResult_t* newPrivateKey() {
-/*
-static WC_RNG randomNumberGenerator;
-// RsaKey rsaPrivateKey;
-  ecc_key eccPrivateKey;
-
-  trng_acquire(&trng_bits[0]);
-
-  // ********************************/
-  // * initialize stack structures  */
-  // ********************************/
-  /*
-
-  XMEMSET(&randomNumberGenerator, 0, sizeof(randomNumberGenerator));
-  //XMEMSET(&rsaPrivateKey, 0, sizeof(rsaPrivateKey));
-
-  ByteArray_t* aNewPrivateKey = malloc(sizeof(keyPairStruct));    //TODO: wal, this should
-                                                                  // be freed somewhere.
-  // ********************************/
-  // * guard against malloc errors  */
-  // ********************************/
-  /*
-
-  if(!aNewPrivateKey) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
-
-  //long e = 65537;                             // standard value to use for exponent
-
-  //error = wc_InitRng(&randomNumberGenerator); // BLOCKING call. the rng must be freed with wc_FreeRng
-                                                // *** Internal return codes ***
-                                                // #define DRBG_SUCCESS      0
-                                                // #define DRBG_FAILURE      1
-                                                // #define DRBG_NEED_RESEED  2
-                                                // #define DRBG_CONT_FAILURE 3
-
-  //if(error != OK) {RETURN_ERROR(ERR_INTERNAL_ERROR)};
-
-  //error = wc_InitRsaKey(&rsaPrivateKey, NULL);  // not using heap hint. No custom memory
-
-  //if(error != OK) {RETURN_ERROR(ERR_INTERNAL_ERROR)};
-
-  // ****************************************
-  // * generate a 2048 bit long private key *
-  // ****************************************
-  //int wc_MakeRsaKey(RsaKey* key, int size, long e, WC_RNG* rng)
-  //error = wc_MakeRsaKey(&rsaPrivateKey, PRIVATE_KEY_LENGTH_1024, e, &randomNumberGenerator);
-
-  //if(error != OK) {RETURN_ERROR(ERR_INTERNAL_ERROR)};
-
-  // **********************************************
-  // * store the new private key in a ByteArray_t *
-  // * that will in turn be stored in             *
-  // * preallocated_return_result_ptr->result     *
-  // **********************************************
-
-  //aNewPrivateKey->size = rsaPrivateKey.dataLen;
-  //aNewPrivateKey->payload = (char *)rsaPrivateKey.data;
-
-  //ref, wc_ecc_init (ecc_key *key)
-  error = wc_ecc_init(&eccPrivateKey);    // preps the key supplied for future use
-
-  //ref, wc_ecc_make_key(WC_RNG *rng, int keysize, ecc_key *key);
-  //wc_ecc_make_key(&dialogRng, PRIVATE_KEY_LENGTH_1024, &eccPrivateKey);
-  
-  preallocated_return_result_ptr->error = OK;
-  preallocated_return_result_ptr->result = malloc(sizeof(ByteArray_t));  // the ByteArray_t holding the new private key
-
-  //error = wc_FreeRng(&randomNumberGenerator);               // required release
-
-  return preallocated_return_result_ptr;                    // return the private key
-  */
-}
+XYResult_t* newPrivateKey() {}
 
 /**
  ****************************************************************************************
@@ -504,25 +258,7 @@ static WC_RNG randomNumberGenerator;
  *      this routine is not a simple getter. it actually creates a new key pair.
  ****************************************************************************************
  */
-XYResult_t* newKeyPair(){
-  /*
-  keyPairStruct* keyPair = malloc(sizeof(keyPairStruct));   //TODO: wal, this should
-                                                            // be freed somewhere.
-  /********************************/
-  /* guard against malloc errors  */
-  /******************************** /
-
-  if(!keyPair) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};     // return the error now
-
-  keyPair->publicKey = NULL;
-  keyPair->privateKey = NULL;
-
-  preallocated_return_result_ptr->error = OK;
-  preallocated_return_result_ptr->result = keyPair;         // keyPair is a ByteArray_t*
-
-  return preallocated_return_result_ptr;
-  */
-}
+XYResult_t* newKeyPair(){}
 
 /**
  ****************************************************************************************
@@ -544,31 +280,7 @@ XYResult_t* newKeyPair(){
  *
  ****************************************************************************************
  */
-XYResult_t* sign(Signer_t* signer, ByteArray_t* dataToSign) {
-
-  /************************************/
-  /* guard against bad input data     */
-  /************************************ /
-
-  if(!signer || !dataToSign) {RETURN_ERROR(ERR_BADDATA)};   // return the error now
-
-  keyPairStruct* keyPair = malloc(sizeof(keyPairStruct));   //TODO: wal, this should
-                                                            // be freed somewhere.
-  /********************************/
-  /* guard against malloc errors  */
-  /******************************** /
-
-  if(!keyPair) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};     // return the error now
-
-  keyPair->publicKey = NULL;
-  keyPair->privateKey = NULL;
-
-  preallocated_return_result_ptr->error = 0;
-  preallocated_return_result_ptr->result = &keyPair;
-
-  return preallocated_return_result_ptr;
-  */
-}
+XYResult_t* sign(Signer_t* signer, ByteArray_t* dataToSign) {}
 
 /**
  ****************************************************************************************
@@ -602,34 +314,7 @@ XYResult_t* sign(Signer_t* signer, ByteArray_t* dataToSign) {
 XYResult_t* verify(Signer_t* signer,
                    ByteArray_t* signedData,
                    XYObject_t* signature,
-                   XYObject_t* publicKey) {
-
-  /************************************/
-  /* guard against bad input data     */
-  /************************************ /
-
-  if(!signer ||
-     !signedData ||
-     !signature ||
-     !publicKey) {RETURN_ERROR(ERR_BADDATA)};               // return the error now
-
-  keyPairStruct* keyPair = malloc(sizeof(keyPairStruct));   //TODO: wal, this should
-                                                            //  be freed somewhere.
-  /********************************/
-  /* guard against malloc errors  */
-  /******************************** /
-
-  if(!keyPair) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};     // return the error now
-
-  keyPair->publicKey = NULL;
-  keyPair->privateKey = NULL;
-
-  preallocated_return_result_ptr->error = OK;
-  preallocated_return_result_ptr->result = NULL;
-
-  return preallocated_return_result_ptr;
-  */
-}
+                   XYObject_t* publicKey) {}
 
 /**
  ****************************************************************************************
@@ -653,35 +338,7 @@ XYResult_t* verify(Signer_t* signer,
  *      will return a malloc error if malloc fails.
  ****************************************************************************************
  */
-XYResult_t* xyencrypt(Signer_t* signer, ByteArray_t* unEncrypedData) {
-
-  /************************************/
-  /* guard against bad input data     */
-  /************************************ /
-
-  if(!signer ||
-     !signer->privateKey.payload ||
-     !signer->privateKey.size ||
-     !unEncrypedData->size ||
-     !unEncrypedData->payload) {RETURN_ERROR(ERR_NOKEYS)};  // return the error now
-
-  keyPairStruct* keyPair = malloc(sizeof(keyPairStruct));   //TODO: wal, this should
-                                                            //  be freed somewhere.
-  /********************************/
-  /* guard against malloc errors  */
-  /******************************** /
-
-  if(!keyPair) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};     // return the error now
-
-  keyPair->publicKey = NULL;
-  keyPair->privateKey = NULL;
-
-  preallocated_return_result_ptr->error = NULL;
-  preallocated_return_result_ptr->result = &keyPair;
-
-  return preallocated_return_result_ptr;
-  */
-}
+XYResult_t* xyencrypt(Signer_t* signer, ByteArray_t* unEncrypedData) {}
 
 /**
  ****************************************************************************************
@@ -706,35 +363,7 @@ XYResult_t* xyencrypt(Signer_t* signer, ByteArray_t* unEncrypedData) {
  *      will return a malloc error if malloc fails.
  ****************************************************************************************
  */
-XYResult_t* xydecrypt(Signer_t* signer, ByteArray_t* encrypedData) {
-
-  /************************************/
-  /* guard against bad input data     */
-  /************************************ /
-
-  if(!signer ||
-     !signer->privateKey.payload ||
-     !signer->privateKey.size ||
-     !encrypedData->size ||
-     !encrypedData->payload) {RETURN_ERROR(ERR_NOKEYS)};    // return the error now
-
-  keyPairStruct* keyPair = malloc(sizeof(keyPairStruct));   //TODO: wal, this should
-                                                            //  be freed somewhere.
-  /********************************/
-  /* guard against malloc errors  */
-  /******************************** /
-
-  if(!keyPair) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};     // return the error now
-
-  keyPair->publicKey = NULL;
-  keyPair->privateKey = NULL;
-
-  preallocated_return_result_ptr->error = NULL;
-  preallocated_return_result_ptr->result = &keyPair;
-
-  return preallocated_return_result_ptr;
-  */
-}
+XYResult_t* xydecrypt(Signer_t* signer, ByteArray_t* encrypedData) {}
 
 /*
 /////////////////////

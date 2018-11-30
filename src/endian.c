@@ -50,3 +50,27 @@ void to_uint16_be(unsigned char *dest, uint16_t value)
   dest[0] = (unsigned char)((value & 0xff00) >> 8);
   dest[1] = (unsigned char)(value & 0xff);
 }
+
+/*----------------------------------------------------------------------------*
+*  NAME
+*      littleEndian
+*
+*  DESCRIPTION
+*      Determines the endian of the device we are running on.
+*
+*  PARAMETERS
+*      none
+*
+*  RETURNS
+*      result      [out]     bool    returns TRUE if Little Endian endian, FALSE
+*                                    if Big Endian.
+*  NOTES
+*
+*----------------------------------------------------------------------------
+*/
+int littleEndian(void){
+
+  volatile uint32_t i=0x01234567;
+  // return 0 for big endian, 1 for little endian.
+  return (*((uint8_t*)(&i))) == 0x67;
+}

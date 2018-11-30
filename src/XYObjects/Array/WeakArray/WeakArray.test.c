@@ -13,7 +13,7 @@
 int testAdd();
 int testGap();
 
-int main(){
+int main2(){
     int score = 0;
     score += testAdd();
     score += testGap();
@@ -144,7 +144,6 @@ int testGap(){
     //XY_ASSERT_EQUAL(*(newEndPtr-(sizeof(char)*6*2)), *(uint8_t*)&signatureFlags );
     XY_ASSERT_EQUAL(*(newEndPtr-2-5), *endPtr );
 
-    breakpoint();
     return score;
 }
 
