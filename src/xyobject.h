@@ -20,7 +20,7 @@ typedef struct XYObject{
 typedef struct ObjectProvider {
    int        sizeIdentifierSize;
    int        defaultSize;
-   XYResult_t*  (*create)(char[2], void*);
+   XYResult_t*  (*create)(const char[2], void*);
    XYResult_t*  (*fromBytes)(char*);
    XYResult_t*  (*toBytes)(XYObject_t*);
 } ObjectProvider_t;

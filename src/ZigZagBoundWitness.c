@@ -111,7 +111,7 @@ XYResult_t* incomingData(ZigZagBoundWitness_t* self,
       return NULL;
     }
     ObjectProvider_t* SSA_Creator = lookup_result->result;
-    XYResult_t* create_result = SSA_Creator->create((const char*)&KeySet_id, NULL);
+    XYResult_t* create_result = SSA_Creator->create((char*)&KeySet_id, NULL);
     XYObject_t* pubkeyArray_object = create_result->result;
     ShortStrongArray_t* pubkeyArray = pubkeyArray_object->payload;
 
@@ -157,7 +157,7 @@ XYResult_t* incomingData(ZigZagBoundWitness_t* self,
     self->boundWitness->payloads->size = to_uint32((unsigned char*)&self->boundWitness->payloads->size);
     ByteArray_t* signingData = signingData_result->result;
 
-    create_result = SSA_Creator->create((const char*)&SignatureSet_id, NULL);
+    create_result = SSA_Creator->create((char*)&SignatureSet_id, NULL);
     XYObject_t* signatureArray_object = create_result->result;
     ShortStrongArray_t* signatureArray = signatureArray_object->payload;
 
@@ -189,10 +189,12 @@ XYResult_t* incomingData(ZigZagBoundWitness_t* self,
     return NULL;
   }
 
+  /* wal, compiler warning, 'unreachable code'
   XYResult_t* toBytes_result = BountWitnessTransfer_creator->toBytes(newObject_result->result);
   free(newObject_result);
 
   return toBytes_result;
+  */
 }
 
 /*----------------------------------------------------------------------------*
@@ -336,6 +338,7 @@ XYResult_t* addIncomingKeys(ZigZagBoundWitness_t* self, ShortStrongArray_t* inco
       return preallocated_return_result_ptr;
     }
   }
+  return preallocated_return_result_ptr;
 }
 
 /*----------------------------------------------------------------------------*
@@ -381,12 +384,18 @@ XYResult_t* addIncomingPayload(ZigZagBoundWitness_t* self, IntStrongArray_t* inc
       ObjectProvider_t* weakArrayCreator = lookup_result->result;
 
       XYResult_t* fromBytes_result = weakArrayCreator->fromBytes(&userPayloadBytes[4]);
-      if(fromBytes_result->error != OK) return 1;
+      if(fromBytes_result->error != OK){
+        result_int = 1;
+        return preallocated_return_result_ptr;
+      }
       IntWeakArray_t* signedHeuristicsArray = fromBytes_result->result;
 
       free(fromBytes_result);
       fromBytes_result = weakArrayCreator->fromBytes(&userPayloadBytes[4+signedHeuristicsArray->size]);
-      if(fromBytes_result->error != OK) return 1;
+      if(fromBytes_result->error != OK){
+        result_int = 1;
+        return preallocated_return_result_ptr;
+      }
       IntWeakArray_t* unsignedHeuristicsArray = fromBytes_result->result;
 
       Payload_t* userPayload = (Payload_t*)userPayloadBytes;
@@ -398,7 +407,11 @@ XYResult_t* addIncomingPayload(ZigZagBoundWitness_t* self, IntStrongArray_t* inc
       memcpy(xyobject->payload, &encoded_size, 4);
       */
       XYResult_t* add_result = self->dynamicPayloads->add(self->dynamicPayloads, xyobject);
-      if(add_result->error != OK) return 1;
+      if(add_result->error != OK){
+        preallocated_return_result_ptr->error = add_result->error;
+        preallocated_return_result_ptr->result = 0;
+        return preallocated_return_result_ptr;
+      }
     } else {
 
       result_int = 2;   //TODO: wal, why 2?  how 'bout a meaningful constant here?
@@ -407,6 +420,7 @@ XYResult_t* addIncomingPayload(ZigZagBoundWitness_t* self, IntStrongArray_t* inc
       return preallocated_return_result_ptr;
     }
   }
+  return preallocated_return_result_ptr;
 }
 
 /*----------------------------------------------------------------------------*
@@ -468,7 +482,7 @@ XYResult_t* addIncomingSignatures(ZigZagBoundWitness_t* self, ShortStrongArray_t
       memcpy(signature->signature, incomingSignaturesAddr+7, signature->size-1);
       XYResult_t* newObject_result = newObject((const char*)incomingSignaturesAddr+4, signature);
       XYResult_t* add_result = self->dynamicSignatures->add(self->dynamicSignatures, newObject_result->result);
-      if(add_result->error != OK){ result_int = 1; preallocated_return_result_ptr; };
+      if(add_result->error != OK){ result_int = 1; return preallocated_return_result_ptr; };
       signatureCount += 1;
       //return 0; //TODO: Assure that this function behaves to spec.
     } else {
@@ -505,7 +519,7 @@ XYResult_t* makeSelfKeySet(ZigZagBoundWitness_t* self){
   // Get a copy of the public key we are using currently
   XYResult_t* getPublicKey_result = self->signer->getPublicKey(self->signer);
   if(getPublicKey_result->error != 0){
-    printf("Failed to get public key.\n");
+    //printf("Failed to get public key.\n");    // wal, removed to save memory
     return getPublicKey_result;
   }
   XYObject_t* publicKey = getPublicKey_result->result;

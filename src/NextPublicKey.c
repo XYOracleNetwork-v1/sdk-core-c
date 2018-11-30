@@ -101,11 +101,11 @@ XYResult_t* NextPublicKey_creator_fromBytes(char* pubkey_data){
           return_NPK->publicKey = malloc(element_size*sizeof(char));
           break;
         case 2:
-          element_size = to_uint16(&pubkey_data[4]);
+          element_size = to_uint16((unsigned char*)&pubkey_data[4]);
           return_NPK->publicKey = malloc(element_size*sizeof(char));
           break;
         case 4:
-          element_size = to_uint32(&pubkey_data[4]);
+          element_size = to_uint32((unsigned char*)&pubkey_data[4]);
           return_NPK->publicKey = malloc(element_size*sizeof(char));
           break;
       }

@@ -1,7 +1,7 @@
 /**
  ****************************************************************************************
  *
- * @file crypto.c
+ * @file XYOHeuristicsBuilder.c
  *
  * @XYO Core library source code.
  *
@@ -34,7 +34,7 @@ void breakpoint(void){};
 *      be discouraged
 *
 *  PARAMETERS
-     *data            [in]        char*
+*     data            [in]        char*
 *
 *  RETURNS
 *      found          [out]      uintxx   returns unsigned integer representing the data given
@@ -94,7 +94,7 @@ XYResult_t* Heuristic_RSSI_Creator_toBytes(XYObject_t* user_XYObject){
 
   return preallocated_return_result_ptr;
 }
-
+/*
 XYResult_t* Heuristic_Text_Creator_create(const char id[2], void* text){
   return newObject(id, text);
 }
@@ -103,13 +103,13 @@ XYResult_t* Heuristic_Text_Creator_fromBytes(char* heuristic_data){
   char id[2];
   memcpy(id, heuristic_data, 2);  //TODO: wal, constants please
 
-  uint16_t size = to_uint16(&heuristic_data[2]);
+  uint16_t size = to_uint16((unsigned char*)&heuristic_data[2]);  // wal, compiler type warning
 
   char* payload_bytes = malloc(size*sizeof(char));
 
-  /********************************/
-  /* guard against malloc errors  */
-  /********************************/
+  // ******************************** /
+  // * guard against malloc errors  * /
+  // ******************************** /
 
   if(!payload_bytes) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
 
@@ -119,7 +119,7 @@ XYResult_t* Heuristic_Text_Creator_fromBytes(char* heuristic_data){
 }
 
 XYResult_t* Heuristic_Text_Creator_toBytes(XYObject_t* user_XYObject){
-  char* text = user_XYObject->payload;
+  unsigned char* text = user_XYObject->payload;   // wal, compiler type warning
   uint16_t size = to_uint16(text);
   uint16_t encodedSize = size;
 
@@ -129,9 +129,9 @@ XYResult_t* Heuristic_Text_Creator_toBytes(XYObject_t* user_XYObject){
 
   char* encoded_bytes = malloc(sizeof(char)*size);
 
-  /********************************/
-  /* guard against malloc errors  */
-  /********************************/
+  // ******************************** /
+  // * guard against malloc errors  * /
+  // ******************************** /
 
   if(encoded_bytes == NULL) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
 
@@ -147,5 +147,7 @@ XYResult_t* Heuristic_Text_Creator_toBytes(XYObject_t* user_XYObject){
 
   return preallocated_return_result_ptr;
 }
+*/
 
 // end of file xyoheuristicsbuilder.c
+

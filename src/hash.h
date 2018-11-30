@@ -67,9 +67,9 @@ XYResult_t* hashGetId(HashProvider_t* hashProviderObject);
 XYResult_t* createHash(ByteArray_t* dataToHash);
 XYResult_t* verifyHash(ByteArray_t* dataHashed, XYObject_t* hash);
 
-XYResult_t* Heuristic_sha256_Creator_create(const char id[2], void* sha256);
-XYResult_t* Heuristic_sha256_Creator_fromBytes(char* heuristic_data);
-XYResult_t* Heuristic_sha256_Creator_toBytes(XYObject_t* user_XYObject);
+//XYResult_t* Heuristic_sha256_Creator_create(const char id[2], void* sha256);
+//XYResult_t* Heuristic_sha256_Creator_fromBytes(char* heuristic_data);
+//XYResult_t* Heuristic_sha256_Creator_toBytes(XYObject_t* user_XYObject);
 
 #endif
 

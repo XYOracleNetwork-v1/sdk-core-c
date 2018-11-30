@@ -21,6 +21,10 @@
 #include "xyo.h"
 #include "xyobject.h"
 
+
+extern uint32_t to_uint32(unsigned char* data);
+
+
 /*----------------------------------------------------------------------------*
 *  NAME
 *      Index_creator_create
@@ -101,10 +105,10 @@ XYResult_t* Index_creator_toBytes(XYObject_t* user_XYObject){
   uint32_t encoded_bytes;
   char* index = (char*)user_XYObject->payload;
 
-  encoded_bytes = to_uint32(&index[0]);
+  encoded_bytes = to_uint32((unsigned char*)&index[0]);
 
   if(!littleEndian()){
-    encoded_bytes = to_uint32((char*)&encoded_bytes);
+    encoded_bytes = to_uint32((unsigned char*)&encoded_bytes);
   }
 
   preallocated_return_result_ptr = &preallocated_return_result;

@@ -18,6 +18,9 @@
  */
  #include "arrays.h"
  
+extern uint32_t to_uint32(unsigned char* data);   // wal, address compiler warning
+extern uint16_t to_uint16(unsigned char* data);   // wal, address compiler warning
+
 /*----------------------------------------------------------------------------*
 *  NAME
 *      ShortWeakArray_add
@@ -79,15 +82,15 @@ XYResult_t* ShortWeakArray_add(ShortWeakArray_t* self_ShortWeakArray,
           /* First we read 2 bytes of the payload to get the size,
            * the to_uint16 function reads ints in big endian.
            */
-          object_size = to_uint16(user_object_payload); //TODO: Check compatibility on big endian devices.
+          object_size = to_uint16((unsigned char*)user_object_payload); //TODO: Check compatibility on big endian devices.
           if(littleEndian()){
-            object_size = to_uint16((char*)&object_size);
+            object_size = to_uint16((unsigned char*)&object_size);
           }
           break;
         case 4:
-          object_size = to_uint32(user_object_payload);
+          object_size = to_uint32((unsigned char*)user_object_payload);
           if(littleEndian()){
-            object_size = to_uint32((char*)&object_size);
+            object_size = to_uint32((unsigned char*)&object_size);
           }
           break;
       }
@@ -192,8 +195,9 @@ XYResult_t* ShortWeakArray_get(ShortWeakArray_t* self_ShortWeakArray, int index)
    * and bounds check each loop.
    */
   int internal_index = 0;
-
-  for(char* arrayPointer = self_ShortWeakArray->payload; ((void *)arrayPointer < ((self_ShortWeakArray->payload)+(sizeof(char)*(self_ShortWeakArray->size-2)))); ){
+  char* arrayEnd = ((char*)self_ShortWeakArray->payload)+(sizeof(char) * (self_ShortWeakArray->size-2));
+  
+  for(char* arrayPointer = self_ShortWeakArray->payload;arrayPointer < arrayEnd; ){
 
     XYResult_t* lookup_result = tableLookup(arrayPointer);
 
@@ -211,10 +215,10 @@ XYResult_t* ShortWeakArray_get(ShortWeakArray_t* self_ShortWeakArray, int index)
             element_size = arrayPointer[2];
             break;
           case 2:
-            element_size = to_uint16(arrayPointer+(sizeof(char)*2));
+            element_size = to_uint16((unsigned char*)arrayPointer+(sizeof(char)*2));
             break;
           case 4:
-            element_size = to_uint32(arrayPointer+(sizeof(char)*2));
+            element_size = to_uint32((unsigned char*)arrayPointer+(sizeof(char)*2));
             break;
         }
 
@@ -341,7 +345,7 @@ XYResult_t* ShortWeakArray_creator_fromBytes(char* data){
       return_array->add = &ShortWeakArray_add;
       return_array->remove = NULL;
       return_array->get = &ShortWeakArray_get;
-      return_array->size = to_uint16(data);
+      return_array->size = to_uint16((unsigned char*)data);
 
       return_array->payload = malloc(sizeof(char)*(return_array->size-2));
 
@@ -385,7 +389,10 @@ XYResult_t* ShortWeakArray_creator_toBytes(XYObject_t* user_XYObject){
 
   if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA);}
 
-  if((user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x05) || (user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x02) || (user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x08) || (user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x03)){
+  if((user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x05) || 
+     (user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x02) || 
+     (user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x08) || 
+     (user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x03)){
 
     ShortWeakArray_t* user_array = *(ShortWeakArray_t**)(user_XYObject->GetPayload(user_XYObject))->result;
     uint16_t totalSize = user_array->size;
@@ -407,13 +414,13 @@ XYResult_t* ShortWeakArray_creator_toBytes(XYObject_t* user_XYObject){
        */
 
       if(littleEndian()){
-        user_array->size = to_uint16((char*)(uintptr_t)&user_array->size);
+        user_array->size = to_uint16((unsigned char*)(uintptr_t)&user_array->size);
       }
 
       memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject)->result, 2);
       memcpy(byteBuffer+2, user_array->payload, sizeof(char)*(totalSize-2));
       if(littleEndian()){
-        user_array->size = to_uint16((char*)(uintptr_t)&user_array->size);
+        user_array->size = to_uint16((unsigned char*)(uintptr_t)&user_array->size);
       }
 
       preallocated_return_result_ptr->error = OK;

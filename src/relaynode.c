@@ -83,7 +83,7 @@ XYResult_t* initRelayNode(RelayNode* self, OriginChainProvider_t* repository, Ha
        return 0;
      }
    }
-   return 0;
+   //return 0;
    /*
      if((*theirCatalog - BOUND_WITNESS_OPTION) & TAKE_ORIGIN_CHAIN_OPTION){
        return GIVE_ORIGIN_CHAIN_OPTION + BOUND_WITNESS_OPTION;

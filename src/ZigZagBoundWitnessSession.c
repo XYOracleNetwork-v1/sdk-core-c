@@ -21,13 +21,6 @@
 #include "ZigZagBoundWitnessSession.h"
 //#include "XYOHeuristicsBuilder.h"
 
-/*
- * FUNCTION DECLARATIONS
- ****************************************************************************************
- */
-
-XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* data);
-
 /*----------------------------------------------------------------------------*
 *   NAME
 *     completeBoundWitness
@@ -165,17 +158,19 @@ XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession_t* userSession,
 *      XYResult_t   [out]     XYResult_t*                   Returns XYResult<ByteArray_t*> the
 *                                                           data to send to the other party.
 *----------------------------------------------------------------------------*/
-XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* data){
+XYResult_t* receiverCallback(void* self, ByteArray_t* data){
 
   /********************************/
   /* guard against bad input data */
   /********************************/
-
+  
   if(!self || !data) {RETURN_ERROR(ERR_BADDATA);}
 
   if(data->size == 0 ) return 0;
+  
+  ZigZagBoundWitnessSession_t* selfBoundWitness = (ZigZagBoundWitnessSession_t*)self;
 
-  if( (((ZigZagBoundWitnessSession_t*)self)->cycles == 0) && data->size == 0 ){
+  if( (selfBoundWitness->cycles == 0) && data->size == 0 ){
 
     XYResult_t* lookup_result = tableLookup((char*)&BoundWitnessTransfer_id);
 
@@ -186,13 +181,13 @@ XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* dat
 
     if(transfer_result->error != OK) return transfer_result;
     BoundWitnessTransfer_t* transfer = transfer_result->result;
-    self->boundWitness->incomingData(self->boundWitness, transfer, 1);
+    selfBoundWitness->boundWitness->incomingData(selfBoundWitness->boundWitness, transfer, 1);
 
     RETURN_ERROR(OK);
   } else {
-    self->cycles++;
+    selfBoundWitness->cycles++;
 
-    return self->completeBoundWitness(self, data);
+    return selfBoundWitness->completeBoundWitness(self, data);
 
   }
 }

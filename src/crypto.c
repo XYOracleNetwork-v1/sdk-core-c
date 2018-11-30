@@ -20,12 +20,14 @@
 #include <stdlib.h>
 #include "crypto.h"         // includes "xyobject.h", "hash.h"
 #include "xyo.h"
-
+//#include "wc_ecc.h"
 
 /*
  * FUNCTIONS & METHODS
  ****************************************************************************************
  */
+
+extern WOLFSSL_API int wc_ecc_export_private_only(ecc_key *key, byte *out, word32 *outLen);
 
 /**
  ****************************************************************************************
@@ -55,8 +57,8 @@
  */
 XYResult_t* newCryptoSignerInstance(ByteArray_t* privateKey) {
 
-  Signer_t* signer = malloc(sizeof(Signer_t));          //TODO: wal, this should be
-                                                        // freed somewhere
+  Signer_t* signer = malloc(sizeof(Signer_t));          //TODO: wal, is this 
+                                                        // freed somewhere?
   /********************************/
   /* guard against malloc errors  */
   /********************************/
@@ -133,7 +135,7 @@ XYResult_t* newCryptoCreator(){
   /* guard against malloc errors  */
   /********************************/
 
-  if(!aNewCryptoCreator) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};           // couldn't create a new creator
+  if(!aNewCryptoCreator) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};           // couldn't create a new crypto creator
 
   preallocated_return_result_ptr = newPrivateKey();                         // Generate a new private key.
   /*
@@ -375,6 +377,65 @@ XYResult_t* getPrivateKey(Signer_t* signer){
   return preallocated_return_result_ptr;                  // return the private key
 }
 
+/***********************************************/
+/* Globals used by myRngFunc and newPrivateKey */
+/***********************************************/
+  int           error = OK;
+  uint8_t       trng_bits[16];
+  WC_RNG        wc_replacement_rng;
+  ecc_key       eccKey;
+  ecc_key*      eccKeyPtr = &eccKey;
+  unsigned int  newPrivateKeyIntArray[136];
+  unsigned int* newPrivateKeyIntArray_ptr;
+  word32        privateKeyLengthInBytes = 32;
+
+#define HAVE_ECC_KOBLITZ
+#ifdef HAVE_ECC_KOBLITZ
+  static const ecc_oid_t ecc_oid_secp256k1[] = {
+#ifdef HAVE_OID_ENCODING
+  1,3,132,0,10
+#else
+  0x2B,0x81,0x04,0x00,0x0A
+#endif
+  };
+#endif /* HAVE_ECC_KOBLITZ */
+
+/***********************************************/
+
+/**
+ ****************************************************************************************
+ *  NAME
+ *      myRngFunc
+ *
+ *  DESCRIPTION
+ *      this routine creates and returns a random number. we use this vs wolf's rng
+ *      because wolf's is too large!
+ *
+ *  PARAMETERS
+ *      output    [in]    byte *      a byte buffer ptr in which to store the random number
+ *      size      [in]    word32      the size of the random number to be generated
+ *
+ *  RETURNS
+ *      error     [out]   int         holds the error code 
+ *
+ *  NOTES
+ *      this function MUST always work, thus it always returns with no error (OK).
+ ****************************************************************************************
+ */
+int myRngFunc(byte* output, word32 size) {
+  
+  int error = OK;
+  
+  //trng_acquire(&trng_bits[0]);  // Acquire a 128 bit (16-byte) random number. it's saved in trng_bits[]                     
+
+  word32 smallRandomNumber = rand();
+  
+  memcpy(output, &trng_bits, sizeof(trng_bits));
+
+  return error;
+}
+
+
 /**
  ****************************************************************************************
  *  NAME
@@ -397,35 +458,168 @@ XYResult_t* getPrivateKey(Signer_t* signer){
  *      wc_ = wolf crypto library routine or data type
  *      support SECP256k1
  ****************************************************************************************
- */
   int error = OK;
   uint8_t trng_bits[16];
   WC_RNG dialogRng;
   int keysize;
+ */
 
 XYResult_t* newPrivateKey() {
+  
+  word32  	    randomNumberLengthInBytes = 16;     // size of random number in bytes
+  byte          newRandomNumberByteArray[16];
+  byte*         newRandomNumberByteArray_ptr;
+  
+/*
+#if USE_TRNG
+void init_rand_seed_from_trng(void)
+{
+    uint8_t trng_bits[16];
+    uint32_t seed = 0;
+
+    trng_acquire(trng_bits);
+
+    seed = *( (uint32_t *) trng_bits );
+    co_random_init(seed);
+}
+#endif // USE_TRNG
+*/
+  
+  //trng_acquire(&trng_bits[0]);  // Acquire a 128 bit (16-byte) random number. save it in trng_bits[]                     
+
+  // ********************************
+  // * initialize stack structures  *
+  // ********************************
+  
+  XMEMSET(&wc_replacement_rng, 0, sizeof(wc_replacement_rng));
+  
+  newPrivateKeyIntArray_ptr = &newPrivateKeyIntArray[0];
+  newRandomNumberByteArray_ptr = &newRandomNumberByteArray[0];
+  
+  //eccKeyPtr = (ecc_key*)malloc(sizeof(ecc_key));    //TODO: wal, this should
+                                                    // be freed somewhere.
+  // ********************************/
+  // * guard against malloc errors  */
+  // ********************************/
+  
+  //if(!eccKeyPtr) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+  
+  //newRandomNumberByteArray_ptr = malloc(16);    //TODO: wal, this should
+                                                // be freed somewhere.
+  
+  //if(!newRandomNumberByteArray_ptr) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
+
+  //if(error != OK) {RETURN_ERROR(ERR_INTERNAL_ERROR)};    
+
+  //ref, int wc_InitRng(WC_RNG* rng);
+  error = wc_InitRng(&wc_replacement_rng);  // a BLOCKING call. the rng must be freed with wc_FreeRng
+                                            // *** Internal return codes ***
+                                            // #define DRBG_SUCCESS      0
+                                            // #define DRBG_FAILURE      1
+                                            // #define DRBG_NEED_RESEED  2
+                                            // #define DRBG_CONT_FAILURE 3
+                                            //   DRBG = deterministic random bit generator
+
+  if(error != OK) {RETURN_ERROR(ERR_INTERNAL_ERROR)};
+  
+//int wc_RNG_GenerateBlock(WC_RNG* rng, byte* output, word32 sz) 	  
+  error = wc_RNG_GenerateBlock(&wc_replacement_rng, newRandomNumberByteArray_ptr, randomNumberLengthInBytes);  
+  
+  if(error != OK) {RETURN_ERROR(ERR_INTERNAL_ERROR)};    
+
+  //ref, wc_ecc_init (ecc_key *key)
+  error = wc_ecc_init(eccKeyPtr);     // preps the key for future use
+  
+  if(error != OK) {RETURN_ERROR(ERR_INTERNAL_ERROR)};  
+  
+/*
+* TODO: SECP256K1 curve
+  Public key = Point X and Point Y
+  Anticipating your needs... Signatures should be point variables R + S
+  Private key = 
+*/
+  ecc_set_type eccCurveType;
+  
+  eccCurveType.size      = 32;                                                                   /* size/bytes */
+  eccCurveType.id        = ECC_SECP256K1;                                                        /* ID         */
+  eccCurveType.name      = "SECP256k1";                                                          /* curve name */                                                          
+  eccCurveType.prime     = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEFFFFFC2F";   /* prime      */
+  eccCurveType.Af        = "0000000000000000000000000000000000000000000000000000000000000000";   /* A          */
+  eccCurveType.Bf        = "0000000000000000000000000000000000000000000000000000000000000007";   /* B          */
+  eccCurveType.order     = "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFEBAAEDCE6AF48A03BBFD25E8CD0364141";   /* order      */
+  eccCurveType.Gx        = "79BE667EF9DCBBAC55A06295CE870B07029BFCDB2DCE28D959F2815B16F81798";   /* Gx         */
+  eccCurveType.Gy        = "483ADA7726A3C4655DA4FBFC0E1108A8FD17B448A68554199C47D08FFB10D4B8";   /* Gy         */
+  eccCurveType.oid       = &ecc_oid_secp256k1[0];                                                /* oid        */  // wal
+  eccCurveType.oidSz     = sizeof(ecc_oid_secp256k1);                                            /* oid/oidSz  */  // wal
+  eccCurveType.oidSum    = sizeof(ecc_oid_secp256k1) / sizeof(ecc_oid_t);                        /* sum of encoded OID bytes */
+  eccCurveType.cofactor  = 0;    // ECC_SECP256K1_OID;                                           /* cofactor   */
+  
+  // set/init some known values in the key before 'making' it.
+  
+  eccKey.type   = ECC_PRIVATEKEY;     // vital to set the key 'type'
+  eccKey.idx    = 21;                 // index into ecc types. might be 21
+  eccKey.dp     = &eccCurveType;      // dp = domain parameters either points to NIST 
+                                      // curves (idx >= 0) or user supplied.
+  eccKey.state  = 0;                  // /* internal ECC states */ enum ECC_STATE_NONE = 0
+  eccKey.flags  = 0;
+
+  //ref,  int wc_ecc_set_custom_curve(ecc_key* key, const ecc_set_type* dp);
+  //error = wc_ecc_set_custom_curve(eccKeyPtr /*&eccKey*/, &eccSetCurveType);
+
+  //if(error != OK) {RETURN_ERROR(ERR_INTERNAL_ERROR)};    
+
+  //ref, wc_ecc_make_key(WC_RNG *rng, int keysize, ecc_key *key);
+  //ref, wc_ecc_make_key(&rng, 32, &key);       // initialize 32 byte ecc key
+  error = wc_ecc_make_key(&wc_replacement_rng, 
+                          32,                   // actually in bytes, 32 / / PRIVATE_KEY_LENGTH_1024 / 
+                          &eccKey);             // MEMORY_E = -125 (0xFFFFFF83),  / out of memory error /
+
+  if(error != OK) {RETURN_ERROR(ERR_INTERNAL_ERROR)};    
+
+  // **********************************************
+  // * store the new private key in a ByteArray_t *
+  // * that will in turn be stored in             *
+  // * preallocated_return_result_ptr->result     *
+  // **********************************************
+ 
+  //ref, WOLFSSL_API int wc_ecc_export_private_only(ecc_key *key, byte *out, word32 *outLen) 	
+  error = wc_ecc_export_private_only(&eccKey, (byte *)newPrivateKeyIntArray_ptr, &privateKeyLengthInBytes);
+  
+  if(error != OK) {RETURN_ERROR(ERR_INTERNAL_ERROR)};    
+
+  preallocated_return_result_ptr->error = error;
+  preallocated_return_result_ptr->result = &eccKey.k;   // the field holding the new key
+  
+  error = wc_ecc_free(&eccKey);                         // This function frees an ecc_key 
+                                                        // object after it has been used.
+  wc_FreeRng(&wc_replacement_rng);
+  
+  return preallocated_return_result_ptr;                // return the private key
+
+  
 /*
 static WC_RNG randomNumberGenerator;
 // RsaKey rsaPrivateKey;
-  ecc_key eccPrivateKey;
 
   trng_acquire(&trng_bits[0]);
 
   // ********************************/
   // * initialize stack structures  */
   // ********************************/
+  
   /*
-
   XMEMSET(&randomNumberGenerator, 0, sizeof(randomNumberGenerator));
   //XMEMSET(&rsaPrivateKey, 0, sizeof(rsaPrivateKey));
 
-  ByteArray_t* aNewPrivateKey = malloc(sizeof(keyPairStruct));    //TODO: wal, this should
-                                                                  // be freed somewhere.
-  // ********************************/
-  // * guard against malloc errors  */
-  // ********************************/
-  /*
+  ByteArray_t* aNewPrivateKey = malloc(sizeof(keyPairStruct));  //TODO: wal, this should
+                                                                // be freed somewhere.
+  */
+  
+  // ********************************
+  // * guard against malloc errors  *
+  // ********************************
 
+  /*
   if(!aNewPrivateKey) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY)};
 
   //long e = 65537;                             // standard value to use for exponent
@@ -439,39 +633,21 @@ static WC_RNG randomNumberGenerator;
 
   //if(error != OK) {RETURN_ERROR(ERR_INTERNAL_ERROR)};
 
-  //error = wc_InitRsaKey(&rsaPrivateKey, NULL);  // not using heap hint. No custom memory
-
-  //if(error != OK) {RETURN_ERROR(ERR_INTERNAL_ERROR)};
-
-  // ****************************************
-  // * generate a 2048 bit long private key *
-  // ****************************************
-  //int wc_MakeRsaKey(RsaKey* key, int size, long e, WC_RNG* rng)
-  //error = wc_MakeRsaKey(&rsaPrivateKey, PRIVATE_KEY_LENGTH_1024, e, &randomNumberGenerator);
-
-  //if(error != OK) {RETURN_ERROR(ERR_INTERNAL_ERROR)};
-
-  // **********************************************
-  // * store the new private key in a ByteArray_t *
-  // * that will in turn be stored in             *
-  // * preallocated_return_result_ptr->result     *
-  // **********************************************
-
-  //aNewPrivateKey->size = rsaPrivateKey.dataLen;
-  //aNewPrivateKey->payload = (char *)rsaPrivateKey.data;
+  ecc_key eccPrivateKey;
 
   //ref, wc_ecc_init (ecc_key *key)
   error = wc_ecc_init(&eccPrivateKey);    // preps the key supplied for future use
 
   //ref, wc_ecc_make_key(WC_RNG *rng, int keysize, ecc_key *key);
-  //wc_ecc_make_key(&dialogRng, PRIVATE_KEY_LENGTH_1024, &eccPrivateKey);
-  */
-  preallocated_return_result_ptr->error = OK;
-  preallocated_return_result_ptr->result = malloc(sizeof(ByteArray_t));  // the ByteArray_t holding the new private key
+  wc_ecc_make_key(&wc_replacement_rng, PRIVATE_KEY_LENGTH_1024, &eccPrivateKey);
+  
+  //preallocated_return_result_ptr->error = OK;
+  //preallocated_return_result_ptr->result = malloc(sizeof(ByteArray_t));  // the ByteArray_t holding the new private key
 
   //error = wc_FreeRng(&randomNumberGenerator);               // required release
 
   return preallocated_return_result_ptr;                    // return the private key
+  */
 }
 
 /**

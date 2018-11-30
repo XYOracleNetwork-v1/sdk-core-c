@@ -37,23 +37,24 @@
 *----------------------------------------------------------------------------*/
 XYResult_t* Payload_creator_create(const char id[2], void* payload_data){
 
-  /********************************/
-  /* guard against bad input data */
-  /********************************/
+  // ******************************** /
+  // * guard against bad input data * /
+  // ******************************** /
 
   //if(!payload_data) {RETURN_ERROR(ERR_BADDATA);}
-
+/*
   if(payload_data == NULL){
     Payload_t* user_payload = malloc(sizeof(Payload_t));
     XYResult_t* lookup_result = tableLookup((const char*)&IntWeakArray_id);
     ObjectProvider_t* array_creator = lookup_result->result;
-    XYResult_t* arrayCreate_result = array_creator->create((const char*)&IntWeakArray_id, NULL);
+    XYResult_t* arrayCreate_result = array_creator->create((char*)&IntWeakArray_id, NULL);
     user_payload->signedHeuristics = ((XYObject_t*)arrayCreate_result->result)->payload;
-    arrayCreate_result = array_creator->create((const char*)&IntWeakArray_id, NULL);
+    arrayCreate_result = array_creator->create((char*)&IntWeakArray_id, NULL);
     user_payload->unsignedHeuristics = ((XYObject_t*)arrayCreate_result->result)->payload;
     user_payload->size = user_payload->signedHeuristics->size + user_payload->unsignedHeuristics->size + 4;
     return newObject(id, user_payload);
   }
+  */
   return newObject(id, payload_data);
 }
 
@@ -75,15 +76,15 @@ XYResult_t* Payload_creator_fromBytes(char* payload_data){
 
   /********************************/
   /* guard against bad input data */
-  /********************************/
+  /******************************** /
 
   if(!payload_data) {RETURN_ERROR(ERR_BADDATA);}
 
   Payload_t* return_payload = malloc(sizeof(Payload_t));
 
-  /********************************/
-  /* guard against malloc errors  */
-  /********************************/
+  // ******************************** /
+  // * guard against malloc errors  * /
+  // ******************************** /
 
   if(!return_payload) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
 
@@ -97,12 +98,12 @@ XYResult_t* Payload_creator_fromBytes(char* payload_data){
 
   if(array_result->error==OK){
     signedWeakArray = array_result->result;
-    uint32_t firstSize = to_uint32((char*)&payload_data[4]);
-    /*
+    uint32_t firstSize = to_uint32((unsigned char*)&payload_data[4]);
+    // *
      * We ask the first payload what it's size is and then add that to
      * the offset of 4 (for Payload.size) in order to derrive the position
      * of the second array in the payload.
-     */
+     * /
     array_result = weakArrayCreator->fromBytes(&payload_data[sizeof(char)*(firstSize+4)]);
 
     if(array_result->error==OK){
@@ -127,6 +128,8 @@ XYResult_t* Payload_creator_fromBytes(char* payload_data){
 
   preallocated_return_result_ptr->error = OK;
   preallocated_return_result_ptr->result = return_payload;
+  
+  */
 
   return preallocated_return_result_ptr;
 }
@@ -149,12 +152,12 @@ XYResult_t* Payload_creator_toBytes(XYObject_t* user_XYObject){
 
   /********************************/
   /* guard against bad input data */
-  /********************************/
+  /******************************** /
 
   if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA);}
 
   Payload_t* user_Payload = user_XYObject->payload;
-  uint32_t size = user_Payload->size;
+  //uint32_t size = user_Payload->size;   // wal, compile warning, size never ref'd
 
   char IntWeakArrayID[2] = {0x01, 0x06};
   XYResult_t* lookup_result = tableLookup(IntWeakArrayID);
@@ -171,7 +174,7 @@ XYResult_t* Payload_creator_toBytes(XYObject_t* user_XYObject){
   }
   XYResult_t* toBytes_result1 = NULL;
   XYResult_t* toBytes_result2 = NULL;
-  /* Take the array_raw in, endian the size around, then do toBytes() */
+  // * Take the array_raw in, endian the size around, then do toBytes() * /
 
   XYResult_t* newObject_result1 = newObject(IntWeakArrayID, user_Payload->signedHeuristics);
   if(newObject_result1->error == OK){
@@ -185,13 +188,13 @@ XYResult_t* Payload_creator_toBytes(XYObject_t* user_XYObject){
   }
   char* return_buffer = malloc((sizeof(uint32_t))+(sizeof(char)*size1)+(sizeof(char)*size2));
 
-  /********************************/
-  /* guard against malloc errors  */
-  /********************************/
+  // ******************************** /
+  // * guard against malloc errors  * /
+  // ******************************** /
 
   if(!return_buffer) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
 
-  /* TODO: payloadsSize is off by 4 here and I am not sure why. disconserting. */
+  // * TODO: payloadsSize is off by 4 here and I am not sure why. disconserting. * /
   uint32_t encoded_size = size1 + size2 + (4*sizeof(char));
   if(littleEndian()){
     encoded_size = to_uint32((unsigned char*)&encoded_size);
@@ -217,18 +220,19 @@ XYResult_t* Payload_creator_toBytes(XYObject_t* user_XYObject){
   memcpy(return_buffer+(sizeof(uint32_t))+(sizeof(char)*size1), unsignedHeuristicBytes, size2*sizeof(char));
 
   // Cleanup XYResults
-  /*
+  / *
   free(newObject_result1);
   free(newObject_result2);
   free(toBytes_result1);
   free(toBytes_result2);
   //free(lookup_result);
-  */
+  * /
 
   preallocated_return_result_ptr = &preallocated_return_result;
 
   preallocated_return_result_ptr->error = OK;
   preallocated_return_result_ptr->result = return_buffer;
+  */
 
   return preallocated_return_result_ptr;
 }

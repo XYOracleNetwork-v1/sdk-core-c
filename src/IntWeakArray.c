@@ -18,6 +18,9 @@
  */
  #include "arrays.h"
 
+extern  uint32_t to_uint16(unsigned char* data);
+extern  uint32_t to_uint32(unsigned char* data);
+
 /*----------------------------------------------------------------------------*
 *  NAME
 *      IntWeakArray_add
@@ -76,15 +79,15 @@ XYResult_t* IntWeakArray_add(IntWeakArray_t* self_IntWeakArray,
           /* First we read 2 bytes of the payload to get the size,
            * the to_uint16 function reads ints in big endian.
            */
-          object_size = to_uint16(user_object_payload); //TODO: Check compatibility on big endian devices.
+          object_size = to_uint16((unsigned char*)user_object_payload); //TODO: Check compatibility on big endian devices.
           if(littleEndian()){
-            object_size = to_uint16((char*)&object_size);
+            object_size = to_uint16((unsigned char*)&object_size);
           }
           break;
         case 4:
-          object_size = to_uint32(user_object_payload);
+          object_size = to_uint32((unsigned char*)user_object_payload);
           if(littleEndian()){
-            object_size = to_uint32((char*)&object_size);
+            object_size = to_uint32((unsigned char*)&object_size);
           }
           break;
       }
@@ -202,10 +205,10 @@ XYResult_t* IntWeakArray_get(IntWeakArray_t* self_IntWeakArray, int index) {
             element_size = arrayPointer[2];
             break;
           case 2:
-            element_size = to_uint16(arrayPointer+(sizeof(char)*2));
+            element_size = to_uint16((unsigned char*)arrayPointer+(sizeof(char)*2));
             break;
           case 4:
-            element_size = to_uint32(arrayPointer+(sizeof(char)*2));
+            element_size = to_uint32((unsigned char*)arrayPointer+(sizeof(char)*2));
             break;
         }
 
@@ -331,7 +334,7 @@ XYResult_t* IntWeakArray_creator_fromBytes(char* data){
       return_array->add = &IntWeakArray_add;
       return_array->remove = NULL;
       return_array->get = &IntWeakArray_get;
-      return_array->size = to_uint32(data);
+      return_array->size = to_uint32((unsigned char*)data);
       return_array->payload = malloc(sizeof(char)*(return_array->size-4));
 
       /********************************/
@@ -402,14 +405,14 @@ XYResult_t* IntWeakArray_creator_toBytes(XYObject_t* user_XYObject){
        * are in the network byte order.
        */
       if(littleEndian()){
-        user_array->size = to_uint32((char*)(uintptr_t)&user_array->size);
+        user_array->size = to_uint32((unsigned char*)(uintptr_t)&user_array->size);
       }
       memcpy(byteBuffer, &user_array->size, 4);
       if(totalSize > 4){
         memcpy(byteBuffer+4, user_array->payload, sizeof(char)*(totalSize-4));
       }
       if(littleEndian()){
-        user_array->size = to_uint32((char*)(uintptr_t)&user_array->size);
+        user_array->size = to_uint32((unsigned char*)(uintptr_t)&user_array->size);
       }
       preallocated_return_result_ptr->error = OK;
       preallocated_return_result_ptr->result = byteBuffer;

@@ -18,18 +18,19 @@
  */
 
 #ifndef NODEBASE_H
+#define NODEBASE_H
 
-//#include "repository.h"
-//#include "hash.h"
-//#include "originchain.h"
-//#include "ZigZagBoundWitnessSession.h"
-//#include "state.h"
-//#include "defines.h"
-//#include "xyobject.h"
-//#include "boundwitnessoption.h"
+#include "C:\xycorp\xy4_firmware\sdk\sdk-core-c\src\include\state\repository.h"
+#include "hash.h"
+#include "C:\xycorp\xy4_firmware\sdk\sdk-core-c\src\include\state\originchain.h"
+#include "state.h"
 #include <stdint.h>
 #include "boundwitnessoption.h"
 #include "nodelistener.h"
+//#include "ZigZagBoundWitnessSession.h"
+//#include "defines.h"
+//#include "xyobject.h"
+//#include "boundwitnessoption.h"
 
 /*
  * TYPE DEFINITIONS
@@ -60,6 +61,7 @@ typedef struct BoundWitnessOption BoundWitnessOption;
  */
 
 struct NodeBase {
+  
   RepositoryProvider_t* blockRepository;
   HashProvider_t* hashingProvider;
   OriginChainNavigator_t* originChainNavigator;

@@ -21,18 +21,15 @@
  */
 
 #include <stdint.h>
-#include <sys/types.h>
 #include <stddef.h>
 
-//#include <xyo/relaynode.h>
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdio.h>
-#include <arpa/inet.h>
 
+#include "objects.h"
 //#include "xyo.h"
-//#include "objects.h"
 //#include "arrays.h"
 //#include "hash.h"
 
@@ -44,12 +41,14 @@
 typedef struct BoundWitness BoundWitness_t;
 typedef struct BoundWitnessTransfer BoundWitnessTransfer_t;
 typedef struct BoundWitnessHeaders BoundWitnessHeaders_t;
+
 /*
  * FORWARD DECLARATION
+ ****************************************************************************************
  */
  typedef struct HashProvider HashProvider_t;
- //typedef struct Signer Signer_t;
- typedef struct NetworkPipe NetworkPipe_t;
+//typedef struct Signer Signer_t;
+// typedef struct NetworkPipe NetworkPipe_t;
 
 /*
  * STRUCTURES

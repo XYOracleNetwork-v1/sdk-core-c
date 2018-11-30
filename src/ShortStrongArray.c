@@ -17,7 +17,10 @@
  ****************************************************************************************
  */
  #include "arrays.h"
- 
+
+extern uint16_t to_uint16(unsigned char* data);
+extern uint32_t to_uint32(unsigned char* data);
+
 /*----------------------------------------------------------------------------*
 *  NAME
 *      ShortStrongArray_add
@@ -77,15 +80,15 @@ XYResult_t* ShortStrongArray_add(ShortStrongArray_t* self_ShortStrongArray,
           /* First we read 2 bytes of the payload to get the size,
            * the to_uint16 function reads ints in big endian.
            */
-          object_size = to_uint16(object_payload); //TODO: Check compatibility on big endian devices.
+          object_size = to_uint16((unsigned char*)object_payload); //TODO: Check compatibility on big endian devices.
           if(littleEndian()){
-            object_size = to_uint16((char*)&object_size);
+            object_size = to_uint16((unsigned char*)&object_size);
           }
           break;
         case 4:
-          object_size = to_uint32(object_payload);
+          object_size = to_uint32((unsigned char*)object_payload);
           if(littleEndian()){
-            object_size = to_uint32((char*)&object_size);
+            object_size = to_uint32((unsigned char*)&object_size);
           }
           break;
       }
@@ -99,7 +102,7 @@ XYResult_t* ShortStrongArray_add(ShortStrongArray_t* self_ShortStrongArray,
        */
        byteArray = TRUE;
        ByteArray_t* user_array = user_XYObject->payload;
-       char* user_object_payload = user_array->payload;
+//       char* user_object_payload = user_array->payload;
        char id[2];
        memcpy(id, user_array, 2);
        lookup_result = tableLookup(id);
@@ -226,7 +229,7 @@ XYResult_t* ShortStrongArray_get(ShortStrongArray_t* self_ShortStrongArray, int 
         if(!element_size) {RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);}
 
         memcpy(element_size, &array_elements[array_offset], element_creator->sizeIdentifierSize);
-        uint16_t int_size = to_uint16(element_size);
+        uint16_t int_size = to_uint16((unsigned char*)element_size);
         free(element_size);
 
         if(i == index){
@@ -348,7 +351,7 @@ XYResult_t* ShortStrongArray_creator_fromBytes(char* data){
       return_array->add = &ShortStrongArray_add;
       return_array->remove = NULL;
       return_array->get = &ShortStrongArray_get;
-      return_array->size = to_uint16(data);
+      return_array->size = to_uint16((unsigned char*)data);
       /*
       char array_id[3];
       array_id[0] = data[2];
@@ -406,7 +409,11 @@ XYResult_t* ShortStrongArray_creator_toBytes(XYObject_t* user_XYObject){
 
   if(!user_XYObject) {RETURN_ERROR(ERR_BADDATA);}
 
-  if((user_XYObject->id[0] == 0x01 && user_XYObject->id[1] == 0x02) || (user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x03)){
+  if((user_XYObject->id[0] == 0x01  && 
+      user_XYObject->id[1] == 0x02) 
+                                    || 
+      (user_XYObject->id[0] == 0x02 && 
+      user_XYObject->id[1] == 0x03)) {
 
     ShortStrongArray_t* user_array = (user_XYObject->GetPayload(user_XYObject))->result;
     uint16_t totalSize = user_array->size;
@@ -427,14 +434,14 @@ XYResult_t* ShortStrongArray_creator_toBytes(XYObject_t* user_XYObject){
        * are in the network byte order.
        */
       if(littleEndian()){
-        user_array->size = to_uint16((char*)(uintptr_t)user_array->size);
+        user_array->size = to_uint16((unsigned char*)(uintptr_t)user_array->size);
       }
 
       memcpy(byteBuffer, user_XYObject->GetPayload(user_XYObject), 4);
       memcpy(byteBuffer+4, user_array->payload, sizeof(char)*(totalSize-4));
 
       if(littleEndian()){
-        user_array->size = to_uint16((char*)(uintptr_t)user_array->size);
+        user_array->size = to_uint16((unsigned char*)(uintptr_t)user_array->size);
       }
 
       preallocated_return_result_ptr->error = OK;

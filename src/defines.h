@@ -84,7 +84,7 @@
 /*
  * Type Table defines
  */
-#define TYPE_TABLE_MAJOR_MAX                    0x20
+#define TYPE_TABLE_MAJOR_MAX                    0x10
 #define TYPE_TABLE_MINOR_MAX                    0x10
 
 /*

@@ -45,7 +45,7 @@ XYResult_t* initNode(NodeBase_t** self, OriginChainProvider_t* repository, HashP
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
 
-  (*self)->blockRepository = repository;
+  //(*self)->blockRepository = repository;          // wal, compile time warning of type mismatch 
   (*self)->hashingProvider = hashingProvider;
 
   (*self)->originChainNavigator = malloc(sizeof(OriginChainNavigator_t));
@@ -64,9 +64,9 @@ XYResult_t* initNode(NodeBase_t** self, OriginChainProvider_t* repository, HashP
   (*self)->originChainNavigator->originChainRepository->repository = repoArray;
   if((*self)->originChainNavigator->originChainRepository == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
   if((*self)->originChainNavigator->originChainRepository->repository == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY); }
-  (*self)->originChainNavigator->originChainRepository->append = append;
-  (*self)->originChainNavigator->originChainRepository->getChain = getChain;
-  (*self)->originChainNavigator->originChainRepository->deleteChain = deleteChain;
+  (*self)->originChainNavigator->originChainRepository->appendToOriginChainInFlash = appendToOriginChainInFlash;
+  (*self)->originChainNavigator->originChainRepository->getTheOriginChainFromFlash = getTheOriginChainFromFlash;
+  (*self)->originChainNavigator->originChainRepository->deleteTheOriginChainFromFlash = deleteTheOriginChainFromFlash;
 
 
   if((*self)->originChainNavigator == NULL){ RETURN_ERROR(ERR_INSUFFICIENT_MEMORY) }
@@ -84,13 +84,13 @@ XYResult_t* initNode(NodeBase_t** self, OriginChainProvider_t* repository, HashP
 
   (*self)->addHeuristic = addHeuristic;
   (*self)->removeHeuristic = removeHeuristic;
-  (*self)->selfSignOriginChain = selfSignOriginChain;
-  (*self)->getUnSignedPayloads = getUnSignedPayloads;
-  (*self)->getSignedPayloads = getSignedPayloads;
-  (*self)->notifyListeners = notifyListeners;
+  //(*self)->selfSignOriginChain = selfSignOriginChain;   // wal, compile time warning of type mismatch 
+  //(*self)->getUnSignedPayloads = getUnSignedPayloads;   // wal, compile time warning of type mismatch 
+  //(*self)->getSignedPayloads = getSignedPayloads;       // wal, compile time warning of type mismatch 
+  //(*self)->notifyListeners = notifyListeners;           // wal, compile time warning of type mismatch 
   //(*self)->getBridgedBlocks = getBridgedBlocks;
   (*self)->doBoundWitness = doBoundWitness;
-  (*self)->updateOriginState = updateOriginState;
+  //(*self)->updateOriginState = updateOriginState;       // wal, compile time warning of type mismatch 
   (*self)->makePayload = makePayload;
   (*self)->onBoundWitnessStart = onBoundWitnessStart;
   (*self)->onBoundWitnessEndSuccess = onBoundWitnessEndSuccess;
@@ -98,25 +98,25 @@ XYResult_t* initNode(NodeBase_t** self, OriginChainProvider_t* repository, HashP
   (*self)->flag = NODE_MODE;
 
 
-  BoundWitnessOption_t* option1 = malloc(sizeof(BoundWitnessOption_t));
-  option1->flag = BOUND_WITNESS_OPTION; //TODO: hard wired
-  option1->getSignedPayload = getSignedIndex;
-  option1->getUnsignedPayload = getUnSignedIndex;
+  //BoundWitnessOption_t* option1 = malloc(sizeof(BoundWitnessOption_t));
+  //option1->flag = BOUND_WITNESS_OPTION; //TODO: hard wired
+  //option1->getSignedPayload = getSignedIndex;
+  //option1->getUnsignedPayload = getUnSignedIndex;
 
   BoundWitnessOption_t* option2 = malloc(sizeof(BoundWitnessOption_t));
   option2->flag = BOUND_WITNESS_OPTION; //TODO: hard wired
   option2->getSignedPayload = getSignedHash;
   option2->getUnsignedPayload = getUnSignedHash;
 
-  BoundWitnessOption_t* option3 = malloc(sizeof(BoundWitnessOption_t));
-  option3->flag = GIVE_ORIGIN_CHAIN_OPTION; //TODO: hard wired
-  option3->getSignedPayload = getSignedBridge;
-  option3->getUnsignedPayload = getUnSignedBridge;
+  //BoundWitnessOption_t* option3 = malloc(sizeof(BoundWitnessOption_t));
+  //option3->flag = GIVE_ORIGIN_CHAIN_OPTION; //TODO: hard wired
+  //option3->getSignedPayload = getSignedBridge;
+  //option3->getUnsignedPayload = getUnSignedBridge;
 
-  (*self)->boundWitnessOptions[0] = option1;
-  (*self)->boundWitnessOptions[1] = option2;
-  (*self)->boundWitnessOptions[2] = option3;
-
+  //(*self)->boundWitnessOptions[0] = option1;
+  //(*self)->boundWitnessOptions[1] = option2;
+  //(*self)->boundWitnessOptions[2] = option3;
+  (*self)->boundWitnessOptions[0] = option2;
 
   XYResult_t* return_result = malloc(sizeof(XYResult_t));
   if(return_result){
@@ -129,6 +129,7 @@ XYResult_t* initNode(NodeBase_t** self, OriginChainProvider_t* repository, HashP
 }
 
 XYObject_t* getSignedHash(void* self){
+  /*
   PreviousHash_t* return_PH = malloc(sizeof(PreviousHash_t));
   if(return_PH){
     return_PH->hash = malloc(sizeof(char)*34);
@@ -155,7 +156,7 @@ XYObject_t* getSignedHash(void* self){
       free(newObject_result);
       return NULL;
     }
-    /*
+    // *
     printf("Bridge Queue: [");
     for(int j = 0; j< nodebase->originChainNavigator->queueLen-2; j++){
       ByteArray_t* lHash = nodebase->originChainNavigator->bridgeQueue[j];
@@ -172,12 +173,14 @@ XYObject_t* getSignedHash(void* self){
       printf("%1x", (unsigned)(unsigned char)lastHash->payload[i]);
     }
     printf("\n");
-    */
+    * /
 
     return newObject_result->result;
   } else {
     return NULL;
   }
+  */
+  return NULL;
 }
 
 XYObject_t* getUnSignedHash(void* self){
@@ -185,10 +188,11 @@ XYObject_t* getUnSignedHash(void* self){
 }
 
 XYObject_t* getSignedIndex(void* self){
-  XYResult_t* newObject_result = newObject((const char*)&Index_id, &((NodeBase_t*)self)->originChainState->index);
-  XYObject_t* return_object = newObject_result->result;
+  //XYResult_t* newObject_result = newObject((const char*)&Index_id, &((NodeBase_t*)self)->originChainState->index);
+  //XYObject_t* return_object = newObject_result->result;
   //free(newObject_result);
-  return return_object;
+  //return return_object;
+  return NULL;
 }
 
 XYObject_t* getUnSignedIndex(void* self){
@@ -196,6 +200,7 @@ XYObject_t* getUnSignedIndex(void* self){
 }
 
 XYObject_t* getSignedBridge(void* self){
+ /*
   XYResult_t* arrayResult = tableLookup((const char*)&ShortWeakArray_id);
   if(arrayResult->error != OK){
     return NULL;
@@ -213,7 +218,7 @@ XYObject_t* getSignedBridge(void* self){
     XYObject_t* hashObj = freeme->result;
     XYResult_t* addResult = arrayRaw->add(arrayRaw, hashObj);
     if(addResult->error != OK){
-      printf("Couldn't add hash to bridge hash set. \n");
+      //printf("Couldn't add hash to bridge hash set. \n");
       free(freeme);
       free(addResult);
       free(hashObj);
@@ -223,11 +228,12 @@ XYObject_t* getSignedBridge(void* self){
   }
   free(arrayResult);
   return arrayObject;
-
+*/
   return NULL;
 }
 
 XYObject_t* getUnSignedBridge(void* self){
+/*
   if(((NodeBase_t*)self)->originChainNavigator->queueLen<1){
     return NULL;
   }
@@ -236,7 +242,8 @@ XYObject_t* getUnSignedBridge(void* self){
   XYResult_t* newObject_result = newObject((const char*)&BridgeBlockSet_id, provider->repository);
   if(newObject_result->error != OK) { free(newObject_result); return NULL; }
   return newObject_result->result;
-
+*/
+  return NULL;
 }
 
 
@@ -258,7 +265,6 @@ XYObject_t* getUnSignedBridge(void* self){
  *
  ****************************************************************************************
  */
-
 uint8_t addHeuristic(NodeBase_t* self, uint32_t key, XYObject_t* heuristic){
   if(key > self->heuristicCount) { return FALSE; }
   XYObject_t* heuristicsArray = (XYObject_t*)self->heuristics;
@@ -302,6 +308,7 @@ void onBoundWitnessEndSuccess(NodeBase_t* self, BoundWitness_t* boundWitness){
       return;
     } else {
       #ifndef HEADLESS
+      /* wal, removed to save memory
       XYObject_t* hash_object = hash_result->result;
       ByteArray_t* hash = hash_object->payload;
       printf(GRN "New block found:  " RESET);
@@ -309,14 +316,14 @@ void onBoundWitnessEndSuccess(NodeBase_t* self, BoundWitness_t* boundWitness){
         printf("%1x", (unsigned)(unsigned char)hash->payload[i]);
       }
       printf("\n");
-
+      */
       #endif
-
+      /*
       XYResult_t* contains_result = self->originChainNavigator->containsOriginBlock(self->originChainNavigator, boundWitness);
       if(contains_result->error != OK ){
         //TODO: De-onion and sort bridge blocks
-        self->originChainNavigator->addBoundWitness(self->originChainNavigator, boundWitness);
-        notifyListeners(self, boundWitness);
+        //self->originChainNavigator->addBoundWitness(self->originChainNavigator, boundWitness);
+        //notifyListeners(self, boundWitness);
         return;
       }
       else{
@@ -327,13 +334,17 @@ void onBoundWitnessEndSuccess(NodeBase_t* self, BoundWitness_t* boundWitness){
   } else {
     return;
   }
+  */
+    }
+  }
+  return;
 }
 
 /*
  * Called When a bound witness has failed to be added.
  */
 void onBoundWitnessEndFailure( void ){
-  printf(RED "Bound witness failed!\n" RESET);
+  //printf(RED "Bound witness failed!\n" RESET);
 }
 
 /*
@@ -345,7 +356,7 @@ void onBoundWitnessStart( void ){
 
 /*
 * Self signs an origin block to the devices origin chain.
-*/
+* /
 uint8_t selfSignOriginChain(NodeBase_t* self){
   ZigZagBoundWitness_t* boundWitness = malloc(sizeof(ZigZagBoundWitness_t) + (2*sizeof(XYObject_t)));
   if(boundWitness){
@@ -441,7 +452,7 @@ uint8_t selfSignOriginChain(NodeBase_t* self){
     return FALSE;;
   }
 }
-
+*/
 /*
 * Gets all of the unsigned payloads for a given flag.
 */
@@ -512,7 +523,9 @@ XYObject_t* getSignedPayloads(NodeBase_t* self){
 * Call the listener for each block in a bound witness.
 */
 void notifyListeners(NodeBase_t* self, BoundWitness_t* boundWitness){
-  for(uint32_t i = 0; i < MAX_ALLOCATED_LISTENERS; i++){
+  
+  /*
+  for(uint32_t i = 0; i < MAX_ALLOCATED_LISTENERS; i++){  // wal, compiler flagged this as a pointless comparison between zeros
     if(self->listeners[i] != NULL){
       self->listeners[i]->onBoundWitnessDiscovered((void*)boundWitness);
     } else {
@@ -520,6 +533,7 @@ void notifyListeners(NodeBase_t* self, BoundWitness_t* boundWitness){
     }
   }
   return;
+  */
 }
 
 /*
@@ -595,6 +609,7 @@ XYResult_t* doBoundWitness(NodeBase_t* self, ByteArray_t* startingData, NetworkP
     RETURN_ERROR(ERR_CRITICAL);
   }
 }
+
 /*
 * Update the state of the origin chain.
 */
@@ -707,3 +722,6 @@ XYResult_t* makePayload(NodeBase_t* self){
     RETURN_ERROR(ERR_INSUFFICIENT_MEMORY);
   }
 }
+
+// end of file nodebase.c
+

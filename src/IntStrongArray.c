@@ -27,6 +27,9 @@
 #include <stdio.h>
 */
 
+extern uint16_t to_uint16(unsigned char* data);
+extern uint32_t to_uint32(unsigned char* data);
+
 /*----------------------------------------------------------------------------*
 *  NAME
 *      IntStrongArray_add
@@ -86,15 +89,15 @@ XYResult_t* IntStrongArray_add(IntStrongArray_t* self_IntStrongArray,
           /* First we read 2 bytes of the payload to get the size,
            * the to_uint16 function reads ints in big endian.
            */
-          object_size = to_uint16(object_payload); //TODO: Check compatibility on big endian devices.
+          object_size = to_uint16((unsigned char*)object_payload); //TODO: Check compatibility on big endian devices.
           if(littleEndian()){
-            object_size = to_uint16((char*)&object_size);
+            object_size = to_uint16((unsigned char*)&object_size);
           }
           break;
         case 4:
-          object_size = to_uint32(object_payload);
+          object_size = to_uint32((unsigned char*)object_payload);
           if(littleEndian()){
-            object_size = to_uint32((char*)&object_size);
+            object_size = to_uint32((unsigned char*)&object_size);
           }
           break;
       }
@@ -230,7 +233,7 @@ XYResult_t* IntStrongArray_get(IntStrongArray_t* self_IntStrongArray, int index)
         //TODO: wal, should check for any malloc errors
 
         memcpy(element_size, &array_elements[array_offset], element_creator->sizeIdentifierSize);
-        uint32_t int_size = to_uint32(element_size);
+        uint32_t int_size = to_uint32((unsigned char*)element_size);
         free(element_size);
         if(i == index){
           char* return_object_payload = malloc(int_size);
@@ -342,7 +345,7 @@ XYResult_t* IntStrongArray_creator_fromBytes(char* data){
       return_array->add = &IntStrongArray_add;
       return_array->remove = NULL;
       return_array->get = &IntStrongArray_get;
-      return_array->size = to_uint32(data);
+      return_array->size = to_uint32((unsigned char*)data);
       char array_id[3];
       array_id[0] = data[4];
       array_id[1] = data[5];
@@ -443,7 +446,7 @@ XYResult_t* IntStrongArray_creator_toBytes(XYObject_t* user_XYObject){
       }
 
       if(littleEndian()){
-        user_array->size = to_uint32((char*)(uintptr_t)user_array->size);
+        user_array->size = to_uint32((unsigned char*)(uintptr_t)user_array->size);
       }
       preallocated_return_result_ptr->error = OK;
       preallocated_return_result_ptr->result = byteBuffer;
@@ -460,10 +463,19 @@ XYResult_t* IntStrongArray_creator_toBytes(XYObject_t* user_XYObject){
     RETURN_ERROR(ERR_BADDATA);
   }
 }
-
-XYResult_t* BlockSet_creator_toBytes(struct XYObject* user_XYObject){
+/*
+typedef struct XYObject{
+ char id[2];
+ void* payload;
+ XYResult_t* (*GetXyobjectId)(struct XYObject*);  // Fetch the above id object and return it.
+ XYResult_t* (*GetPayload)(struct XYObject*);     // Fetch the above payload pointer object and return it.
+} XYObject_t ;
+*/
+XYResult_t* BlockSet_creator_toBytes(XYObject_t* user_XYObject){
+  
   if((user_XYObject->id[0] == 0x02 && user_XYObject->id[1] == 0x09)){
-    IntStrongArray_t* user_array = user_XYObject->GetPayload(user_XYObject);
+    
+    IntStrongArray_t* user_array = (user_XYObject->GetPayload(user_XYObject))->result;  // wal, compiler warning fix
     uint32_t totalSize = user_array->size;
     char* byteBuffer = malloc(sizeof(char)*totalSize);
     XYResult_t* return_result = malloc(sizeof(XYResult_t));
@@ -481,7 +493,9 @@ XYResult_t* BlockSet_creator_toBytes(struct XYObject* user_XYObject){
         encodedSize = to_uint32((unsigned char*)&encodedSize);
       }
       memcpy(byteBuffer, &encodedSize, 4);
-      memcpy(byteBuffer+4, user_XYObject->payload+4, 2);
+      char* bodyPtr = (char*)byteBuffer+4;
+      char* userBodyPtr = (char*)user_XYObject->payload+4;
+      memcpy(bodyPtr, userBodyPtr, 2);
 
       memcpy(byteBuffer+6, user_array->payload, sizeof(char)*(totalSize-6));
       return_result->error = OK;
@@ -496,7 +510,6 @@ XYResult_t* BlockSet_creator_toBytes(struct XYObject* user_XYObject){
   else {
     RETURN_ERROR(ERR_BADDATA)
   }
-
 }
 
 // end of file intstrongarray.c

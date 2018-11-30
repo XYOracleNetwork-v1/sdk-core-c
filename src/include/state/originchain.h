@@ -21,6 +21,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "repository.h"
+#include "C:\xycorp\xy4_firmware\sdk\sdk-core-c\src\include\objects\BoundWitness.h"
 
 #ifndef ORIGINCHAIN_H
 #define ORIGINCHAIN_H
@@ -42,6 +43,7 @@ typedef struct OriginChainNavigatorT {
   char lastHash[32];
 
 } OriginChainNavigator_t;
+
 #endif
 
 

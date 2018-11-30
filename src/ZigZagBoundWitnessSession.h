@@ -26,6 +26,7 @@
 #include "arrays.h"
 #include "ByteArray.h"
 #include "hash.h"
+#include "network.h"
 #include "crypto.h"
 #include "include/objects/BoundWitness.h"
 #include "include/objects/ZigZagBoundWitness.h"     // "crypto.h", "BoundWitness.h", "xyobject.h", "hash.h"
@@ -74,7 +75,7 @@ struct NetworkPeer{
  ****************************************************************************************
  */
 
-XYResult_t* receiverCallback(ZigZagBoundWitnessSession_t* self, ByteArray_t* data);
+XYResult_t* receiverCallback(void* self, ByteArray_t* data);
 XYResult_t* completeBoundWitness(ZigZagBoundWitnessSession_t* userSession,
                                  ByteArray_t* boundWitnessData);
 

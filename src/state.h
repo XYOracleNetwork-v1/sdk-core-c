@@ -18,13 +18,14 @@
  */
 
 #ifndef STATE_H
+#define STATE_H
+
 #include <stdint.h>
-#include "xyobject.h"
+//#include "xyobject.h"
 #include "crypto.h"
 #include "xyo.h"
 #include "ZigZagBoundWitnessSession.h"
-#include "include/state/originchain.h"
-#include "include/state/repository.h"
+//#include "include/state/repository.h"
 
 /*
  * TYPE DEFINITIONS
