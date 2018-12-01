@@ -21,3 +21,6 @@ XYObject_t IteratorGet(XYArrayItr_t* itr);
 
 XYResult_t Iterator_bookmark(XYObject_t *self, uint32_t element, uint32_t bytesAfter, uint32_t offset, XYArrayItr_t* optional);
 XYResult_t Iterator_insert(XYObject_t* self, uint32_t element, uint32_t offset, uint32_t totalBytes, char* bytes);
+
+int testAdd( void );
+int testGap( void );

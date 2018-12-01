@@ -48,6 +48,6 @@ extern XYResult_t socket_recv(NetworkPipe_t* self, char* data, uint32_t recvByte
 //extern NetworkPipe_t* findSomeoneToTalkTo( void );
 
 //TODO: DEBUG extern
-extern char globalBuffer[1024];
+
 #define NODEBASE_H
 #endif

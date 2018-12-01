@@ -76,3 +76,4 @@ void to_uint16_be(unsigned char* dest, uint16_t value);
 int littleEndian(void);
 
 #endif
+

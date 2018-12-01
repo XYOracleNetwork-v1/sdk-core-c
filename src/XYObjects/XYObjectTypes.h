@@ -19,3 +19,5 @@
 
 #define TYPE_ARRAY   (0x01)
 //#define TYPE_ARRAY_STRONG  (0x02)
+
+

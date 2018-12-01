@@ -18,14 +18,12 @@
 #define NETWORK_H
 
 #include <stdint.h>
-#include <pthread.h>
-#include <unistd.h>
 #include <stdio.h>
-#include <sys/socket.h>
+//#include <sys/socket.h>
 #include <stdlib.h>
-#include <netinet/in.h>
+//#include <netinet/in.h>
 #include <string.h>
-#include <fcntl.h>
+//#include <fcntl.h>
 #include <limits.h>
 #include "defines.h"
 #include "ByteArray.h"
@@ -43,7 +41,7 @@ struct NetworkPeer{
    * of writing is network.c for TCP.
    */
   int socket;
-  struct sockaddr_in address;
+//  struct sockaddr_in address;
   uint16_t port;
 };
 
@@ -52,20 +50,6 @@ struct NetworkPipe{
   uint8_t role;
   ByteArray_t scratchBuffer;
   char theirCatalog[CATALOG_BUFFER_SIZE+4];
-};
-
-
-struct client_arguments{
-  uint8_t flags;
-  pthread_t* server;
-  struct sockaddr_in* *peers;
-  uint8_t peerCount;
-};
-
-struct server_arguments{
-  uint8_t flags;
-  pthread_t* client;
-  int port;
 };
 
 void* serverThread(void* flag);

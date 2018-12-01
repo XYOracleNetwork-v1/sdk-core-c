@@ -48,3 +48,4 @@ XYResult_t WeakArray_get(XYObject_t *self,
   }
 
 uint8_t lengthTypeToLength(int _VALUE_);
+  

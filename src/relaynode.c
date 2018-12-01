@@ -46,7 +46,7 @@
        return 0;
      }
    }
-   return 0;
+   //return 0;
 }
 
 #define typedFlags 176
@@ -57,16 +57,10 @@ char payloadBuffer[30] = { TYPED_ITERABLE, 0x01, 0x00, 0x00, 0x00, sizeof(payloa
                               0x00, 0x00, 0x00, sizeof(payloadBuffer)-8, 78, 0x01, 0x00, sizeof(payloadBuffer)-10, 190, 0x03,
                               0x00, sizeof(payloadBuffer)-12, 0x00, 0x00, 0x00, 0x01, UNTYPED_ITERABLE, 0x01, 
                               0x00, 0x00, 0x00, 0x04};
-char paydbg[] = { TYPED_ITERABLE, 0x01, 0x00, 0x00, 0x00, sizeof(payloadBuffer)-2, 176, 0x08, 
-                              0x00, 0x00, 0x00, sizeof(payloadBuffer)-8, 78, 0x01, 0x00, sizeof(payloadBuffer)-10, 190, 0x03,
-                              0x00, sizeof(payloadBuffer)-12, 0x00, 0x00, 0x00, 0x01, UNTYPED_ITERABLE, 0x01, 
-                              0x00, 0x00, 0x00, 0x04};
 
 char signatureBuffer[6+12+66] = { TYPED_ITERABLE, 0x01, 0x00, 0x00, 0x00, sizeof(signatureBuffer)-2, typedFlags, 0x08, 0x00, sizeof(signatureBuffer)-8, untypedFlags, 0x01, 0x00, 70, NONITERABLE_TWOBYTE, 0x04, 0x00, 68 };
-char sigdbg[] = { TYPED_ITERABLE, 0x01, 0x00, 0x00, 0x00, sizeof(signatureBuffer)-2, typedFlags, 0x08, 0x00, sizeof(signatureBuffer)-8, untypedFlags, 0x01, 0x00, 70, NONITERABLE_TWOBYTE, 0x04, 0x00, 68 };
 
 char pubkeyBuffer[6+8+66] = { TYPED_ITERABLE, 2, 0, 0, 0, sizeof(pubkeyBuffer)+sizeof(payloadBuffer)+sizeof(signatureBuffer), typedFlags, 0x01, 0x00, 68+4, untypedFlags, 0x0d, 0x00, 68 };
-char pubdbg[] = { TYPED_ITERABLE, 2, 0, 0, 0, sizeof(pubkeyBuffer)+sizeof(payloadBuffer)+sizeof(signatureBuffer), typedFlags, 0x01, 0x00, 68+4, untypedFlags, 0x0d, 0x00, 68 };
 
 
 /**
@@ -95,15 +89,18 @@ char pubdbg[] = { TYPED_ITERABLE, 2, 0, 0, 0, sizeof(pubkeyBuffer)+sizeof(payloa
   result = insertPayloads(self);
 
   result = insertSignature(self);
+  /*
   to_uint32_be(globalBuffer, sizeof(pubkeyBuffer)+sizeof(payloadBuffer)+sizeof(signatureBuffer)+6);
-  breakpoint();
-  socket_send(&self->networkPipe, globalBuffer, sizeof(pubkeyBuffer)+sizeof(payloadBuffer)+sizeof(signatureBuffer)+6, 0);
+
+  //socket_send(&self->networkPipe, globalBuffer, sizeof(pubkeyBuffer)+sizeof(payloadBuffer)+sizeof(signatureBuffer)+6, 0);
   char funBuffer[500];
-  int ret_code = socket_recv(&self->networkPipe, funBuffer, 65000).value.i;
+  //int ret_code = socket_recv(&self->networkPipe, funBuffer, 65000).value.i;
   for(int i = 0; i < ret_code; i++){
     printf("%d", ret_code);
   }
   printf("\n");
+  */
+   
   return result;
 }
 
@@ -111,12 +108,12 @@ XYResult_t insertPublicKey(RelayNode_t* relay){
   DECLARE_RESULT();
 
   XYObject_t arrayObject;
-  arrayObject.header = relay->networkPipe.scratchBuffer.payload;
+  arrayObject.header = (XYObjectHeader_t*)relay->networkPipe.scratchBuffer.payload;
   arrayObject.payload = relay->networkPipe.scratchBuffer.payload+2;
 
-  void* endPtr;
+  //void* endPtr;
 
-  XYArrayItr_t itr = WeakArrayIterator(relay->networkPipe.scratchBuffer.payload, relay->networkPipe.scratchBuffer.payload+2);
+  XYArrayItr_t itr = WeakArrayIterator((XYObjectHeader_t*)relay->networkPipe.scratchBuffer.payload, relay->networkPipe.scratchBuffer.payload+2);
   
   XYObject_t innerArrayObject;
   innerArrayObject.header = itr.header;
@@ -124,7 +121,7 @@ XYResult_t insertPublicKey(RelayNode_t* relay){
   //innerArrayObject = WeakArray_get(&itr, 0);
   
 
-  XYArrayItr_t innerItr = WeakArrayIterator(relay->networkPipe.scratchBuffer.payload, itr.indexPtr);
+  XYArrayItr_t innerItr = WeakArrayIterator((XYObjectHeader_t*)relay->networkPipe.scratchBuffer.payload, itr.indexPtr);
   
   memset(pubkeyBuffer + 8 + 6, 1, 66);
 
@@ -133,7 +130,7 @@ XYResult_t insertPublicKey(RelayNode_t* relay){
   Iterator_insert(&innerArrayObject, 0, 67+5, oldLength, pubkeyBuffer+8);
   XYObject_t* self = &arrayObject;
   XYOBJ_INCREMENT(67+5);
-  socket_send(&relay->networkPipe, pubkeyBuffer, sizeof(pubkeyBuffer), 1);
+  //socket_send(&relay->networkPipe, pubkeyBuffer, sizeof(pubkeyBuffer), 1);
   return result;
 }
 
@@ -141,19 +138,19 @@ XYResult_t insertPayloads(RelayNode_t* relay){
   DECLARE_RESULT();
 
   XYObject_t arrayObject;
-  arrayObject.header = relay->networkPipe.scratchBuffer.payload;
+  arrayObject.header = (XYObjectHeader_t*)relay->networkPipe.scratchBuffer.payload;
   arrayObject.payload = relay->networkPipe.scratchBuffer.payload+2;
 
-  void* endPtr;
+  //void* endPtr;
 
-  XYArrayItr_t itr = WeakArrayIterator(relay->networkPipe.scratchBuffer.payload, relay->networkPipe.scratchBuffer.payload+2);
+  XYArrayItr_t itr = WeakArrayIterator((XYObjectHeader_t*)relay->networkPipe.scratchBuffer.payload, relay->networkPipe.scratchBuffer.payload+2);
   
   XYObject_t innerArrayObject =  IteratorNext(&itr);
 
-  XYArrayItr_t innerItr = WeakArrayIterator(relay->networkPipe.scratchBuffer.payload, itr.indexPtr);
+  XYArrayItr_t innerItr = WeakArrayIterator((XYObjectHeader_t*)relay->networkPipe.scratchBuffer.payload, itr.indexPtr);
 
   Iterator_insert(&innerArrayObject, 0, (sizeof(payloadBuffer)-6), XYObject_getFullLength(&arrayObject).value.ui, payloadBuffer+6);
-  socket_send(&relay->networkPipe, &payloadBuffer, sizeof(payloadBuffer), 1);
+  //socket_send(&relay->networkPipe, &payloadBuffer, sizeof(payloadBuffer), 1);
   return result;
 }
 
@@ -165,7 +162,7 @@ XYResult_t insertSignature(RelayNode_t* relay){
   arrayObject.header = (XYObjectHeader_t*)relay->networkPipe.scratchBuffer.payload;
   arrayObject.payload = relay->networkPipe.scratchBuffer.payload+2;
 
-  void* endPtr;
+  //void* endPtr;
 
   XYArrayItr_t itr = WeakArrayIterator((XYObjectHeader_t*)relay->networkPipe.scratchBuffer.payload, relay->networkPipe.scratchBuffer.payload+2);
   IteratorNext(&itr);
@@ -183,7 +180,7 @@ XYResult_t insertSignature(RelayNode_t* relay){
   //char writeBuffer[6+10+66] = { TYPED_ITERABLE, 0x01, 0x00, 0x00, 0x00, 80, *(uint8_t*)&typedFlags, 0x08, 0x00, 74, *(uint8_t*)&untypedFlags, 0x01, 0x00, 70, NONITERABLE_TWOBYTE, 0x04 };
   memset(signatureBuffer + 12 + 6, 3, 66);
   Iterator_insert(&innerArrayObject, 0, 67+5, XYObject_getFullLength(&arrayObject).value.ui, signatureBuffer+6);
-  socket_send(&relay->networkPipe, &signatureBuffer, sizeof(signatureBuffer), 1);
+  //socket_send(&relay->networkPipe, &signatureBuffer, sizeof(signatureBuffer), 1);
 
   return result;
 }
