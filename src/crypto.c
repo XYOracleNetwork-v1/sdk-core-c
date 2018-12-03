@@ -52,7 +52,10 @@
  *      will return a malloc error if malloc fails.
  ****************************************************************************************
  */
-XYResult_t* newCryptoSignerInstance(ByteArray_t* privateKey) {}
+XYResult_t* newCryptoSignerInstance(ByteArray_t* privateKey) {
+
+  return NULL;
+}
 
 /**
  ****************************************************************************************
@@ -72,7 +75,10 @@ XYResult_t* newCryptoSignerInstance(ByteArray_t* privateKey) {}
  *      will return a malloc error if malloc fails.
  ****************************************************************************************
  */
-XYResult_t* newCryptoCreator(){}
+XYResult_t* newCryptoCreator(){
+
+  return NULL;
+}
 
 /**
  ****************************************************************************************
@@ -92,7 +98,10 @@ XYResult_t* newCryptoCreator(){}
  *      this routine is a 'getter' only. it does't generate a new ID.
  ****************************************************************************************
  */
-XYResult_t* cryptoGetId(CryptoCreator_t* object){}
+XYResult_t* cryptoGetId(CryptoCreator_t* object){
+
+  return NULL;
+}
 
 /**
  ****************************************************************************************
@@ -116,7 +125,10 @@ XYResult_t* cryptoGetId(CryptoCreator_t* object){}
  *      this routine is a 'getter' only. it does't generate a new ID.
  ****************************************************************************************
  */
-XYResult_t* getSignatureId(Signer_t* signer){}
+XYResult_t* getSignatureId(Signer_t* signer){
+
+  return NULL;
+}
 
 /**
  ****************************************************************************************
@@ -136,7 +148,10 @@ XYResult_t* getSignatureId(Signer_t* signer){}
  *      this routine is a 'getter' only. it does't generate a new key.
  ****************************************************************************************
  */
-XYResult_t* getPublicKey(Signer_t* signer){}
+XYResult_t* getPublicKey(Signer_t* signer){
+
+  return NULL;
+}
 
 /**
  ****************************************************************************************
@@ -158,7 +173,10 @@ XYResult_t* getPublicKey(Signer_t* signer){}
  *      this routine is a 'getter' only. it does't generate a new key.
  ****************************************************************************************
  */
-XYResult_t* getPublicKeyId(Signer_t* signer){}
+XYResult_t* getPublicKeyId(Signer_t* signer){
+
+  return NULL;
+}
 
 /**
  ****************************************************************************************
@@ -178,7 +196,10 @@ XYResult_t* getPublicKeyId(Signer_t* signer){}
  *      //TODO: convert this routine from a simple 'getter' to a creator.
  ****************************************************************************************
  */
-XYResult_t* newPublicKey(Signer_t* signer){}
+XYResult_t* newPublicKey(Signer_t* signer){
+
+  return NULL;
+}
 
 /**
  ****************************************************************************************
@@ -206,7 +227,10 @@ XYResult_t* newPublicKey(Signer_t* signer){}
  *      keep in mind that this is just a fetch call (getter), not a generate new key call.
  ****************************************************************************************
  */
-XYResult_t* getPrivateKey(Signer_t* signer){}
+XYResult_t* getPrivateKey(Signer_t* signer){
+
+  return NULL;
+}
 
 /**
  ****************************************************************************************
@@ -237,7 +261,10 @@ uint8_t trng_bits[16];
 WC_RNG dialogRng;
 int keysize;
 */
-XYResult_t* newPrivateKey() {}
+XYResult_t* newPrivateKey() {
+
+  return NULL;
+}
 
 /**
  ****************************************************************************************
@@ -258,7 +285,10 @@ XYResult_t* newPrivateKey() {}
  *      this routine is not a simple getter. it actually creates a new key pair.
  ****************************************************************************************
  */
-XYResult_t* newKeyPair(){}
+XYResult_t* newKeyPair(){
+
+  return NULL;
+}
 
 /**
  ****************************************************************************************
@@ -280,7 +310,10 @@ XYResult_t* newKeyPair(){}
  *
  ****************************************************************************************
  */
-XYResult_t* sign(Signer_t* signer, ByteArray_t* dataToSign) {}
+XYResult_t* sign(Signer_t* signer, ByteArray_t* dataToSign) {
+
+  return NULL;
+}
 
 /**
  ****************************************************************************************
@@ -314,7 +347,9 @@ XYResult_t* sign(Signer_t* signer, ByteArray_t* dataToSign) {}
 XYResult_t* verify(Signer_t* signer,
                    ByteArray_t* signedData,
                    XYObject_t* signature,
-                   XYObject_t* publicKey) {}
+                   XYObject_t* publicKey) {
+  return NULL;               
+}
 
 /**
  ****************************************************************************************
@@ -338,7 +373,10 @@ XYResult_t* verify(Signer_t* signer,
  *      will return a malloc error if malloc fails.
  ****************************************************************************************
  */
-XYResult_t* xyencrypt(Signer_t* signer, ByteArray_t* unEncrypedData) {}
+XYResult_t* xyencrypt(Signer_t* signer, ByteArray_t* unEncrypedData) {
+
+  return NULL;
+}
 
 /**
  ****************************************************************************************
@@ -363,7 +401,10 @@ XYResult_t* xyencrypt(Signer_t* signer, ByteArray_t* unEncrypedData) {}
  *      will return a malloc error if malloc fails.
  ****************************************************************************************
  */
-XYResult_t* xydecrypt(Signer_t* signer, ByteArray_t* encrypedData) {}
+XYResult_t* xydecrypt(Signer_t* signer, ByteArray_t* encrypedData) {
+
+  return NULL;
+}
 
 /*
 /////////////////////

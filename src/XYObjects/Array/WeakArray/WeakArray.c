@@ -17,17 +17,18 @@ uint8_t lengthTypeToLength(int _VALUE_){
   {
   case XY_LENGTH_1BYTE:
     return 1;
-    break;
+//    break;
   case XY_LENGTH_2BYTE:
     return 2;
-    break;
+//    break;
   case XY_LENGTH_4BYTE:
     return 4;
-    break;
+//    break;
   case XY_LENGTH_8BYTE:                                   
-  return 8;
-    break;
+    return 8;
+//    break;
   }
+  
   return 255;
 }
 
@@ -93,3 +94,4 @@ XYResult_t WeakArray_get(XYObject_t *self, int index)
 }
 
 // end of file WeakArray.c
+

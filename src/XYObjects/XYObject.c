@@ -81,16 +81,18 @@ uint8_t matchType(XYObject_t* obj, uint8_t type){
   switch(obj->header->type){
     case 1:
       return obj->header->type == type;
-      break;
+//      break;
     case 2:
       if(type == MINOR_ARRAY){
         return TRUE;
       } else {
         return FALSE;
       }
-      break;
+//      break;
     default:
       return obj->header->type == type;
-      break;
+//      break;
   }
 }
+
+

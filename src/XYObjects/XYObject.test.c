@@ -34,14 +34,11 @@ int main3(){
   
   uint32_t size32 = XYOBJ_READ_UINT32();
   uint32_t size16 = XYOBJ_READ_UINT16();
-  uint32_t size8 = XYOBJ_READ_UINT8();
+//  uint32_t size8 = XYOBJ_READ_UINT8();
 
   //XY_ASSERT_EQUAL(size32, 16909060);
   //XY_ASSERT_EQUAL(size16, 258);
   //XY_ASSERT_EQUAL(size8, 1);
   return score;
-
-
-
-  
 }
+

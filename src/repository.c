@@ -33,8 +33,8 @@
 *      XYResult_t*                              [out]      bool   Returns OK if success
 *----------------------------------------------------------------------------*/
 OriginChainProvider_t* initOriginChainProvider(){
+  
   return NULL;
-
 }
 
 /*----------------------------------------------------------------------------*
@@ -52,6 +52,7 @@ OriginChainProvider_t* initOriginChainProvider(){
 *      XYResult_t*                              [out]      bool   Returns OK if success
 *----------------------------------------------------------------------------*/
 XYResult_t* append(OriginChainProvider_t* self, ByteArray_t* value, uint16_t timeout){
+  
   return NULL;
 }
 
@@ -69,6 +70,7 @@ XYResult_t* append(OriginChainProvider_t* self, ByteArray_t* value, uint16_t tim
 *      XYResult_t*                              [out]      XYObject_t*   IntStrongArray
 *----------------------------------------------------------------------------*/
 XYResult_t* getChain(OriginChainProvider_t* self){
+  
   return NULL;
 }
 
@@ -86,5 +88,9 @@ XYResult_t* getChain(OriginChainProvider_t* self){
 *      XYResult_t*                              [out]      XYObject_t*   IntStrongArray
 *----------------------------------------------------------------------------*/
 XYResult_t* deleteChain(OriginChainProvider_t* self){
+  
   return NULL;
 }
+
+// end of file repository.c
+
