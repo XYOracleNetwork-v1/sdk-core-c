@@ -150,7 +150,7 @@
 /*
  * Configs
  */
-#define NODE_MODE BOUND_WITNESS_OPTION+GIVE_ORIGIN_CHAIN_OPTION
+#define NODE_MODE BOUND_WITNESS_OPTION
 
 #define RED   "\x1B[31m"
 #define GRN   "\x1B[32m"

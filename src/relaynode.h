@@ -47,6 +47,15 @@ extern XYResult_t socket_send(NetworkPipe_t* self, char* data, uint32_t count, u
 extern XYResult_t socket_recv(NetworkPipe_t* self, char* data, uint32_t recvBytes);
 //extern NetworkPipe_t* findSomeoneToTalkTo( void );
 
+#define TWO_NONITERABLE_UNTYPED 64 //UNDEFINED BEHAVIOR
+#define TWO_NONITERABLE_TYPED 80
+#define FOUR_NONITERABLE_TYPED 144
+#define TWO_ITERABLE_UNTYPED 96
+#define TWO_ITERABLE_TYPED 112
+#define FOUR_ITERABLE_TYPED 176
+#define FOUR_ITERABLE_UNTYPED 160
+#define FOUR_NONITERABLE_UNTYPED 128
+
 //TODO: DEBUG extern
 extern char globalBuffer[1024];
 #define NODEBASE_H
