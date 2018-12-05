@@ -37,8 +37,8 @@
 XYResult_t newOriginBlock(OriginChainState_t* self_OriginChainState,
                            ByteArray_t* originBlockHash) {
 
-  XYResult_t result;
-  return result;
+  DECLARE_RESULT();
+  XYSTATUS(XY_STATUS_OK);
 }
 
 /*----------------------------------------------------------------------------*
@@ -56,8 +56,8 @@ XYResult_t newOriginBlock(OriginChainState_t* self_OriginChainState,
 *      XYResult_t*                             [out]      bool   Returns OK if success
 *----------------------------------------------------------------------------*/
 XYResult_t addSigner(OriginChainState_t* self_OriginChainState, Signer_t* user_Signer) {
-  XYResult_t result;
-  return result;
+  DECLARE_RESULT();
+  XYSTATUS(XY_STATUS_OK);
 }
 
 /**
@@ -79,7 +79,7 @@ XYResult_t addSigner(OriginChainState_t* self_OriginChainState, Signer_t* user_S
  ****************************************************************************************
  */
  XYResult_t getSigners(OriginChainState_t* self_OriginChainState){
-  XYResult_t result;
-  return result;
+  DECLARE_RESULT();
+  XYSTATUS(XY_STATUS_OK);
  }
 // end of file state.c

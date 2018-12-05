@@ -34,24 +34,8 @@ XYResult_t XYObject_getLength(XYObject_t *self);
 //and also including the header
 XYResult_t XYObject_getFullLength(XYObject_t *self);
 
-static const char TypedArray_id[2]            = { 0x30, 0x01 };
-static const char UnTypedArray_id[2]          = { 0x20, 0x01 };
-
-static const char BoundWitness_id[2]          = { 0x02, 0x01 };
-static const char KeySet_id[2]                = { 0x02, 0x02 };
-static const char SignatureSet_id[2]          = { 0x02, 0x03 };
-static const char Payload_id[2]               = { 0x02, 0x04 };
-static const char Index_id[2]                 = { 0x02, 0x05 };
-static const char PreviousHash_id[2]          = { 0x02, 0x06 };
-static const char NextPublicKey_id[2]         = { 0x02, 0x07 };
-static const char BridgeHashSet_id[2]         = { 0x02, 0x08 };
-static const char BridgeBlockSet_id[2]        = { 0x02, 0x09 };
-static const char BoundWitnessTransfer_id[2]  = { 0x02, 0x0a };
-
-static const char Sha256_id[2]                = { 0x03, 0x05 };
-static const char ECDSASecp256k1_id[2]        = { 0x04, 0x01 };
-static const char ECDSASecp256k1Sig_id[2]     = { 0x05, 0x01 };
-static const char Rssi_id[2]                  = { 0x08, 0x01 };
+uint32_t getLength(XYObject_t* self);
+uint32_t getLengthFieldSize(XYObject_t* self);
 
 /*
  * MACROS
@@ -88,8 +72,8 @@ static const char Rssi_id[2]                  = { 0x08, 0x01 };
 #define XYOBJ_READ_UINT8_ARRAY(_DEST_, _LEN_) memcpy(_DEST_, (XYObject_t *)self->payload, _LEN_)
 #define XYOBJ_WRITE_UINT8_ARRAY(_SRC_, _LEN_) memcpy((XYObject_t *)self->payload, _SRC_,  _LEN_)
 
-#define XYOBJ_INCREMENT_UINT16(_VALUE_) to_uint16_be((unsigned char*)((XYObject_t *)self)->payload, to_uint16(self->payload) + _VALUE_)
-#define XYOBJ_INCREMENT_UINT32(_VALUE_) to_uint32_be((unsigned char*)((XYObject_t *)self)->payload, to_uint32(self->payload) + _VALUE_)
-#define XYOBJ_INCREMENT_UINT64(_VALUE_) to_uint64_be((unsigned char *)((XYObject_t *)self)->payload, to_uint64(self->payload) + _VALUE_)
+#define XYOBJ_INCREMENT_UINT16(_VALUE_) to_uint16_be((unsigned char*)((XYObject_t *)self)->payload, to_uint16((unsigned char*)self->payload) + _VALUE_)
+#define XYOBJ_INCREMENT_UINT32(_VALUE_) to_uint32_be((unsigned char*)((XYObject_t *)self)->payload, to_uint32((unsigned char*)self->payload) + _VALUE_)
+#define XYOBJ_INCREMENT_UINT64(_VALUE_) to_uint64_be((unsigned char *)((XYObject_t *)self)->payload, to_uint64((unsigned char*)self->payload) + _VALUE_)
 
 uint8_t matchType(XYObject_t* self, uint8_t type);

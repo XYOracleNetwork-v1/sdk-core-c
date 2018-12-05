@@ -28,7 +28,6 @@
  ****************************************************************************************
  * @brief  Acquires 128 bits, saves them in trng_bits[] and restores the modified regs.
  * @param[in] trng_bits_ptr Pointer to number
- * @return void
  ****************************************************************************************
  */
 void trng_acquire(uint8_t *trng_bits_ptr);

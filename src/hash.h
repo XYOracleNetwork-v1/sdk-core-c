@@ -43,9 +43,10 @@ typedef unsigned char  byte;
  */
 
 XYResult_t newHashProvider(void);
-XYResult_t hashGetId( void );
+XYResult_t getHashId( void );
 XYResult_t createHash(ByteArray_t* dataToHash);
 XYResult_t verifyHash(ByteArray_t* dataHashed, XYObject_t* hash);
+extern void trng_acquire( uint8_t* );
 
 #endif
 

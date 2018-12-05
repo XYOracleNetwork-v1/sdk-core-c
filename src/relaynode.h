@@ -36,18 +36,11 @@ struct RelayNode {
   NodeListener listener;
   NetworkPipe_t networkPipe;
 };
-
-
-uint8_t Relay_getChoice(uint8_t* theirCatalog);
-XYResult_t doConnection(RelayNode_t* self);
-XYResult_t insertPublicKey(RelayNode_t* relay);
-XYResult_t insertPayloads(RelayNode_t* relay);
-XYResult_t insertSignature(RelayNode_t* relay);
-extern XYResult_t socket_send(NetworkPipe_t* self, char* data, uint32_t count, uint8_t debug);
-extern XYResult_t socket_recv(NetworkPipe_t* self, char* data, uint32_t recvBytes);
-//extern NetworkPipe_t* findSomeoneToTalkTo( void );
-
-#define TWO_NONITERABLE_UNTYPED 64 //UNDEFINED BEHAVIOR
+#define ONE_NONITERABLE_UNTYPED 0 // Consider changing this constant
+#define ONE_NONITERABLE_TYPED 16
+#define ONE_ITERABLE_UNTYPED 32
+#define ONE_ITERABLE_TYPED 48
+#define TWO_NONITERABLE_UNTYPED 64
 #define TWO_NONITERABLE_TYPED 80
 #define FOUR_NONITERABLE_TYPED 144
 #define TWO_ITERABLE_UNTYPED 96
@@ -56,7 +49,17 @@ extern XYResult_t socket_recv(NetworkPipe_t* self, char* data, uint32_t recvByte
 #define FOUR_ITERABLE_UNTYPED 160
 #define FOUR_NONITERABLE_UNTYPED 128
 
+
+uint8_t Relay_getChoice(uint8_t* theirCatalog);
+XYResult_t doConnection(RelayNode_t* self, uint32_t offset);
+XYResult_t getInitBoundWitness( void );
+extern XYResult_t socket_send(NetworkPipe_t* self, char* data, uint32_t count, uint8_t debug);
+extern XYResult_t socket_recv(NetworkPipe_t* self, char* data, uint32_t recvBytes);
+//extern NetworkPipe_t* findSomeoneToTalkTo( void );
+
+
+
 //TODO: DEBUG extern
-extern char globalBuffer[1024];
-#define NODEBASE_H
+extern uint8_t fetter[49];
+#define RELAYNODE_H
 #endif

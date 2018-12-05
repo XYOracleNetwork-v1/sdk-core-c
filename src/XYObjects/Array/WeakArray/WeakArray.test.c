@@ -1,3 +1,4 @@
+#ifdef XYBUILD_TESTS
 #include <stdio.h>
 #include <stdlib.h>
 #include "WeakArray.h"
@@ -35,6 +36,8 @@ int testAdd(){
 
     XYObject_t signatureObject;
     signatureObject.header = &signatureHeader;
+    signatureObject.payload = malloc(sizeof(char)*67);
+    memset(signatureObject.payload, 2, 67);
 
     XYHeaderFlags_t untypedFlags;
     untypedFlags.typed = 0;
@@ -57,11 +60,11 @@ int testAdd(){
     endPtr = arrayObject.payload + XYObject_getLength(self).value.ui;
     XY_ASSERT_EQUAL(XYObject_getLength(self).value.ui, 4);
 
-    WeakArray_add(self, signatureHeader, 67);
+    WeakArray_add(self, &signatureObject, 67);
     XY_ASSERT_EQUAL(XYObject_getLength(self).value.ui, 4+67);
     XY_ASSERT_EQUAL(*(uint8_t*)(((&arrayObject)->payload)+4), *(uint8_t*)&signatureFlags ); 
     
-    WeakArray_add(self, signatureHeader, 67);
+    WeakArray_add(self, &signatureObject, 67);
     XY_ASSERT_EQUAL(XYObject_getLength(self).value.ui, 4+67+67);
     XY_ASSERT_EQUAL(*(uint8_t*)(((&arrayObject)->payload)+4+67), *(uint8_t*)&signatureFlags ); 
 
@@ -87,6 +90,8 @@ int testGap(){
 
     XYObject_t signatureObject;
     signatureObject.header = &signatureHeader;
+    signatureObject.payload = malloc(sizeof(char)*67);
+    memset(signatureObject.payload, 2, 67);
 
     XYHeaderFlags_t untypedFlags;
     untypedFlags.typed = 0;
@@ -110,7 +115,7 @@ int testGap(){
     char* endPtr;
     XYObject_t* self = &arrayObject;
     
-    WeakArray_add(self, signatureHeader, 6);
+    WeakArray_add(self, &signatureObject, 6);
     
     XYArrayItr_t itr = WeakArrayIterator(arrayObject.header, arrayObject.payload);
 
@@ -123,7 +128,7 @@ int testGap(){
         *(char*)&itr.indexPtr[0] = 0;
         *(char*)&itr.indexPtr[1] = 4;
         
-        WeakArray_add(self, signatureHeader, 6);
+        WeakArray_add(self, &signatureObject, 6);
 
         XY_ASSERT_EQUAL(XYObject_getLength(self).value.ui, 4+(6*(i+2)));
         XY_ASSERT_EQUAL(*(uint8_t*)(((&arrayObject)->payload)+(4+(6*(i+1)))), *(uint8_t*)&signatureFlags );
@@ -161,6 +166,8 @@ int testTypedGap(){
 
     XYObject_t signatureObject;
     signatureObject.header = &signatureHeader;
+    signatureObject.payload = malloc(sizeof(char)*4);
+    memset(signatureObject.payload, 2, 67);
 
     XYHeaderFlags_t typedFlags;
     typedFlags.typed = 1;
@@ -183,7 +190,7 @@ int testTypedGap(){
 
     char* endPtr;
     XYObject_t* self = &arrayObject;
-    WeakArray_add(self, signatureHeader, 6);
+    WeakArray_add(self, &signatureObject, 6);
     
     XYArrayItr_t itr = WeakArrayIterator(arrayObject.header, arrayObject.payload);
 
@@ -196,7 +203,7 @@ int testTypedGap(){
         *(char*)&itr.indexPtr[0] = 0;
         *(char*)&itr.indexPtr[1] = 4;
         
-        WeakArray_add(self, signatureHeader, 4);
+        WeakArray_add(self, &signatureObject, 4);
         
         XY_ASSERT_EQUAL(XYObject_getLength(self).value.ui, 6+(4*(i+2)));
         XY_ASSERT_EQUAL(to_uint16((uint8_t*)(((&arrayObject)->payload)+(6+(4*(i+1))))), 4 );
@@ -225,3 +232,4 @@ int testAddArray(){
     int score = 0;
     return score;
 }
+#endif

@@ -46,19 +46,35 @@
        return 0;
      }
    }
-   return 0;
 }
 
-char payloadBuffer[26] = { FOUR_ITERABLE_TYPED, 0xCC, 0x00, 0x00, 0x00, sizeof(payloadBuffer)-2, FOUR_ITERABLE_TYPED, 0x07, 
-                              0x00, 0x00, 0x00, sizeof(payloadBuffer)-8, TWO_ITERABLE_UNTYPED, 0x01, 0x00, sizeof(payloadBuffer)-14-2, FOUR_NONITERABLE_UNTYPED, 0x03,
-                              0x00, sizeof(payloadBuffer)-18-4, 0x00, 0x00, 0x00, 0x01, 
-                              0x00, 0x02};
 
-char signatureBuffer[6+10+66] = { FOUR_ITERABLE_TYPED, 0xCC, 0x00, 0x00, 0x00, sizeof(signatureBuffer)-2, FOUR_ITERABLE_UNTYPED, 0x01, 0x00,0x00,0x00, sizeof(signatureBuffer)-8, TWO_NONITERABLE_UNTYPED, 0x04, 0x00, sizeof(signatureBuffer)-14 };
+/**
+ ****************************************************************************************
+ *  NAME
+ *      getInitBoundWitness
+ *
+ *  DESCRIPTION
+ *  Returns valid Bound Witnessness initialization data
+ *
+ *  PARAMETERS
+ *      self        [in]      RelayNode_t*
+ *
+ *  RETURNS
+ *      id          [out]     char*
+ *
+ *  NOTES
+ *
+ ****************************************************************************************
+ */
 
-char pubkeyBuffer[6+16+66] = { FOUR_ITERABLE_UNTYPED, 2, 0, 0, 0, ((sizeof(pubkeyBuffer)-2)+(sizeof(payloadBuffer))+(sizeof(signatureBuffer))), FOUR_ITERABLE_TYPED, 0xCC, 0x00,0x00, 0x00, sizeof(pubkeyBuffer)-8, FOUR_ITERABLE_UNTYPED, 0x01, 0x00,0x00, 0x00, sizeof(pubkeyBuffer)-14, TWO_NONITERABLE_UNTYPED, 0x0d, 0x00, sizeof(pubkeyBuffer)-20 };
-
-
+ XYResult_t getInitBoundWitness( void ){
+  DECLARE_RESULT();
+  result.status = XY_STATUS_OK;
+  result.value.ptr = fetter;
+  return result;
+   
+ }
 /**
  ****************************************************************************************
  *  NAME
@@ -77,123 +93,40 @@ char pubkeyBuffer[6+16+66] = { FOUR_ITERABLE_UNTYPED, 2, 0, 0, 0, ((sizeof(pubke
  *
  ****************************************************************************************
  */
- XYResult_t doConnection(RelayNode_t* self){
-   /*
-  uint8_t tun = TWO_NONITERABLE_UNTYPED;
-  uint8_t tiu = TWO_ITERABLE_UNTYPED;
-  uint8_t tit = TWO_ITERABLE_TYPED;
-  uint8_t fit = FOUR_ITERABLE_TYPED;
-  
-  DECLARE_RESULT();
-  result = insertPublicKey(self);
-  if(result.value.i != 0)
-    printf("Insert pubkey failed\n");
-  result = insertPayloads(self);
-  if(result.value.i != 0)
-    printf("Insert payload failed\n");
+uint8_t fetter[]= { 4, 0, 0, 0, 1, // Catalog
+TWO_ITERABLE_UNTYPED, 0x2, 0x00, 42, //BW 27 + 13
+ONE_ITERABLE_UNTYPED, 0x16, 25,  // Fetter Set 24 bytes
+ONE_ITERABLE_UNTYPED, 0x15, 22, // Fetter
+ONE_ITERABLE_UNTYPED, 0x19, 5, // KeySet
+ONE_NONITERABLE_UNTYPED, 0x0E, 2, 0, // Stub Public Key
+ONE_ITERABLE_UNTYPED, 0x08, 12, ONE_NONITERABLE_UNTYPED, 0x0F, 9, 0, 0, 0, 0, 0, 0, 0, 0, // Stub Hash
+ONE_ITERABLE_UNTYPED, 0x18, 11, //Witness Set
+ONE_ITERABLE_UNTYPED, 0x17, 8, // Witness
+ONE_ITERABLE_UNTYPED, 0x1A, 5, // Signature Set
+ONE_NONITERABLE_UNTYPED, 0x0B, 2, 0 }; // Stub Signature
 
-  result = insertSignature(self);
-  if(result.value.i != 0)
-    printf("Insert signature failed\n");
-  to_uint32_be(globalBuffer, ((sizeof(pubkeyBuffer))+(sizeof(payloadBuffer))+(sizeof(signatureBuffer))+4) );
-  socket_send(&self->networkPipe, globalBuffer, ((sizeof(pubkeyBuffer))+(sizeof(payloadBuffer))+(sizeof(signatureBuffer)))+4, 0);
-  char funBuffer[500];
-  memset(funBuffer, 0, 500);
-  
-  int ret_code = socket_recv(&self->networkPipe, funBuffer, 65000).value.i;
-  
+ XYResult_t doConnection(RelayNode_t* self, uint32_t offset){
+  DECLARE_RESULT()
 
-  for(int i = 0; i < ret_code; i++){
-    printf("%d", funBuffer[i]);
+  if(offset>0){ // client
+    XYObject_t fetterSet = { (XYObjectHeader_t*)self->networkPipe.scratchBuffer.payload, self->networkPipe.scratchBuffer.payload+2 };
+    XYObject_t fetterObject = {(XYObjectHeader_t*)&fetter[5], (XYObjectHeader_t*)&fetter[7]};
+    //uint32_t length = XYObject_getLength(&fetterSet).value.ui;
+    WeakArray_add(&fetterSet, &fetterObject , sizeof(fetter)-7);
+
+    socket_send(&self->networkPipe, (char*)&fetter[5], sizeof(fetter)-5, 1);
+  } else { // server
+    socket_send(&self->networkPipe, (char*)fetter, sizeof(fetter), 1);
+    char recvBuffer[1024];
+    socket_recv(&self->networkPipe, recvBuffer, 4);
+    
+    socket_recv(&self->networkPipe, recvBuffer+4, to_uint32((unsigned char*)recvBuffer) );
   }
-  printf("\n");
+  XYObject_t globalBuffer = { (XYObjectHeader_t*)self->networkPipe.scratchBuffer.payload, self->networkPipe.scratchBuffer.payload+2 };
+  uint32_t newOffset = XYObject_getLength(&globalBuffer).value.ui;
+  socket_recv(&self->networkPipe, self->networkPipe.scratchBuffer.payload+newOffset, 4);
+  uint32_t packetSize = to_uint32(((unsigned char*)self->networkPipe.scratchBuffer.payload)+newOffset);
+  
+  socket_recv(&self->networkPipe, self->networkPipe.scratchBuffer.payload+newOffset, packetSize);
   return result;
-  */
-  
-}
-
-XYResult_t insertPublicKey(RelayNode_t* relay){
-  /*
-  DECLARE_RESULT();
-
-  XYObject_t arrayObject;
-  arrayObject.header = relay->networkPipe.scratchBuffer.payload;
-  arrayObject.payload = relay->networkPipe.scratchBuffer.payload+2;
-
-  void* endPtr;
-
-  XYArrayItr_t itr = WeakArrayIterator(relay->networkPipe.scratchBuffer.payload, relay->networkPipe.scratchBuffer.payload+2);
-  
-  XYObject_t innerArrayObject;
-  innerArrayObject.header = itr.header;
-  innerArrayObject.payload = itr.indexPtr;
-  //innerArrayObject = WeakArray_get(&itr, 0);
-  
-
-  XYArrayItr_t innerItr = WeakArrayIterator(relay->networkPipe.scratchBuffer.payload, itr.indexPtr);
-  
-  memset(pubkeyBuffer + 6 + 16, 1, 66);
-
-  uint32_t oldLength = XYObject_getFullLength(&arrayObject).value.ui;
-
-  //result = Iterator_insert(&innerArrayObject, 0, 67+5, oldLength, pubkeyBuffer+8);
-  XYObject_t* self = &arrayObject;
-  XYOBJ_INCREMENT(67+5);
-  socket_send(&relay->networkPipe, pubkeyBuffer, sizeof(pubkeyBuffer), 1);
-  return result;
-  */
-}
-
-XYResult_t insertPayloads(RelayNode_t* relay){
-  /*
-  DECLARE_RESULT();
-  XYObject_t arrayObject;
-  arrayObject.header = relay->networkPipe.scratchBuffer.payload;
-  arrayObject.payload = relay->networkPipe.scratchBuffer.payload+2;
-
-  void* endPtr;
-
-  XYArrayItr_t itr = WeakArrayIterator(relay->networkPipe.scratchBuffer.payload, relay->networkPipe.scratchBuffer.payload+2);
-  
-  XYObject_t innerArrayObject =  IteratorNext(&itr);
-
-  XYArrayItr_t innerItr = WeakArrayIterator(relay->networkPipe.scratchBuffer.payload, itr.indexPtr);
-
-  //result = Iterator_insert(&innerArrayObject, 0, (sizeof(payloadBuffer)-6), XYObject_getFullLength(&arrayObject).value.ui, payloadBuffer+6);
-  socket_send(&relay->networkPipe, &payloadBuffer, sizeof(payloadBuffer), 1);
-  return result;
-  */
-}
-
-
-XYResult_t insertSignature(RelayNode_t* relay){
-  /*
-  DECLARE_RESULT();
-
-  XYObject_t arrayObject;
-  arrayObject.header = (XYObjectHeader_t*)relay->networkPipe.scratchBuffer.payload;
-  arrayObject.payload = relay->networkPipe.scratchBuffer.payload+2;
-
-  void* endPtr;
-
-  XYArrayItr_t itr = WeakArrayIterator((XYObjectHeader_t*)relay->networkPipe.scratchBuffer.payload, relay->networkPipe.scratchBuffer.payload+2);
-  IteratorNext(&itr);
-  
-  XYObject_t innerArrayObject = IteratorNext(&itr);
-  //XYObjectHeader_t innerArrayHeader;
-  //innerArrayHeader.flags = typedFlags;
-  //innerArrayHeader.type = TYPE_ARRAY;
-  //innerArrayObject.header = &innerArrayHeader;
-  //innerArrayObject.payload = itr.indexPtr;
-  
-
-  XYArrayItr_t innerItr = WeakArrayIterator((XYObjectHeader_t*)relay->networkPipe.scratchBuffer.payload, itr.indexPtr);
-
-  //char writeBuffer[6+10+66] = { TYPED_ITERABLE, 0x01, 0x00, 0x00, 0x00, 80, *(uint8_t*)&typedFlags, 0x08, 0x00, 74, *(uint8_t*)&untypedFlags, 0x01, 0x00, 70, NONITERABLE_TWOBYTE, 0x04 };
-  memset(signatureBuffer + 10 + 6, 3, 66);
-  //result = Iterator_insert(&innerArrayObject, 0, 67+5, XYObject_getFullLength(&arrayObject).value.ui, signatureBuffer+6);
-  socket_send(&relay->networkPipe, &signatureBuffer, sizeof(signatureBuffer), 1);
-
-  return result;
-  */
 }

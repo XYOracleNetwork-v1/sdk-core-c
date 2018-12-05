@@ -17,23 +17,19 @@ uint8_t lengthTypeToLength(int _VALUE_){
   {
   case XY_LENGTH_1BYTE:
     return 1;
-    break;
   case XY_LENGTH_2BYTE:
     return 2;
-    break;
   case XY_LENGTH_4BYTE:
     return 4;
-    break;
   case XY_LENGTH_8BYTE:                                   
   return 8;
-    break;
   }
   return 255;
 }
 
 XYResult_t WeakArray_add(XYObject_t *self,
-                              XYObjectHeader_t newItemHeader,
-                              int newItemLength)
+                              XYObject_t* newItem,
+                              uint32_t newItemLength)
 {
   INIT_SELF(TYPE_ARRAY);
 
@@ -44,11 +40,14 @@ XYResult_t WeakArray_add(XYObject_t *self,
   CHECK_RESULT(fullLength);
 
   //put the new object at the end of the current object
-  uint8_t *newObject = (((XYObject_t *)self)->payload + currentLength.value.i);
+  uint8_t *newObject = ((unsigned char*)((XYObject_t *)self)->payload) + currentLength.value.ui;
   
   //set the type of the newly added item
   if(!self->header->flags.typed || currentLength.value.ui == lengthTypeToLength(self->header->flags.lengthType)){
-    memcpy(newObject, &newItemHeader, sizeof(newItemHeader));
+    memcpy(newObject, newItem->header, sizeof(XYObjectHeader_t));
+    memcpy(newObject+sizeof(XYObjectHeader_t), newItem->payload, newItemLength-2);
+  } else {
+    memcpy(newObject, newItem->payload, newItemLength);
   }
 
   //set the new length of the array object (old length + new object length)
@@ -66,7 +65,7 @@ XYResult_t WeakArray_get(XYObject_t *self, int index)
 
   //the nextPtr points to the first byte after the end of this object
   //we use this to prevent over flow and to check for end of list
-  uint8_t *outOfBoundsPtr = ((XYObject_t *)self)->payload + fullLength.value.i;
+  uint8_t *outOfBoundsPtr = ((unsigned char*)((XYObject_t *)self)->payload) + fullLength.value.i;
 
   XYResult_t currentValue = XYObject_getValue(self);
   CHECK_RESULT(currentValue);
@@ -81,7 +80,15 @@ XYResult_t WeakArray_get(XYObject_t *self, int index)
     {
       XYERROR(XY_STATUS_INDEXOUTOFRANGE)
     }
-    lengthOfSubObject = XYObject_getFullLength((XYObject_t *)ptr);
+    XYObject_t subObject;
+    if(self->header->flags.typed){
+      subObject.header = self->header;
+      subObject.payload = ptr;
+    } else {
+      subObject.header = (XYObjectHeader_t*)ptr;
+      subObject.payload = ptr+2;
+    }
+    lengthOfSubObject = XYObject_getFullLength(&subObject);
     CHECK_RESULT(lengthOfSubObject);
     ptr += lengthOfSubObject.value.i;
   }

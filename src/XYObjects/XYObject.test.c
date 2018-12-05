@@ -1,3 +1,4 @@
+#ifdef XYBUILD_TESTS
 #include <stdio.h>
 #include <stdlib.h>
 #include "XYObject.h"
@@ -39,9 +40,7 @@ int main(){
   XY_ASSERT_EQUAL(size32, 16909060);
   XY_ASSERT_EQUAL(size16, 258);
   XY_ASSERT_EQUAL(size8, 1);
-  return score;
-
-
-
-  
+  return score;  
 }
+
+#endif

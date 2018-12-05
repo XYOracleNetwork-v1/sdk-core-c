@@ -71,7 +71,7 @@ struct server_arguments{
 void* serverThread(void* flag);
 void* clientThread(void* args);
 extern XYResult_t connectToPeer(NetworkPipe_t* pipe, char* buffer, uint32_t size, uint8_t flags);
-extern XYResult_t servePeer(NetworkPipe_t* pipe, char* buffer, uint32_t bufSize, uint8_t flags);
+extern XYResult_t servePeer(NetworkPipe_t* pipe, char* buffer, uint32_t bufSize, uint8_t flags, uint16_t port);
 extern uint8_t canDo(ByteArray_t* catalog);
 
 #endif

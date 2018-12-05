@@ -9,7 +9,7 @@ typedef struct arrayItr
   XYObjectHeader_t* header;
   char* base;
   XYObjectHeader_t* innerHeader;
-  void *indexPtr;
+  char *indexPtr;
 } XYArrayItr_t;
 
 XYArrayItr_t WeakArrayIterator(XYObjectHeader_t* header, char* buffer);

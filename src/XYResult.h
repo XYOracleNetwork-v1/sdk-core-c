@@ -19,9 +19,9 @@ typedef struct XYResult{
   } value;
 } XYResult_t;
 
-#define XYERROR(_STATUS_) { XYResult_t result; result.status = _STATUS_; result.value.i = 0; return result; };
+#define XYERROR(_STATUS_) { XYResult_t return_result; return_result.status = _STATUS_; return_result.value.i = 0; return return_result; };
 #define XYSTATUS(_STATUS_) { result.status = _STATUS_; result.value.i = 0; return result; };
-#define CHECK_NULL(_VALUE_) if (!_VALUE_) { XYERROR(XY_STATUS_ERROR); }
+#define CHECK_NULL(_VALUE_) if (!_VALUE_) { result.status = XY_STATUS_ERROR; return result; }
 #define CHECK_RESULT(_RESULT_) if (_RESULT_.status != XY_STATUS_OK) { return _RESULT_; };
 
 #define XY_STATUS_OK (0)

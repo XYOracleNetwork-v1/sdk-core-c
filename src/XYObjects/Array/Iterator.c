@@ -17,7 +17,7 @@ XYArrayItr_t WeakArrayIterator(XYObjectHeader_t* header, char* buffer){
     return (XYArrayItr_t){0, 0, 0, 0};
   } else {
     uint8_t lenLen = lengthTypeToLength(header->flags.lengthType);
-    return (XYArrayItr_t){header, buffer, (XYObjectHeader_t*)(buffer+lenLen), (XYObjectHeader_t*)(buffer+lenLen+2)};
+    return (XYArrayItr_t){header, buffer, (XYObjectHeader_t*)(buffer+lenLen), (char*)(buffer+lenLen+2)};
   }
 }
 
@@ -34,7 +34,7 @@ XYObject_t IteratorNext(XYArrayItr_t* itr){
     returnObject.header = itr->innerHeader;
     returnObject.payload = itr->indexPtr;
     uint32_t jump = XYObject_getLength(&returnObject).value.ui;
-    itr->innerHeader = itr->indexPtr + jump;
+    itr->innerHeader = (XYObjectHeader_t*)itr->indexPtr + jump;
     itr->indexPtr = (char*)itr->innerHeader + sizeof(XYObjectHeader_t);
     returnObject.header = itr->innerHeader;
     returnObject.payload = itr->indexPtr;
@@ -59,7 +59,7 @@ XYObject_t IteratorGet(XYArrayItr_t* itr){
   }
 
   if(itr->header->flags.typed){
-    returnObject.header = itr->indexPtr;
+    returnObject.header = (XYObjectHeader_t*)itr->indexPtr;
     returnObject.payload = itr->indexPtr + sizeof(XYObjectHeader_t);
 
   } else {
@@ -80,12 +80,12 @@ XYResult_t Iterator_bookmark(XYObject_t* self, uint32_t element, uint32_t bytesA
     objectItr = &itr;
   }
   XYObject_t currentObject = IteratorGet(objectItr);
-  for(int i = 0; i!=element+1; i++){
-    if(currentObject.header == NULL && (i!=-1)){
+  for(uint32_t i = 0; i!=element+1; i++){
+    if(currentObject.header == NULL && (i!=0xFFFFFFFF)){
       result.status = XY_STATUS_ERROR;
       return result;
     }
-    XYObject_t currentObject = IteratorNext(objectItr);
+    currentObject = IteratorNext(objectItr);
   }
   
   char* current = objectItr->indexPtr;
@@ -102,21 +102,27 @@ XYResult_t Iterator_insert(XYObject_t* self, uint32_t element, uint32_t offset, 
   
   DECLARE_RESULT();
   XYArrayItr_t objectItr = WeakArrayIterator(self->header, self->payload);
-  char* charCounter = objectItr.indexPtr;
+  unsigned char* charCounter = (unsigned char*)objectItr.indexPtr;
   XYObject_t currentObject = IteratorGet(&objectItr);
-  for(int i = 0; i!=element+1; i++){
-    if(currentObject.header == NULL && (i!=-1)){
+  for(uint32_t i = 0; i!=element+1; i++){
+    if(currentObject.header == NULL && (i!=0xFFFFFFFF-1)){
       result.status = XY_STATUS_ERROR;
       return result;
     }
     currentObject = IteratorNext(&objectItr);
   }
   
-  char* current = objectItr.indexPtr;
+  unsigned char* current = (unsigned char*)objectItr.indexPtr;
   
-  uint32_t bytesAfter = current-charCounter;
-  
-  memmove(current+offset, current, bytesAfter);
+  long bytesAfter = current-charCounter;
+  if(bytesAfter > 0xFFFFFFFF && bytesAfter>0){
+    #ifdef XY_DEBUGMODE
+    printf("Tried to bridge too big a gap.\n");
+    #endif
+    exit(-100); //TODO: meaningful error code.
+  }
+  // Note: Cast from long to unsigned long
+  memmove(current+offset, current, (unsigned long)bytesAfter); 
   memcpy(current, bytes, offset);
   
 

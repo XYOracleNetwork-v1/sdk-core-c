@@ -17,12 +17,12 @@ uint64_t to_uint64(unsigned char *data)
 
 uint32_t to_uint32(unsigned char *data)
 {
-  return (data[0] << 24) + (data[1] << 16) + (data[2] << 8) + data[3];
+  return ((uint32_t)data[0] << 24) + ((uint32_t)data[1] << 16) + ((uint32_t)data[2] << 8) + (uint32_t)data[3];
 }
 
 uint16_t to_uint16(unsigned char *data)
 {
-  return (data[0] << 8) + data[1];
+  return (uint16_t)(data[0] << 8) + (uint16_t)data[1];
 }
 
 void to_uint64_be(unsigned char *dest, uint64_t value)
@@ -72,5 +72,5 @@ int littleEndian(void){
 
   volatile uint32_t i=0x01234567;
   // return 0 for big endian, 1 for little endian.
-  return (*((uint8_t*)(&i))) == 0x67;
+  return (*((volatile uint8_t*)(&i))) == 0x67;
 }

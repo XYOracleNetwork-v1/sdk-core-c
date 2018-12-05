@@ -26,7 +26,7 @@
  ****************************************************************************************
  */
 
- void trng_acquire(){return;}
+ void trng_acquire( uint8_t* data){return;}
 
 /**
  ****************************************************************************************
@@ -48,7 +48,10 @@
  *      the wiki on HackMD is out of date / incorrect
  ****************************************************************************************
  */
-XYResult_t getHashId( void ){}
+XYResult_t getHashId( void ){
+  DECLARE_RESULT();
+  XYSTATUS(XY_STATUS_OK);
+}
 
 /**
  ****************************************************************************************
@@ -73,7 +76,10 @@ XYResult_t getHashId( void ){}
  *      wc_ = wolf crypto library routine or data type
  ****************************************************************************************
  */
-XYResult_t createHash(ByteArray_t* dataToHash){}
+XYResult_t createHash(ByteArray_t* dataToHash){
+  DECLARE_RESULT();
+  XYSTATUS(XY_STATUS_OK);
+}
 
 /**
  ****************************************************************************************
@@ -100,7 +106,10 @@ XYResult_t createHash(ByteArray_t* dataToHash){}
  ****************************************************************************************
  */
 
-XYResult_t verifyHash(ByteArray_t* dataToBeHashed, XYObject_t* hashForComparison){}
+XYResult_t verifyHash(ByteArray_t* dataToBeHashed, XYObject_t* hashForComparison){
+  DECLARE_RESULT();
+  XYSTATUS(XY_STATUS_OK);
+}
 
 /**
  ****************************************************************************************
@@ -122,6 +131,9 @@ XYResult_t verifyHash(ByteArray_t* dataToBeHashed, XYObject_t* hashForComparison
  *      will return a malloc error if malloc fails
  ****************************************************************************************
  */
-XYResult_t newHashProvider(){}
+XYResult_t newHashProvider(){
+  DECLARE_RESULT();
+  XYSTATUS(XY_STATUS_OK);
+}
 
 // end of file hash.c

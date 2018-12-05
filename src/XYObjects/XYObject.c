@@ -24,7 +24,7 @@
  */
 
 //assuming validation by caller
-int getLength(XYObject_t* self) {
+uint32_t getLength(XYObject_t* self) {
   switch(self->header->flags.lengthType) {
     case XY_LENGTH_1BYTE:
       return XYOBJ_READ_UINT8();
@@ -32,15 +32,15 @@ int getLength(XYObject_t* self) {
       return XYOBJ_READ_UINT16();
     case XY_LENGTH_4BYTE:
       return XYOBJ_READ_UINT32();
-    case XY_LENGTH_8BYTE:
-      return XYOBJ_READ_UINT64();
+    //case XY_LENGTH_8BYTE:          // Disabled to avoid integer-overflow related bugs
+    //  return XYOBJ_READ_UINT64();
   }
 
   return 0;
 }
 
 //assuming validation by caller
-int getLengthFieldSize(XYObject_t* self) {
+uint32_t getLengthFieldSize(XYObject_t* self) {
   switch(self->header->flags.lengthType) {
     case XY_LENGTH_1BYTE:
       return 1;
@@ -48,8 +48,8 @@ int getLengthFieldSize(XYObject_t* self) {
       return 2;
     case XY_LENGTH_4BYTE:
       return 4;
-    case XY_LENGTH_8BYTE:
-      return 8;
+    //case XY_LENGTH_8BYTE:
+    //  return 8;
   }
 
   return 0;
@@ -67,13 +67,13 @@ XYResult_t XYObject_getValue(XYObject_t* self) {
 
 XYResult_t XYObject_getLength(XYObject_t* self) {
   INIT_SELF_UNKNOWN();
-  result.value.i = getLength(self);
+  result.value.ui = getLength(self);
   return result;
 }
 
 XYResult_t XYObject_getFullLength(XYObject_t* self) {
   INIT_SELF_UNKNOWN();
-  result.value.i = getLength(self) + XY_HEADER_LENGTH;
+  result.value.ui = getLength(self) + XY_HEADER_LENGTH;
   return result;
 }
 
@@ -81,16 +81,13 @@ uint8_t matchType(XYObject_t* obj, uint8_t type){
   switch(obj->header->type){
     case 1:
       return obj->header->type == type;
-      break;
     case 2:
       if(type == MINOR_ARRAY){
         return TRUE;
       } else {
         return FALSE;
       }
-      break;
     default:
       return obj->header->type == type;
-      break;
   }
 }

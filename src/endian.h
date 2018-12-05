@@ -22,56 +22,55 @@
 /**
  * @brief Convert 64-bit Value from Big Endian to Platform Endian
  * 
- * @param char 
- * @return uint32_t 
+ * @param data Pointer to the uintxx in question
+ * @return uint32_t Data pointer read in big endian
  */
 uint64_t to_uint64(unsigned char* data);
 
 /**
- * @brief Convert 32-bit Value from Big Endian to Platform Endian
+ * @brief Convert 64-bit Value from Big Endian to Platform Endian
  * 
- * @param char 
- * @return uint32_t 
+ * @param data Pointer to the uintxx in question
+ * @return uint32_t Data pointer read in big endian
  */
 uint32_t to_uint32(unsigned char* data);
 
 /**
- * @brief Convert 16-bit Value from Big Endian to Platform Endian
+ * @brief Convert 64-bit Value from Big Endian to Platform Endian
  * 
- * @param char 
- * @return uint16_t 
+ * @param data Pointer to the uintxx in question
+ * @return uint32_t Data pointer read in big endian
  */
 uint16_t to_uint16(unsigned char* data);
 
 /**
- * @brief Write 64-Bit Big Endian value to a buffer from a Platform Endian source
+ * @brief Convert 64-bit Value from Platform Endian to Big Endian and write to Dest
  * 
- * @param char 
- * @param value 
+ * @param dest Destination pointer where to be written
+ * @param value Platform Endian number to be read
  */
 void to_uint64_be(unsigned char* dest, uint64_t value);
 
 /**
- * @brief Write 32-Bit Big Endian value to a buffer from a Platform Endian source
+ * @brief Convert 32-bit Value from Platform Endian to Big Endian and write to Dest
  * 
- * @param char 
- * @param value 
+ * @param dest Destination pointer where to be written
+ * @param value Platform Endian number to be read
  */
 void to_uint32_be(unsigned char* dest, uint32_t value);
 
 /**
- * @brief Write 16-Bit Big Endian value to a buffer from a Platform Endian source
+ * @brief Convert 16-bit Value from Platform Endian to Big Endian and write to Dest
  * 
- * @param char 
- * @param value 
+ * @param dest destination pointer where to be written
+ * @param value Platform Endian number to be read
  */
 void to_uint16_be(unsigned char* dest, uint16_t value);
 
 /**
  * @brief Detect if the machine running is littleEndian.
  * 
- * @param char 
- * @param value 
+ * @return int endianess 
  */
 int littleEndian(void);
 
