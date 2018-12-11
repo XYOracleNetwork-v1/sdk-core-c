@@ -1,11 +1,12 @@
 #pragma once
+//TODO: Debug
+#include <stdio.h>
 
 #include "../../../XYResult.h"
 #include "../../XYObject.h"
 #include "../../XYObjectTypes.h"
 #include "../../../defines.h"
-//TODO: Debug
-#include <stdio.h>
+
 
 /**
  * @brief Add Item from a Weak Array
@@ -26,9 +27,27 @@ XYResult_t WeakArray_add(XYObject_t *self,
  * @param index Index to retreive 
  * @return XYResult_t Object in array at index
  */
+#ifdef BUILD_WEAKARRAY_GET
 XYResult_t WeakArray_get(XYObject_t *self,
                          int index);
+#endif
 
+#define XYARRAY_INCREMENT(_ARRAY_, _VALUE_)                          \
+  switch (((XYObject_t *)_ARRAY_)->header->flags.lengthType) \
+  {                                                       \
+  case XY_LENGTH_1BYTE:                                   \
+    memset(((XYObject_t *)_ARRAY_)->payload, (uint8_t)_VALUE_, 1);    \
+    break;                                                \
+  case XY_LENGTH_2BYTE:                                   \
+    to_uint16_be((unsigned char*)((XYObject_t *)_ARRAY_)->payload, to_uint16((unsigned char*)((XYObject_t *)_ARRAY_)->payload) + _VALUE_);\
+    break;                                                \
+  case XY_LENGTH_4BYTE:                                   \
+    to_uint32_be((unsigned char*)((XYObject_t *)_ARRAY_)->payload, to_uint32((unsigned char*)((XYObject_t *)_ARRAY_)->payload) + _VALUE_);\
+    break;                                                \
+  case XY_LENGTH_8BYTE:                                   \
+    to_uint64_be((unsigned char*)((XYObject_t *)_ARRAY_)->payload, to_uint64((unsigned char*)((XYObject_t *)_ARRAY_)->payload) + _VALUE_);\
+    break;                                                \
+  }
 
 #define XYOBJ_INCREMENT(_VALUE_)                          \
   switch (((XYObject_t *)self)->header->flags.lengthType) \

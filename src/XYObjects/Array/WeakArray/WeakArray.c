@@ -31,7 +31,16 @@ XYResult_t WeakArray_add(XYObject_t *self,
                               XYObject_t* newItem,
                               uint32_t newItemLength)
 {
-  INIT_SELF(TYPE_ARRAY);
+  //printf("%p %p %p\n", self, self->header, self->payload);
+  //INIT_SELF(TYPE_ARRAY);
+  
+  DECLARE_RESULT();
+
+  if(!self || !self->header || !self->payload) {
+    result.status = XY_STATUS_ERROR;
+    return result;
+  }
+  
 
   XYResult_t currentLength = XYObject_getLength(self);
   CHECK_RESULT(currentLength);
@@ -46,16 +55,19 @@ XYResult_t WeakArray_add(XYObject_t *self,
   if(!self->header->flags.typed || currentLength.value.ui == lengthTypeToLength(self->header->flags.lengthType)){
     memcpy(newObject, newItem->header, sizeof(XYObjectHeader_t));
     memcpy(newObject+sizeof(XYObjectHeader_t), newItem->payload, newItemLength-2);
+    XYOBJ_INCREMENT(newItemLength);
   } else {
-    memcpy(newObject, newItem->payload, newItemLength);
+    memcpy(newObject, newItem->payload, newItemLength-2 );
+    XYOBJ_INCREMENT(newItemLength-2);
   }
 
   //set the new length of the array object (old length + new object length)
-  XYOBJ_INCREMENT(newItemLength);
+  
 
   return result;
 }
 
+#ifdef BUILD_WEAKARRAY_GET
 XYResult_t WeakArray_get(XYObject_t *self, int index)
 {
   INIT_SELF(TYPE_ARRAY);
@@ -98,5 +110,6 @@ XYResult_t WeakArray_get(XYObject_t *self, int index)
 
   return result;
 }
+#endif
 
 // end of file WeakArray.c

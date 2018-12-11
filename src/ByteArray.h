@@ -17,6 +17,6 @@
 typedef struct ByteArray{
   uint32_t size;
   char reserved[2];
-  char* payload;
+  unsigned char* payload;
 } ByteArray_t;
 #endif

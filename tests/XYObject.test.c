@@ -12,7 +12,7 @@
 #define XY_ASSERT_EQUAL(A, B) if(A != B){ score = score + 1; }
 #endif
 
-int main(){
+int testObject(){
   int score = 0;
 
   XYHeaderFlags_t signatureFlags;

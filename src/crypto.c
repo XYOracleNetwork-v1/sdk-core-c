@@ -304,15 +304,22 @@ XYResult_t newKeyPair(){
  *                                                // using the private key of the
  *                                                // XyoCryptoSigner.
  *  RETURNS
- *      preallocated_return_result_ptr   [out]     XYResult_t*
+ *      XYResult_t      [out]     Uint32_t        // Bytes copied to dest stored in result.value.ui         
  *
  *  NOTES
  *
  ****************************************************************************************
  */
-XYResult_t sign(Signer_t* signer, ByteArray_t* dataToSign) {
+XYResult_t sign(Signer_t* signer, char* dest, ByteArray_t* src) {
   DECLARE_RESULT();
-  XYSTATUS(XY_STATUS_OK);
+  if(!dest && !src->payload && !src->size){
+    XYERROR(XY_STATUS_ERROR);
+  }
+
+  memset(dest, 3, 1);
+  result.status = XY_STATUS_OK;
+  result.value.ui = 1;
+  return result;
 }
 
 /**

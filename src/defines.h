@@ -142,10 +142,7 @@
 #define CATALOG_BUFFER_SIZE                       5
 #define CATALOG_SIZE                              4
 #define DEFAULT_NUM_PEERS                         1
-
-#define UNTYPED_ITERABLE                        160
-#define TYPED_ITERABLE                          176
-#define NONITERABLE_TWOBYTE                     111
+#define TCP_WRAPPER_SIZE                          5
 
 /*
  * Configs

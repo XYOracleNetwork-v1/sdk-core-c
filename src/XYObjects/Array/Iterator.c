@@ -8,6 +8,7 @@
  * @copyright Copyright (c) 2018 XY - The Persistant COmpany
  * 
  */
+#ifdef BUILD_ITERATORS
 
 #include "Iterator.h"
 #include <stdlib.h>
@@ -99,7 +100,6 @@ XYResult_t Iterator_bookmark(XYObject_t* self, uint32_t element, uint32_t bytesA
 }
 
 XYResult_t Iterator_insert(XYObject_t* self, uint32_t element, uint32_t offset, uint32_t totalBytes, char* bytes){
-  
   DECLARE_RESULT();
   XYArrayItr_t objectItr = WeakArrayIterator(self->header, self->payload);
   unsigned char* charCounter = (unsigned char*)objectItr.indexPtr;
@@ -131,4 +131,5 @@ XYResult_t Iterator_insert(XYObject_t* self, uint32_t element, uint32_t offset, 
   return result;
 }
 
+#endif
 // end of file Iterator.c

@@ -53,13 +53,14 @@ struct RelayNode {
 uint8_t Relay_getChoice(uint8_t* theirCatalog);
 XYResult_t doConnection(RelayNode_t* self, uint32_t offset);
 XYResult_t getInitBoundWitness( void );
-extern XYResult_t socket_send(NetworkPipe_t* self, char* data, uint32_t count, uint8_t debug);
+extern XYResult_t socket_send(NetworkPipe_t* self, char* data, uint32_t count);
 extern XYResult_t socket_recv(NetworkPipe_t* self, char* data, uint32_t recvBytes);
+extern XYResult_t socket_close(NetworkPipe_t* self);
 //extern NetworkPipe_t* findSomeoneToTalkTo( void );
 
 
 
 //TODO: DEBUG extern
-extern uint8_t fetter[49];
+extern uint8_t fetter[47];
 #define RELAYNODE_H
 #endif

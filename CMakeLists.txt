@@ -20,8 +20,8 @@ file(GLOB_RECURSE SOURCES "src/*.c")
 
 include_directories("${PROJECT_BINARY_DIR}")
 
-set(CMAKE_BUILD_TYPE Debug)
-#set(CMAKE_BUILD_TYPE Release)
+#set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_BUILD_TYPE Release)
 
 #find_program(iwyu_path NAMES iwyu-tool iwyu-fix-includes)
 #if(NOT iwyu_path)
@@ -32,9 +32,11 @@ set(CMAKE_BUILD_TYPE Debug)
 if(UNIX AND NOT APPLE)
 	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Weverything -fsanitize=address -fsanitize=leak -Wno-padded -Wno-zero-length-array -Wno-unused-parameter -ferror-limit=50")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fsanitize=memory")
 	endif()
 endif()
+set(CMAKE_C_FLAGS "-Wempty-translation-unit -pedantic-errors -Wall -Wextra -Wno-padded -ferror-limit=50")
+
 # add the executable
 # add_executable(sdk-xyo ${SOURCES})
 

@@ -1,4 +1,0 @@
-mkdir output
-cd output
-clang -c ../src/*.c
-cd ..

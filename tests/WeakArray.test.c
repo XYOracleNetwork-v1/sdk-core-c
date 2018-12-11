@@ -14,7 +14,7 @@
 int testAdd();
 int testGap();
 
-int main2(){
+int testArrays(){
     int score = 0;
     score += testAdd();
     score += testGap();
@@ -73,8 +73,6 @@ int testAdd(){
 
     return score;
 }
-void breakpoint();
-void breakpoint(){}
 
 int testGap(){
     int score = 0;

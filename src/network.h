@@ -18,12 +18,9 @@
 #define NETWORK_H
 
 #include <stdint.h>
-#include <pthread.h>
 #include <unistd.h>
 #include <stdio.h>
-#include <sys/socket.h>
 #include <stdlib.h>
-#include <netinet/in.h>
 #include <string.h>
 #include <fcntl.h>
 #include <limits.h>
@@ -33,19 +30,9 @@
 
 typedef struct ProcedureCatalogue ProcedureCatalogue_t;
 typedef struct NetworkPipe NetworkPipe_t;
-typedef struct NetworkPeer NetworkPeer_t;
+//typedef struct NetworkPeer NetworkPeer_t;
+typedef struct _NetworkPeer* NetworkPeer_t;
 
-struct NetworkPeer{
-  /*
-   * Sentinel-known implementation specific private variables
-   * They can be erased in later networking impelmentations,
-   * the only file that uses these variables at the time
-   * of writing is network.c for TCP.
-   */
-  int socket;
-  struct sockaddr_in address;
-  uint16_t port;
-};
 
 struct NetworkPipe{
   NetworkPeer_t peer;
@@ -54,24 +41,10 @@ struct NetworkPipe{
   char theirCatalog[CATALOG_BUFFER_SIZE+4];
 };
 
-
-struct client_arguments{
-  uint8_t flags;
-  pthread_t* server;
-  struct sockaddr_in* *peers;
-  uint8_t peerCount;
-};
-
-struct server_arguments{
-  uint8_t flags;
-  pthread_t* client;
-  int port;
-};
-
 void* serverThread(void* flag);
 void* clientThread(void* args);
-extern XYResult_t connectToPeer(NetworkPipe_t* pipe, char* buffer, uint32_t size, uint8_t flags);
-extern XYResult_t servePeer(NetworkPipe_t* pipe, char* buffer, uint32_t bufSize, uint8_t flags, uint16_t port);
+extern XYResult_t connectToPeer(NetworkPipe_t* pipe, unsigned char* buffer, uint32_t size, uint8_t flags);
+extern XYResult_t servePeer(NetworkPipe_t* pipe, uint16_t port);
 extern uint8_t canDo(ByteArray_t* catalog);
 
 #endif

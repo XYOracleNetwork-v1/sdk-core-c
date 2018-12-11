@@ -68,6 +68,10 @@ XYResult_t XYObject_getValue(XYObject_t* self) {
 XYResult_t XYObject_getLength(XYObject_t* self) {
   INIT_SELF_UNKNOWN();
   result.value.ui = getLength(self);
+  if(result.value.ui == 255){
+    result.status = XY_STATUS_ERROR;
+    return result;
+  }
   return result;
 }
 
@@ -77,10 +81,11 @@ XYResult_t XYObject_getFullLength(XYObject_t* self) {
   return result;
 }
 
-uint8_t matchType(XYObject_t* obj, uint8_t type){
-  switch(obj->header->type){
+uint8_t matchType(XYObjectHeader_t* header, uint8_t type){
+  if(header == NULL) { return FALSE; }
+  switch(header->type){
     case 1:
-      return obj->header->type == type;
+      return header->type == type;
     case 2:
       if(type == MINOR_ARRAY){
         return TRUE;
@@ -88,6 +93,6 @@ uint8_t matchType(XYObject_t* obj, uint8_t type){
         return FALSE;
       }
     default:
-      return obj->header->type == type;
+      return header->type == type;
   }
 }

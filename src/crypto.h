@@ -69,7 +69,7 @@ XYResult_t getPublicKeyId(Signer_t* signer);
 XYResult_t getSignatureId(Signer_t* signer);
 XYResult_t XyoCryptoSigner (XYObject_t* privateKey);
 XYResult_t getPublicKey(Signer_t* signer);
-XYResult_t sign(Signer_t* signer, ByteArray_t* dataToSign);
+XYResult_t sign(Signer_t* signer, char* dest, ByteArray_t* src);
 XYResult_t verify(Signer_t* signer, ByteArray_t* signedData, XYObject_t* signature, XYObject_t* publicKey);
 XYResult_t xyencrypt(Signer_t* signer, ByteArray_t* unEncrypedData);
 XYResult_t xydecrypt(Signer_t* signer, ByteArray_t* encrypedData);

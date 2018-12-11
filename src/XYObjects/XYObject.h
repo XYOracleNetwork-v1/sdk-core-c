@@ -53,7 +53,7 @@ uint32_t getLengthFieldSize(XYObject_t* self);
   CHECK_IS_XYOBJECT( _TYPE_ );
 
 //check if the passed in buffer is the expected object type
-#define IS_XYOBJECT(_TYPE_, _PTR_) matchType(_PTR_, _TYPE_)
+#define IS_XYOBJECT(_TYPE_, _PTR_) matchType(((XYObject_t*)_PTR_)->header, _TYPE_)
 //(((XYObject_t*)_PTR_)->header->type == _TYPE_)
 
 //check the object type and return a validation error if it fails
@@ -76,4 +76,4 @@ uint32_t getLengthFieldSize(XYObject_t* self);
 #define XYOBJ_INCREMENT_UINT32(_VALUE_) to_uint32_be((unsigned char*)((XYObject_t *)self)->payload, to_uint32((unsigned char*)self->payload) + _VALUE_)
 #define XYOBJ_INCREMENT_UINT64(_VALUE_) to_uint64_be((unsigned char *)((XYObject_t *)self)->payload, to_uint64((unsigned char*)self->payload) + _VALUE_)
 
-uint8_t matchType(XYObject_t* self, uint8_t type);
+uint8_t matchType(XYObjectHeader_t* header, uint8_t type);
