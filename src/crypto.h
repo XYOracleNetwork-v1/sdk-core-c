@@ -18,11 +18,11 @@
  */
 
 #include "hash.h"         // includes "xyobject.h"
-#include "WolfSSL/wc_types.h"
-#include "WolfSSL/wc_rsa.h"
-#include "WolfSSL/trng.h"
-#include "WolfSSL/wc_ecc.h"
-#include "WolfSSL/wc_random.h"
+//#include "WolfSSL/wc_types.h"
+//#include "WolfSSL/wc_rsa.h"
+//#include "WolfSSL/trng.h"
+//#include "WolfSSL/wc_ecc.h"
+//#include "WolfSSL/wc_random.h"
 
 /*
  * DEFINES

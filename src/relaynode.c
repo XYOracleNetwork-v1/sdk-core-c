@@ -255,8 +255,6 @@ ONE_NONITERABLE_UNTYPED, 0x13, 2, 1};
     socket_close(&self->networkPipe);
   }
 
-  breakpoint();
-
   result.status = XY_STATUS_OK;
   result.value.ui = 0;
   return result;

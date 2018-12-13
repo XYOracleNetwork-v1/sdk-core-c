@@ -24,7 +24,7 @@
 #include "XYObjects/XYObject.h"
 #include "WolfSSL/wc_sha256.h"                      // wc_ = wolf crypto library routine (SHA-256)
 
-extern XYResult_t preallocated_return_result;
+//extern XYResult_t preallocated_return_result;
 
 /*
  * DEFINES
@@ -46,7 +46,7 @@ XYResult_t newHashProvider(void);
 XYResult_t getHashId( void );
 XYResult_t createHash(ByteArray_t* dataToHash);
 XYResult_t verifyHash(ByteArray_t* dataHashed, XYObject_t* hash);
-extern void trng_acquire( uint8_t* );
+//extern void trng_acquire( uint8_t* );
 
 #endif
 
