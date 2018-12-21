@@ -140,7 +140,8 @@
 #define ERROR_SEND_FAILED                       -27
 #define MAX_PEERS                                10
 #define CATALOG_BUFFER_SIZE                       5
-#define CATALOG_SIZE                              4
+#define BLE_WRAPPER_SIZE													4
+#define HEADER_SIZE																sizeof(XYObjectHeader_t)
 #define DEFAULT_NUM_PEERS                         1
 #define TCP_WRAPPER_SIZE                          5
 

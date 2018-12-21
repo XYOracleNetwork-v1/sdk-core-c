@@ -55,6 +55,22 @@ uint32_t getLengthFieldSize(XYObject_t* self) {
   return 0;
 }
 
+uint8_t lengthTypeToLength(int _VALUE_){
+  switch (_VALUE_)
+  {
+  case XY_LENGTH_1BYTE:
+    return 1;
+  case XY_LENGTH_2BYTE:
+    return 2;
+  case XY_LENGTH_4BYTE:
+    return 4;
+  case XY_LENGTH_8BYTE:                                   
+  return 8;
+  }
+  return 255;
+}
+
+
 /**
  * ==== Public Functions ====
  */
@@ -79,6 +95,19 @@ XYResult_t XYObject_getFullLength(XYObject_t* self) {
   INIT_SELF_UNKNOWN();
   result.value.ui = getLength(self) + XY_HEADER_LENGTH;
   return result;
+}
+
+XYObject_t XYObject_fromPtr(void* ptr){
+	char* start = (char*)ptr;
+	return (XYObject_t){(XYObjectHeader_t*)&start[8], (XYObjectHeader_t*)&start[10]};
+}
+
+uint8_t getFullHeaderSize(unsigned char* header){
+	XYObjectHeader_t* tempHeader;
+	tempHeader = (XYObjectHeader_t*)((char*)header);
+	
+	uint32_t fetterSetSizeLength = lengthTypeToLength(tempHeader->flags.lengthType);
+	return sizeof(XYObjectHeader_t)+fetterSetSizeLength;
 }
 
 uint8_t matchType(XYObjectHeader_t* header, uint8_t type){

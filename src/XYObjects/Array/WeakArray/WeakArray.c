@@ -12,26 +12,9 @@
 #include "WeakArray.h"
 #include <stdlib.h>
 
-uint8_t lengthTypeToLength(int _VALUE_){
-  switch (_VALUE_)
-  {
-  case XY_LENGTH_1BYTE:
-    return 1;
-  case XY_LENGTH_2BYTE:
-    return 2;
-  case XY_LENGTH_4BYTE:
-    return 4;
-  case XY_LENGTH_8BYTE:                                   
-  return 8;
-  }
-  return 255;
-}
-
 XYResult_t WeakArray_add(XYObject_t *self,
-                              XYObject_t* newItem,
-                              uint32_t newItemLength)
+                              XYObject_t* newItem)
 {
-  //printf("%p %p %p\n", self, self->header, self->payload);
   //INIT_SELF(TYPE_ARRAY);
   
   DECLARE_RESULT();
@@ -40,13 +23,12 @@ XYResult_t WeakArray_add(XYObject_t *self,
     result.status = XY_STATUS_ERROR;
     return result;
   }
-  
-
+	XYResult_t newItemLengthResult = XYObject_getFullLength(newItem);
+	CHECK_RESULT(newItemLengthResult);
+	uint32_t newItemLength = newItemLengthResult.value.ui;
+	
   XYResult_t currentLength = XYObject_getLength(self);
   CHECK_RESULT(currentLength);
-
-  XYResult_t fullLength = XYObject_getFullLength(self);
-  CHECK_RESULT(fullLength);
 
   //put the new object at the end of the current object
   uint8_t *newObject = ((unsigned char*)((XYObject_t *)self)->payload) + currentLength.value.ui;
@@ -55,13 +37,15 @@ XYResult_t WeakArray_add(XYObject_t *self,
   if(!self->header->flags.typed || currentLength.value.ui == lengthTypeToLength(self->header->flags.lengthType)){
     memcpy(newObject, newItem->header, sizeof(XYObjectHeader_t));
     memcpy(newObject+sizeof(XYObjectHeader_t), newItem->payload, newItemLength-2);
+		
+		//set the new length of the array object (old length + new object length)
     XYOBJ_INCREMENT(newItemLength);
   } else {
     memcpy(newObject, newItem->payload, newItemLength-2 );
-    XYOBJ_INCREMENT(newItemLength-2);
+    
+		//set the new length of the array object (old length + new object length)
+		XYOBJ_INCREMENT(newItemLength-2);
   }
-
-  //set the new length of the array object (old length + new object length)
   
 
   return result;

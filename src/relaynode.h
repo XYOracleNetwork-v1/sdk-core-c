@@ -50,7 +50,7 @@ struct RelayNode {
 #define FOUR_NONITERABLE_UNTYPED 128
 
 
-uint8_t Relay_getChoice(uint8_t* theirCatalog);
+uint8_t Relay_getChoice(const uint8_t* theirCatalog);
 XYResult_t doConnection(RelayNode_t* self, uint32_t offset);
 XYResult_t getInitBoundWitness( void );
 extern XYResult_t socket_send(NetworkPipe_t* self, char* data, uint32_t count);
@@ -61,6 +61,6 @@ extern XYResult_t socket_close(NetworkPipe_t* self);
 
 
 //TODO: DEBUG extern
-extern uint8_t fetter[47];
+//extern uint8_t fetter[47];
 #define RELAYNODE_H
 #endif

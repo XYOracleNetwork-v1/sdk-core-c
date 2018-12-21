@@ -38,7 +38,7 @@
  *
  ****************************************************************************************
  */
- uint8_t Relay_getChoice(uint8_t* theirCatalog){
+ uint8_t Relay_getChoice(const uint8_t* theirCatalog){
    if(*theirCatalog - BOUND_WITNESS_OPTION != 0){
      return GIVE_ORIGIN_CHAIN_OPTION + BOUND_WITNESS_OPTION;
    } else {
@@ -73,7 +73,7 @@
  XYResult_t getInitBoundWitness( void ){
   DECLARE_RESULT();
   result.status = XY_STATUS_OK;
-  result.value.ptr = fetter;
+//  result.value.ptr = fetter;
   return result;
    
  }
@@ -95,6 +95,7 @@
  *
  ****************************************************************************************
  */
+#ifdef BUILD_ALL
 uint8_t fragment[]= { 4, 0, 0, 0, 1, // Catalog
 TWO_ITERABLE_UNTYPED, 0x1b, 0x00, 47, // Fragment
 ONE_ITERABLE_UNTYPED, 0x15, 29, // Fetter
@@ -259,3 +260,4 @@ ONE_NONITERABLE_UNTYPED, 0x13, 2, 1};
   result.value.ui = 0;
   return result;
 }
+#endif

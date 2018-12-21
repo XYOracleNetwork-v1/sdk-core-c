@@ -33,10 +33,17 @@ XYResult_t XYObject_getLength(XYObject_t *self);
 //this is the length of the object, including the length field (if one exists),
 //and also including the header
 XYResult_t XYObject_getFullLength(XYObject_t *self);
-
 uint32_t getLength(XYObject_t* self);
 uint32_t getLengthFieldSize(XYObject_t* self);
 
+// Functions for working with XYObjects from raw pointers
+XYObject_t XYObject_fromPtr(void* ptr);
+
+// Will grab header, then calculate llengthFieldSize
+uint8_t getFullHeaderSize(unsigned char*);
+
+// Convert encoded length to length.
+uint8_t lengthTypeToLength(int _VALUE_);
 /*
  * MACROS
  ****************************************************************************************

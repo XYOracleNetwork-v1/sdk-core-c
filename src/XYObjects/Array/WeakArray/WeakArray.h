@@ -16,9 +16,7 @@
  * @param newItemLength Length of object in array. If typed array the first element newItemLength would be sizeof(XYObjectHeader_t)+sizeof(payload) subsequent adds will only be sizeof(payload)
  * @return XYResult_t Success or Failure
  */
-XYResult_t WeakArray_add(XYObject_t *self,
-                         XYObject_t* newItemHeader,
-                         uint32_t newItemLength);
+XYResult_t WeakArray_add(XYObject_t *self, XYObject_t* newItemHeader);
 
 /**
  * @brief Get Item from a Weak Array
