@@ -30,11 +30,11 @@ XYResult_t WeakArray_get(XYObject_t *self,
                          int index);
 #endif
 
-#define XYARRAY_INCREMENT(_ARRAY_, _VALUE_)                          \
-  switch (((XYObject_t *)_ARRAY_)->header->flags.lengthType) \
+#define XYARRAY_INCREMENT(_ARRAY_, _VALUE_)\
+  switch (((XYObject_t *)_ARRAY_)->header->flags.lengthType)\
   {                                                       \
   case XY_LENGTH_1BYTE:                                   \
-    memset(((XYObject_t *)_ARRAY_)->payload, (uint8_t)_VALUE_, 1);    \
+    memset(((XYObject_t *)_ARRAY_)->payload, (uint8_t)_VALUE_, 1);\
     break;                                                \
   case XY_LENGTH_2BYTE:                                   \
     to_uint16_be((unsigned char*)((XYObject_t *)_ARRAY_)->payload, to_uint16((unsigned char*)((XYObject_t *)_ARRAY_)->payload) + _VALUE_);\
