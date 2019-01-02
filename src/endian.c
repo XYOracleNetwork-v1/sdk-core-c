@@ -9,11 +9,11 @@
  * 
  */
 #include "endian.h"
-
+/*
 uint64_t to_uint64(unsigned char *data)
 {
   return ((uint64_t)data[0] << 56) + ((uint64_t)data[1] << 48) + ((uint64_t)data[2] << 40) + ((uint64_t)data[3] << 32) + ((uint64_t)data[4] << 24) + ((uint64_t)data[5] << 16) + ((uint64_t)data[6] << 8) + (uint64_t)data[7];
-}
+} */
 
 uint32_t to_uint32(unsigned char *data)
 {
@@ -24,7 +24,7 @@ uint16_t to_uint16(unsigned char *data)
 {
   return (uint16_t)(data[0] << 8) + (uint16_t)data[1];
 }
-
+/*
 void to_uint64_be(unsigned char *dest, uint64_t value)
 {
   dest[0] = (unsigned char)((value & 0xff00000000000000) >> 56);
@@ -36,6 +36,7 @@ void to_uint64_be(unsigned char *dest, uint64_t value)
   dest[6] = (unsigned char)((value & 0xff00) >> 8);
   dest[7] = (unsigned char)(value & 0xff);
 }
+*/
 
 void to_uint32_be(unsigned char *dest, uint32_t value)
 {

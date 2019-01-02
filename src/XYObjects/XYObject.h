@@ -74,13 +74,13 @@ uint8_t lengthTypeToLength(int _VALUE_);
 #define XYOBJ_READ_UINT8() (*(uint8_t*)(self->payload))
 #define XYOBJ_READ_UINT16() to_uint16((unsigned char*)((XYObject_t *)self->payload))
 #define XYOBJ_READ_UINT32() to_uint32((unsigned char*)((XYObject_t *)self->payload))
-#define XYOBJ_READ_UINT64() to_uint64((unsigned char*)((XYObject_t *)self->payload))
+#define XYOBJ_READ_UINT64() /*to_uint64((unsigned char*)((XYObject_t *)self->payload))*/
 
 #define XYOBJ_READ_UINT8_ARRAY(_DEST_, _LEN_) memcpy(_DEST_, (XYObject_t *)self->payload, _LEN_)
 #define XYOBJ_WRITE_UINT8_ARRAY(_SRC_, _LEN_) memcpy((XYObject_t *)self->payload, _SRC_,  _LEN_)
 
 #define XYOBJ_INCREMENT_UINT16(_VALUE_) to_uint16_be((unsigned char*)((XYObject_t *)self)->payload, to_uint16((unsigned char*)self->payload) + _VALUE_)
 #define XYOBJ_INCREMENT_UINT32(_VALUE_) to_uint32_be((unsigned char*)((XYObject_t *)self)->payload, to_uint32((unsigned char*)self->payload) + _VALUE_)
-#define XYOBJ_INCREMENT_UINT64(_VALUE_) to_uint64_be((unsigned char *)((XYObject_t *)self)->payload, to_uint64((unsigned char*)self->payload) + _VALUE_)
+#define XYOBJ_INCREMENT_UINT64(_VALUE_) /*to_uint64_be((unsigned char *)((XYObject_t *)self)->payload, to_uint64((unsigned char*)self->payload) + _VALUE_)*/
 
 uint8_t matchType(XYObjectHeader_t* header, uint8_t type);

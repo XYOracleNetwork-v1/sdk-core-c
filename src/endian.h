@@ -25,7 +25,7 @@
  * @param data Pointer to the uintxx in question
  * @return uint32_t Data pointer read in big endian
  */
-uint64_t to_uint64(unsigned char* data);
+//uint64_t to_uint64(unsigned char* data);
 
 /**
  * @brief Convert 64-bit Value from Big Endian to Platform Endian
@@ -49,7 +49,7 @@ uint16_t to_uint16(unsigned char* data);
  * @param dest Destination pointer where to be written
  * @param value Platform Endian number to be read
  */
-void to_uint64_be(unsigned char* dest, uint64_t value);
+//void to_uint64_be(unsigned char* dest, uint64_t value);
 
 /**
  * @brief Convert 32-bit Value from Platform Endian to Big Endian and write to Dest

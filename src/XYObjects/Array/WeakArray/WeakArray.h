@@ -43,7 +43,7 @@ XYResult_t WeakArray_get(XYObject_t *self,
     to_uint32_be((unsigned char*)((XYObject_t *)_ARRAY_)->payload, to_uint32((unsigned char*)((XYObject_t *)_ARRAY_)->payload) + _VALUE_);\
     break;                                                \
   case XY_LENGTH_8BYTE:                                   \
-    to_uint64_be((unsigned char*)((XYObject_t *)_ARRAY_)->payload, to_uint64((unsigned char*)((XYObject_t *)_ARRAY_)->payload) + _VALUE_);\
+    /*to_uint64_be((unsigned char*)((XYObject_t *)_ARRAY_)->payload, to_uint64((unsigned char*)((XYObject_t *)_ARRAY_)->payload) + _VALUE_);*/\
     break;                                                \
   }
 
