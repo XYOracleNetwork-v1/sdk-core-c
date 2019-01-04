@@ -1,0 +1,18 @@
+engines:
+  cppcheck:
+    enabled: true
+    config:
+      check: all
+      project: compile_commands.json
+      language: c
+      stds:
+        - c99
+      platform: unix64
+      defines:
+      - "DEBUG=1"
+      undefines:
+      - "DEBUG"
+      includes:
+      - src/
+      max_configs: 42
+      inconclusive: false
