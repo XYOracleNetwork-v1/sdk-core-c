@@ -99,7 +99,7 @@ XYResult_t XYObject_getFullLength(XYObject_t* self) {
 
 XYObject_t XYObject_fromPtr(void* ptr){
 	char* start = (char*)ptr;
-	return (XYObject_t){(XYObjectHeader_t*)&start[8], (XYObjectHeader_t*)&start[10]};
+	return (XYObject_t){(XYObjectHeader_t*)&start[0], (XYObjectHeader_t*)&start[2]};
 }
 
 uint8_t getFullHeaderSize(unsigned char* header){
