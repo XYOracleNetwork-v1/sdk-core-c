@@ -31,7 +31,7 @@ XYResult_t WeakArray_add(XYObject_t *self,
   CHECK_RESULT(currentLength);
 
   //put the new object at the end of the current object
-  volatile uint8_t *newObject = ((unsigned char*)((XYObject_t *)self)->payload) + currentLength.value.ui;
+  uint8_t *newObject = ((unsigned char*)((XYObject_t *)self)->payload) + currentLength.value.ui;
   
   //set the type of the newly added item
   if(!self->header->flags.typed || currentLength.value.ui == lengthTypeToLength(self->header->flags.lengthType)){
