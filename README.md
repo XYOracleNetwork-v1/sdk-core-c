@@ -28,4 +28,5 @@ To install the project run `sudo make install`.
 * Cmake
 
 ## License
-This project is licensed under the MIT License - see the LICENSE.md file for details
+
+LGPL-3
