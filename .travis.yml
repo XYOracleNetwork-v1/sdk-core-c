@@ -3,3 +3,8 @@ compiler: clang
 addons:
   packages: 
     - cmake
+script: 
+  - mkdir output
+  - cd output
+  - clang -c ../src/*.c
+  - cd ..
