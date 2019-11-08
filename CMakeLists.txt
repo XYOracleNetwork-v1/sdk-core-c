@@ -5,18 +5,12 @@ set (SDK_VERSION_MAJOR 0)
 set (SDK_VERSION_MINOR 1)
 
 # bring in the headers
-include_directories(include)
+include_directories(src/include)
+include_directories(src/WolfSSL)
 
 #find_package(PkgConfig REQUIRED)
 #pkg_search_module(OPENSSL REQUIRED openssl)
 find_package (Threads REQUIRED)
-
-#if( OPENSSL_FOUND )
-#    include_directories(${OPENSSL_INCLUDE_DIRS})
-#    message(STATUS "Using OpenSSL ${OPENSSL_VERSION}")
-#else()
-    # Error; with REQUIRED, pkg_search_module() will throw an error by it's own
-#endif()
 
 file(GLOB_RECURSE SOURCES "src/*.c")
 
@@ -27,6 +21,7 @@ file(GLOB_RECURSE SOURCES "src/*.c")
 include_directories("${PROJECT_BINARY_DIR}")
 
 set(CMAKE_BUILD_TYPE Debug)
+#set(CMAKE_BUILD_TYPE Release)
 
 #find_program(iwyu_path NAMES iwyu-tool iwyu-fix-includes)
 #if(NOT iwyu_path)
@@ -34,14 +29,20 @@ set(CMAKE_BUILD_TYPE Debug)
 #endif()
 
 # add options for warnings
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Weverything -O3")
-
+if(UNIX AND NOT APPLE)
+	set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+	if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+		set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Weverything -fsanitize=address -fsanitize=leak -Wno-padded -Wno-zero-length-array -Wno-unused-parameter -ferror-limit=50")
+	endif()
+endif()
 # add the executable
-#add_executable(sdk ${SOURCES})
+# add_executable(sdk-xyo ${SOURCES})
+
 
 ADD_LIBRARY(sdk-xyo STATIC ${SOURCES})
 target_link_libraries(sdk-xyo ${OPENSSL_LIBRARIES})
 target_link_libraries (sdk-xyo ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries (sdk-xyo wolfssl)
 
 set_property(TARGET sdk-xyo PROPERTY C_INCLUDE_WHAT_YOU_USE ${iwyu_path})
 
@@ -50,6 +51,6 @@ INSTALL(TARGETS sdk-xyo
         DESTINATION "lib"
         )
 INSTALL (
-    DIRECTORY ${CMAKE_SOURCE_DIR}/include/
+    DIRECTORY ${CMAKE_SOURCE_DIR}/src/
     DESTINATION "include/xyo"
     FILES_MATCHING PATTERN "*.h*")

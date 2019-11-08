@@ -1,0 +1,10 @@
+{
+  "files.associations": {
+    "*.c": "c",
+    "*.h": "c"
+  },
+  "doxdocgen.file.copyrightTag": [
+    "@copyright Copyright (c) {year} XY - The Persistant COmpany"
+  ],
+  "doxdocgen.generic.authorEmail": "developer@xy.company"
+}

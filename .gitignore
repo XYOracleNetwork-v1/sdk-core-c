@@ -43,3 +43,6 @@
 *.idb
 *.pdb
 
+build
+output
+.DS_Store
