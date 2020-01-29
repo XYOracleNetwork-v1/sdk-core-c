@@ -4,6 +4,8 @@
 
 # sdk-core-c
 
+![](https://github.com/XYOracleNetwork/sdk-core-c/workflows/Build/badge.svg)
+
 ## Table of Contents
 
 -   [Title](#sdk-core-c)
