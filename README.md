@@ -6,6 +6,8 @@
 
 ![](https://github.com/XYOracleNetwork/sdk-core-c/workflows/Build/badge.svg)
 
+> The XYO Foundation provides this source code available in our efforts to advance the understanding of the XYO Procotol and its possible uses. We continue to maintain this software in the interest of developer education. Usage of this source code is not intended for production.  
+
 ## Table of Contents
 
 -   [Title](#sdk-core-c)
